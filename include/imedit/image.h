@@ -5,6 +5,10 @@
 
 #include <string>
 #include <vector>
+#include <stdexcept>
+#include <stdio.h>
+#include <string>
+#include <iostream>
 
 #include "stb_image.h"
 #include "stb_image_write.h"
@@ -15,7 +19,7 @@
 
 // clamps val between min and max
 template <typename T>
-inline T clamp(T val, T min, T max)
+inline T im_clamp(T val, T min, T max)
 {
     return (val >= min) ?
            ((val <= max) ? val : max) : min;
@@ -23,7 +27,7 @@ inline T clamp(T val, T min, T max)
 
 //! Returns a modulus b.
 template <typename T>
-inline T mod(T a, T b)
+inline T im_mod(T a, T b)
 {
     int n = (int)(a / b);
     a -= n * b;
@@ -38,7 +42,7 @@ unsigned char valToByte(T val)
 {
     T min = 0;
     T max = 1;
-    return int(255.0 * clamp(val, min, max));
+    return int(255.0 * im_clamp(val, min, max));
 }
 
 // converts the byte to a value
@@ -77,16 +81,110 @@ public:
         read(filename);
     }
 
+    // The read and write logic is based off of code
+    // written by Wojciech Jarosz
     bool read(const std::string& filename)
     {
-        // TODO
-        return false;
+        try
+        {
+            if (stbi_is_hdr(filename.c_str()))
+            {
+                float* pxls = stbi_loadf(filename.c_str(),
+                                         &w,
+                                         &h,
+                                         &d,
+                                         3);
+                if (pxls)
+                {
+                    resize(w, h, d);
+
+                    for (int y = 0; y < h; ++y)
+                    {
+                        for (int x = 0; x < w; ++x)
+                        {
+                            for (int z = 0; z < d; ++z)
+                            {
+                                operator()(x, y, z) = (T)pxls[3 * (x + y * w) + z];
+                            }
+                        }
+                    }
+
+                    stbi_image_free(pxls);
+                    return true;
+                }
+                else
+                {
+                    throw std::runtime_error("Could not load HDR image");
+                }
+            }
+            else
+            {
+                unsigned char* pxls = stbi_load(filename.c_str(),
+                                                &w,
+                                                &h,
+                                                &d,
+                                                3);
+                if (pxls)
+                {
+                    resize(w, h, d);
+
+                    for (int y = 0; y < h; ++y)
+                    {
+                        for (int x = 0; x < w; ++x)
+                        {
+                            for (int z = 0; z < d; ++z)
+                            {
+                                operator()(x, y, z) = (T)pxls[3 * (x + y * w) + z];
+                            }
+                        }
+                    }
+
+                    stbi_image_free(pxls);
+                    return true;
+                }
+                else
+                {
+                    throw std::runtime_error("Could not load LDR image");
+                }
+            }
+        }
+        catch (const std::exception &e)
+    	{
+    		std::cerr << "Error reading Image for file: \"" << filename << "\":\n\t"
+    		     << stbi_failure_reason() << std::endl;
+    		return false;
+    	}
     }
 
     bool write(const std::string& filename)
     {
-        // TODO
-        return false;
+        if (d != 1 && d != 3 && d != 4)
+        {
+            std::cout << "Image must have 1, 3, or 4 channels" << std::endl;
+            return false;
+        }
+
+        string extension = getExtension(filename);
+
+        transform(extension.begin(),
+                  extension.end(),
+                  extension.begin(),
+                  ::tolower);
+
+        try
+        {
+            if (extension == "hdr")
+            {
+                // TODO
+            }
+            // TODO
+        }
+        catch (const std::exception &e)
+        {
+            // TODO
+        }
+
+        return true;
     }
 
     bool writeChannel(const std::string& filename, int ch)
