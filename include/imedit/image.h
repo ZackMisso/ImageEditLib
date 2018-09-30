@@ -175,9 +175,58 @@ public:
         {
             if (extension == "hdr")
             {
+                vector<float> pxls(h * w * 3, 1.f);
+                for (int x = 0; x < w; ++x)
+                {
+                    for (int y = 0; y < h; ++y)
+                    {
+                        for (int z = 0; z < d; ++z)
+                        {
+                            pxls[c + 3 * (x + y * w)] = (float)operator()(x, y, z);
+                        }
+                    }
+                }
+
+                if (!stbi_write_hdr(filename.c_str(), w, h, d, &pxls[0]))
+                {
+                    throw runtime_error("Could not write HDR image");
+                }
                 // TODO
             }
-            // TODO
+            else if (extension == "png" ||
+                     extension == "bmp" ||
+                     extension == "tga" ||
+                     extension == "jpg" ||
+                     extension == "jpeg")
+            {
+                int outC = 4;
+                vector<unsigned char> pxls(h * w * outC, 255);
+
+                for (int x = 0; x < w; ++x)
+                {
+                    for (int y = 0; y < h; ++y)
+                    {
+                        int z;
+                        for (z = 0; z < d; ++z)
+                        {
+                            pxls[z + outX * (x + y * w)] = valToByte(operator()(x, y, z));
+                        }
+                        for (; z < 3; ++z)
+                        {
+                            pxls[z + outX * (x + y * w)] = valToByte(operator()(x, y, 0));
+                        }
+                    }
+                }
+
+                if (extension == "png")
+                {
+                    if (!stbi_write_png(filename.c_str(), width, height,
+    				                    outputChannels, &bytePixels[0],
+    				                    sizeof(unsigned char) * width * outputChannels))
+    					throw runtime_error("Could not write PNG image.");
+                    // TODO: more stuff
+                }
+            }
         }
         catch (const std::exception &e)
         {
