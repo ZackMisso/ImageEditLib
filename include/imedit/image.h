@@ -164,7 +164,7 @@ public:
             return false;
         }
 
-        string extension = getExtension(filename);
+        std::string extension = getExtension(filename);
 
         transform(extension.begin(),
                   extension.end(),
@@ -175,21 +175,21 @@ public:
         {
             if (extension == "hdr")
             {
-                vector<float> pxls(h * w * 3, 1.f);
+                std::vector<float> pxls(h * w * 3, 1.f);
                 for (int x = 0; x < w; ++x)
                 {
                     for (int y = 0; y < h; ++y)
                     {
                         for (int z = 0; z < d; ++z)
                         {
-                            pxls[c + 3 * (x + y * w)] = (float)operator()(x, y, z);
+                            pxls[z + 3 * (x + y * w)] = (float)operator()(x, y, z);
                         }
                     }
                 }
 
                 if (!stbi_write_hdr(filename.c_str(), w, h, d, &pxls[0]))
                 {
-                    throw runtime_error("Could not write HDR image");
+                    throw std::runtime_error("Could not write HDR image");
                 }
                 // TODO
             }
@@ -200,7 +200,7 @@ public:
                      extension == "jpeg")
             {
                 int outC = 4;
-                vector<unsigned char> pxls(h * w * outC, 255);
+                std::vector<unsigned char> pxls(h * w * outC, 255);
 
                 for (int x = 0; x < w; ++x)
                 {
@@ -209,28 +209,57 @@ public:
                         int z;
                         for (z = 0; z < d; ++z)
                         {
-                            pxls[z + outX * (x + y * w)] = valToByte(operator()(x, y, z));
+                            pxls[z + outC * (x + y * w)] = valToByte(operator()(x, y, z));
                         }
                         for (; z < 3; ++z)
                         {
-                            pxls[z + outX * (x + y * w)] = valToByte(operator()(x, y, 0));
+                            pxls[z + outC * (x + y * w)] = valToByte(operator()(x, y, 0));
                         }
                     }
                 }
 
                 if (extension == "png")
                 {
-                    if (!stbi_write_png(filename.c_str(), width, height,
-    				                    outputChannels, &bytePixels[0],
-    				                    sizeof(unsigned char) * width * outputChannels))
-    					throw runtime_error("Could not write PNG image.");
-                    // TODO: more stuff
+                    if (!stbi_write_png(filename.c_str(), w, h,
+    				                    outC, &pxls[0],
+    				                    sizeof(unsigned char) * w * outC))
+                    {
+    					throw std::runtime_error("Could not write PNG image.");
+                    }
+                }
+                else if (extension == "bmp")
+                {
+                    if (!stbi_write_bmp(filename.c_str(), w, h,
+    				                    outC, &pxls[0]))
+                    {
+    					throw std::runtime_error("Could not write BMP image.");
+                    }
+                }
+                else if (extension == "tga")
+                {
+                    if (!stbi_write_tga(filename.c_str(), w, h,
+    				                    outC, &pxls[0]))
+                    {
+    					throw std::runtime_error("Could not write TGA image.");
+                    }
+                }
+                else if (extension == "jpg" || extension == "jpeg")
+                {
+                    if (!stbi_write_jpg(filename.c_str(), w, h,
+    				                    outC, &pxls[0], 100))
+                    {
+    					throw std::runtime_error("Could not write JPEG image.");
+                    }
+                }
+                else
+                {
+                    throw std::invalid_argument("Invalid extension");
                 }
             }
         }
         catch (const std::exception &e)
         {
-            // TODO
+            std::cout << "ERROR :: Image::write(" << filename << ") :: " << e.what() << std::endl;
         }
 
         return true;
@@ -276,85 +305,157 @@ public:
     Image<T> operator+(const Image<T>& other) const
     {
         Image<T> image = Image<T>(w, h, d);
-        // TODO
+
+        int size = w * h * d;
+
+        for (int i = 0; i < size; ++i)
+        {
+            image[i] = operator[](i) + other[i];
+        }
+
         return image;
     }
 
     Image<T> operator-(const Image<T>& other) const
     {
         Image<T> image = Image<T>(w, h, d);
-        // TODO
+
+        int size = w * h * d;
+
+        for (int i = 0; i < size; ++i)
+        {
+            image[i] = operator[](i) - other[i];
+        }
+
         return image;
     }
 
+    // this is component-wise multiplication
     Image<T> operator*(const Image<T>& other) const
     {
         Image<T> image = Image<T>(w, h, d);
-        // TODO
+
+        int size = w * h * d;
+
+        for (int i = 0; i < size; ++i)
+        {
+            image[i] = operator[](i) * other[i];
+        }
+
         return image;
     }
 
+    // this is component-wise division
     Image<T> operator/(const Image<T>& other) const
     {
         Image<T> image = Image<T>(w, h, d);
-        // TODO
+
+        int size = w * h * d;
+
+        for (int i = 0; i < size; ++i)
+        {
+            image[i] = operator[](i) / other[i];
+        }
+
         return image;
     }
 
     Image<T> operator+(T val) const
     {
         Image<T> image = Image<T>(w, h, d);
-        // TODO
+
+        int size = w * h * d;
+
+        for (int i = 0; i < size; ++i)
+        {
+            image[i] = operator[](i) + val;
+        }
+
         return image;
     }
 
     Image<T> operator-(T val) const
     {
         Image<T> image = Image<T>(w, h, d);
-        // TODO
+
+        int size = w * h * d;
+
+        for (int i = 0; i < size; ++i)
+        {
+            image[i] = operator[](i) - val;
+        }
+
         return image;
     }
 
     Image<T> operator*(T val) const
     {
         Image<T> image = Image<T>(w, h, d);
-        // TODO
+
+        int size = w * h * d;
+
+        for (int i = 0; i < size; ++i)
+        {
+            image[i] = operator[](i) * val;
+        }
+
         return image;
     }
 
     Image<T> operator/(T val) const
     {
         Image<T> image = Image<T>(w, h, d);
-        // TODO
+
+        int size = w * h * d;
+
+        for (int i = 0; i < size; ++i)
+        {
+            image[i] = operator[](i) / val;
+        }
+
         return image;
     }
 
     void operator+=(const Image<T>& other)
     {
-        // Image<T> image = Image<T>();
-        // // TODO
-        // return image;
+        int size = w * h * d;
+
+        for (int i = 0; i < size; ++i)
+        {
+            operator[](i) += other[i];
+        }
     }
 
     void operator-=(const Image<T>& other)
     {
-        // Image<T> image = Image<T>();
-        // // TODO
-        // return image;
+        int size = w * h * d;
+
+        for (int i = 0; i < size; ++i)
+        {
+            operator[](i) -= other[i];
+        }
     }
 
+    // component wise multiplication
     void operator*=(const Image<T>& other)
     {
-        // Image<T> image = Image<T>();
-        // // TODO
-        // return image;
+        int size = w * h * d;
+
+        for (int i = 0; i < size; ++i)
+        {
+            operator[](i) *= other[i];
+        }
     }
 
+    // component wise division
     void operator/=(const Image<T>& other)
     {
-        // Image<T> image = Image<T>();
-        // // TODO
-        // return image;
+        int size = w * h * d;
+
+        for (int i = 0; i < size; ++i)
+        {
+            operator[](i) /= other[i];
+        }
     }
 
     T& operator[](int index)
