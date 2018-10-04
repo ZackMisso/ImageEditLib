@@ -61,8 +61,8 @@ add_definitions(-DDATA_DIR=R\"\(${PROJECT_SOURCE_DIR}/data\)\")
 #SOURCE_GROUP("ext\\stb" FILES ${ext_stb_srcs})
 
 set(imedit_srcs
-    #ext/stb/stb_image_write.h
-    #ext/stb/stb_image.h
+    ext/stb/stb_image_write.h
+    ext/stb/stb_image.h
 
     include/imedit/image.h
 
