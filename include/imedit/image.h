@@ -50,9 +50,9 @@ unsigned char valToByte(T val)
 
 // converts the byte to a value
 template <typename T>
-T byteToVal(const unsigned char in)
+void byteToVal(const unsigned char in, T& val)
 {
-    return in / T(255.0);
+    val = ((T)in) / ((T)255.0);
 }
 
 // returns the extension of a file path
@@ -88,18 +88,22 @@ public:
     // written by Wojciech Jarosz
     bool read(const std::string& filename)
     {
+        int wid;
+        int hei;
+        int dep;
+
         try
         {
             if (stbi_is_hdr(filename.c_str()))
             {
                 float* pxls = stbi_loadf(filename.c_str(),
-                                         &w,
-                                         &h,
-                                         &d,
+                                         &wid,
+                                         &hei,
+                                         &dep,
                                          3);
                 if (pxls)
                 {
-                    resize(w, h, d);
+                    resize(wid, hei, dep);
 
                     for (int y = 0; y < h; ++y)
                     {
@@ -123,13 +127,13 @@ public:
             else
             {
                 unsigned char* pxls = stbi_load(filename.c_str(),
-                                                &w,
-                                                &h,
-                                                &d,
+                                                &wid,
+                                                &hei,
+                                                &dep,
                                                 3);
                 if (pxls)
                 {
-                    resize(w, h, d);
+                    resize(wid, hei, dep);
 
                     for (int y = 0; y < h; ++y)
                     {
@@ -137,7 +141,7 @@ public:
                         {
                             for (int z = 0; z < d; ++z)
                             {
-                                operator()(x, y, z) = (T)pxls[3 * (x + y * w) + z];
+                                byteToVal(pxls[3 * (x + y * w) + z], operator()(x, y, z));
                             }
                         }
                     }
@@ -194,7 +198,6 @@ public:
                 {
                     throw std::runtime_error("Could not write HDR image");
                 }
-                // TODO
             }
             else if (extension == "png" ||
                      extension == "bmp" ||
@@ -461,12 +464,65 @@ public:
         }
     }
 
+    void operator+=(T val)
+    {
+        int size = w * h * d;
+
+        for (int i = 0; i < size; ++i)
+        {
+            operator[](i) += val;
+        }
+    }
+
+    void operator-=(T val)
+    {
+        int size = w * h * d;
+
+        for (int i = 0; i < size; ++i)
+        {
+            operator[](i) -= val;
+        }
+    }
+
+    // component wise multiplication
+    void operator*=(T val)
+    {
+        int size = w * h * d;
+
+        for (int i = 0; i < size; ++i)
+        {
+            operator[](i) *= val;
+        }
+    }
+
+    // component wise division
+    void operator/=(T val)
+    {
+        int size = w * h * d;
+
+        for (int i = 0; i < size; ++i)
+        {
+            operator[](i) /= val;
+        }
+    }
+
     T& operator[](int index)
     {
         return im[index];
     }
 
-    T operator()(int x, int y, int z)
+    T operator[](int index) const
+    {
+        return im[index];
+    }
+
+    T& operator()(int x, int y, int z)
+    {
+        // return im[z * w * h + y * w + x];
+        return im[(z * h + y) * w + x];
+    }
+
+    T operator()(int x, int y, int z) const
     {
         // return im[z * w * h + y * w + x];
         return im[(z * h + y) * w + x];
@@ -485,6 +541,11 @@ public:
     uint32_t depth() const
     {
         return d;
+    }
+
+    uint32_t size() const
+    {
+        return w * h * d;
     }
 
 protected:
