@@ -47,6 +47,7 @@ include_directories(# Include directory
                     ${CMAKE_CURRENT_SOURCE_DIR}/include/
                     # STB library for image io
                     ${PROJECT_SOURCE_DIR}/ext/stb/
+                    ext/
 )
 
 set(ext_stb_srcs
