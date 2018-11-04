@@ -84,6 +84,14 @@ public:
         read(filename);
     }
 
+    void clear()
+    {
+        for (int i = 0; i < size(); ++i)
+        {
+            im[i] = 0.0;
+        }
+    }
+
     // The read and write logic is based off of code
     // written by Wojciech Jarosz
     bool read(const std::string& filename)
