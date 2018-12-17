@@ -92,6 +92,21 @@ public:
         }
     }
 
+    double average() const
+    {
+        // use long double for precision
+        long double avg = 0.0;
+
+        for (int i = 0; i < size(); ++i)
+        {
+            avg += im[i];
+        }
+
+        avg /= (long double)size();
+
+        return double(avg);
+    }
+
     // The read and write logic is based off of code
     // written by Wojciech Jarosz
     bool read(const std::string& filename)
