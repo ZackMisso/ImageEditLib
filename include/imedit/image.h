@@ -1,6 +1,9 @@
 /*
     ImageEditLib was developed by Zack Misso
     <zackary.t.misso.gr@dartmouth.edu>
+
+    All code here is free to use as long as
+    proper credit is given to the author
 */
 
 #include <string>

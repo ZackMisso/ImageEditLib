@@ -65,9 +65,10 @@ set(imedit_srcs
     ext/stb/stb_image_write.h
     ext/stb/stb_image.h
 
-    image.h
+    include/imedit/image.h
+    include/imedit/procedural.h
 
-    main.cpp
+    test/main.cpp
 )
 
 add_executable(imedit ${imedit_srcs})                                               # a5

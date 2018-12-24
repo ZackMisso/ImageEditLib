@@ -1,44 +1,119 @@
 /*
     ImageEditLib was developed by Zack Misso
     <zackary.t.misso.gr@dartmouth.edu>
+
+    All code here is free to use as long as
+    proper credit is given to the author
 */
 
 #include "image.h"
+#include "noise.h"
 
 // including z axis for now in case I want to extend this to support procedural
 // voxel maps in the future
-struct ImagePartition
+enum ImagePartition
 {
     IP_X, // x axis only
     IP_Y, // y axis only
-    IP_Z, // z axis only
-    IP_R, // r channel only
-    IP_G, // g channel only
-    IP_B, // b channel only
-    IP_A, // a channel only
+    // IP_Z, // z axis only
+
+    // Should these be supported???
+    // IP_R, // r channel only
+    // IP_G, // g channel only
+    // IP_B, // b channel only
+    // IP_A, // a channel only
 
     IP_XY, // x and y axis
-    IP_XZ, // x and z axis
-    IP_YZ, // y and z axis
-    IP_XYZ, // all axis
+    // IP_XZ, // x and z axis
+    // IP_YZ, // y and z axis
+    // IP_XYZ, // all axis
 
-    IP_RG, // r and g channels only
-    IP_RB, // r and b channels only
-    IP_RA, // r and a channels only
-    IP_GB, // g and b channels only
-    IP_GA, // g and a channels only
-    IP_BA, // b and a channels only
-
-    IP_RGB, // r g, and b channels only
-    IP_RGA, // r g, and a channels only
-    IP_RBA, // r b, and a channels only
-    IP_GBA, // g b, and a channels only
-    IP_RGBA // all channels
+    // should these be supported ???
+    // IP_RG, // r and g channels only
+    // IP_RB, // r and b channels only
+    // IP_RA, // r and a channels only
+    // IP_GB, // g and b channels only
+    // IP_GA, // g and a channels only
+    // IP_BA, // b and a channels only
+    //
+    // IP_RGB, // r g, and b channels only
+    // IP_RGA, // r g, and a channels only
+    // IP_RBA, // r b, and a channels only
+    // IP_GBA, // g b, and a channels only
+    // IP_RGBA // all channels
 };
+
+// void marble_image()
+
+template <typename T>
+void turbulence_image(Image<T>& image, T period)
+{
+    for (int i = 0; i < image.height(); ++i)
+    {
+        for (int j = 0; j < image.width(); ++j)
+        {
+            for (int k = 0; k < image.depth(); ++k)
+            {
+                image(j, i, k) = turbulence(j + 0.5f, i + 0.5f, k + 0.5f, period);
+            }
+        }
+    }
+}
+
+template <typename T>
+void turbulence_image_xy(Image<T>& image, T period)
+{
+    for (int i = 0; i < image.height(); ++i)
+    {
+        for (int j = 0; j < image.width(); ++j)
+        {
+            T val = turbulence(j + 0.5f, i + 0.5f, 0.f, period);
+
+            for (int k = 0; k < image.depth(); ++k)
+            {
+                image(j, i, k) = val;
+            }
+        }
+    }
+}
+
+template <typename T>
+void noise_image(Image<T>& image, T period)
+{
+    for (int i = 0; i < image.height(); ++i)
+    {
+        for (int j = 0; j < image.width(); ++j)
+        {
+            for (int k = 0; k < image.depth(); ++k)
+            {
+                image(j, i, k) = noise(j + 0.5f, i + 0.5f, k + 0.5f, period);
+            }
+        }
+    }
+}
+
+template <typename T>
+void noise_image_xy(Image<T>& image, T period)
+{
+    for (int i = 0; i < image.height(); ++i)
+    {
+        for (int j = 0; j < image.width(); ++j)
+        {
+            T val = noise(j + 0.5f, i + 0.5f, 0.f, period);
+
+            for (int k = 0; k < image.depth(); ++k)
+            {
+                image(j, i, k) = val;
+            }
+        }
+    }
+}
 
 template <typename T>
 void sin_image(T amplitude,
                T period,
+               T phase,
+               T offset,
                Image<T>& image,
                ImagePartition part)
 {
@@ -46,113 +121,151 @@ void sin_image(T amplitude,
     {
         case IP_X:
         {
-            // TODO
+            for (int j = 0; j < image.width(); ++j)
+            {
+                T val = amplitude * sin(j / period + phase) + offset;
+
+                for (int k = 0; k < image.depth(); ++k)
+                {
+                    for (int i = 0; i < image.height(); ++i)
+                    {
+                        image(j, i, k) = val;
+                    }
+                }
+            }
+
             break;
         }
         case IP_Y:
         {
-            // TODO
+            for (int i = 0; i < image.height(); ++i)
+            {
+                T val = amplitude * sin(i / period + phase) + offset;
+
+                for (int k = 0; k < image.depth(); ++k)
+                {
+                    for (int j = 0; j < image.width(); ++j)
+                    {
+                        image(j, i, k) = val;
+                    }
+                }
+            }
+
             break;
         }
-        case IP_Z:
-        {
-            // TODO
-            break;
-        }
-        case IP_R:
-        {
-            // TODO
-            break;
-        }
-        case IP_G:
-        {
-            // TODO
-            break;
-        }
-        case IP_B:
-        {
-            // TODO
-            break;
-        }
-        case IP_A:
-        {
-            // TODO
-            break;
-        }
+        // case IP_Z:
+        // {
+        //     // TODO
+        //     break;
+        // }
+        // case IP_R:
+        // {
+        //     // TODO
+        //     break;
+        // }
+        // case IP_G:
+        // {
+        //     // TODO
+        //     break;
+        // }
+        // case IP_B:
+        // {
+        //     // TODO
+        //     break;
+        // }
+        // case IP_A:
+        // {
+        //     // TODO
+        //     break;
+        // }
         case IP_XY:
         {
-            // TODO
+            for (int i = 0; i < image.height(); ++i)
+            {
+                for (int j = 0; j < image.width(); ++j)
+                {
+                    // TODO: how should this be implemented to support different
+                    //       periods for x and y
+                    T val = amplitude * sin((i + j) / period + phase) + offset;
+
+                    for (int k = 0; k < image.depth(); ++k)
+                    {
+                        image(j, i, k) = val;
+                    }
+                }
+            }
+
             break;
         }
-        case IP_XZ:
-        {
-            // TODO
-            break;
-        }
-        case IP_YZ:
-        {
-            // TODO
-            break;
-        }
-        case IP_XYZ:
-        {
-            // TODO
-            break;
-        }
-        case IP_RG:
-        {
-            // TODO
-            break;
-        }
-        case IP_RB:
-        {
-            // TODO
-            break;
-        }
-        case IP_RA:
-        {
-            // TODO
-            break;
-        }
-        case IP_GB:
-        {
-            // TODO
-            break;
-        }
-        case IP_GA:
-        {
-            // TODO
-            break;
-        }
-        case IP_BA:
-        {
-            // TODO
-            break;
-        }
-        case IP_RGB:
-        {
-            // TODO
-            break;
-        }
-        case IP_RGA:
-        {
-            // TODO
-            break;
-        }
-        case IP_RBA:
-        {
-            // TODO
-            break;
-        }
-        case IP_GBA:
-        {
-            // TODO
-            break;
-        }
-        case IP_RGBA:
-        {
-            // TODO
-            break;
-        }
+        // case IP_XZ:
+        // {
+        //     // TODO
+        //     break;
+        // }
+        // case IP_YZ:
+        // {
+        //     // TODO
+        //     break;
+        // }
+        // case IP_XYZ:
+        // {
+        //     // TODO
+        //     break;
+        // }
+        // case IP_RG:
+        // {
+        //     // TODO
+        //     break;
+        // }
+        // case IP_RB:
+        // {
+        //     // TODO
+        //     break;
+        // }
+        // case IP_RA:
+        // {
+        //     // TODO
+        //     break;
+        // }
+        // case IP_GB:
+        // {
+        //     // TODO
+        //     break;
+        // }
+        // case IP_GA:
+        // {
+        //     // TODO
+        //     break;
+        // }
+        // case IP_BA:
+        // {
+        //     // TODO
+        //     break;
+        // }
+        // case IP_RGB:
+        // {
+        //     // TODO
+        //     break;
+        // }
+        // case IP_RGA:
+        // {
+        //     // TODO
+        //     break;
+        // }
+        // case IP_RBA:
+        // {
+        //     // TODO
+        //     break;
+        // }
+        // case IP_GBA:
+        // {
+        //     // TODO
+        //     break;
+        // }
+        // case IP_RGBA:
+        // {
+        //     // TODO
+        //     break;
+        // }
     }
 }

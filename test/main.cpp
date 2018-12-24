@@ -1,12 +1,15 @@
 /*
     ImageEditLib was developed by Zack Misso
     <zackary.t.misso.gr@dartmouth.edu>
+
+    All code here is free to use as long as
+    proper credit is given to the author
 */
 
 #include <iostream>
 #include "imedit/image.h"
-
-// #define
+#include "imedit/procedural.h"
+#include "imedit/im_util.h"
 
 using namespace std;
 
@@ -64,6 +67,65 @@ bool generate_test_set()
             if (blueImage(j, i, 2) != 0.5f) return false;
         }
     }
+
+    // procedural tests
+
+    Image<float> sineImage_X = Image<float>(128, 128, 3);
+    Image<float> sineImage_Y = Image<float>(128, 128, 3);
+    Image<float> sineImage_XY = Image<float>(128, 128, 3);
+
+    sin_image(0.5f, 10.f, 0.f, 0.5f, sineImage_X, IP_X);
+    sin_image(0.5f, 10.f, 0.f, 0.5f, sineImage_Y, IP_Y);
+    sin_image(0.5f, 10.f, 0.f, 0.5f, sineImage_XY, IP_XY);
+
+    sineImage_X.write("sine_X.hdr");
+    sineImage_Y.write("sine_Y.hdr");
+    sineImage_XY.write("sine_XY.hdr");
+
+    Image<float> noiseImage = Image<float>(128, 128, 3);
+
+    noise_image_xy(noiseImage, 1.f);
+
+    noiseImage.write("noise_image.hdr");
+
+    im_abs(noiseImage);
+
+    noiseImage.write("noise_image_abs.hdr");
+
+    Image<float> threshold_min = noiseImage;
+    Image<float> threshold_max = noiseImage;
+
+    thresh_min(threshold_min, 0.3f);
+    thresh_max(threshold_max, 0.3f);
+
+    threshold_min.write("threshold_min.hdr");
+    threshold_max.write("threshold_max.hdr");
+    noiseImage.write("check.hdr");
+
+    Image<float> noiseImage_two = Image<float>(128, 128, 3);
+
+    noise_image_xy(noiseImage_two, 5.f);
+
+    noiseImage_two.write("noise_image_two.hdr");
+
+    im_abs(noiseImage_two);
+
+    noiseImage_two.write("noise_image_two_abs.hdr");
+
+    Image<float> threshold_min_two = noiseImage_two;
+    Image<float> threshold_max_two = noiseImage_two;
+
+    thresh_min(threshold_min_two, 0.3f);
+    thresh_max(threshold_max_two, 0.3f);
+
+    threshold_min_two.write("threshold_min_two.hdr");
+    threshold_max_two.write("threshold_max_two.hdr");
+
+    Image<float> turbulenceImage = Image<float>(128, 128, 3);
+
+    turbulence_image_xy(turbulenceImage, 32.f);
+
+    turbulenceImage.write("turbImage.hdr");
 
     return true;
 }
