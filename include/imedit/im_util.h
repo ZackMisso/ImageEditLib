@@ -14,6 +14,23 @@
 #include <imedit/image.h>
 #include <vector>
 
+namespace imedit
+{
+
+template <typename T>
+void remap_range_lin(Image<T>& image)
+{
+    T min = image.min();
+    T max = image.max();
+
+    for (int i = 0; i < image.size(); ++i)
+    {
+        image[i] = (image[i] - min) / (max - min);
+    }
+}
+
+// TODO: create tone map functionality
+
 template <typename T>
 void im_sin(Image<T>& image)
 {
@@ -51,11 +68,31 @@ void thresh_min(Image<T>& image, T threshold)
 }
 
 template <typename T>
+void thresh_min_image(Image<T>& image, T threshold)
+{
+    for (int i = 0; i < image.size(); ++i)
+    {
+        if (image[i] > threshold) image[i] = 1.0;
+        else image[i] = 0.0;
+    }
+}
+
+template <typename T>
 void thresh_max(Image<T>& image, T threshold)
 {
     for (int i = 0; i < image.size(); ++i)
     {
         if (image[i] > threshold) image[i] = threshold;
+    }
+}
+
+template <typename T>
+void thresh_max_image(Image<T>& image, T threshold)
+{
+    for (int i = 0; i < image.size(); ++i)
+    {
+        if (image[i] < threshold) image[i] = 1.0;
+        else image[i] = 0.0;
     }
 }
 
@@ -96,4 +133,6 @@ Image<T>* low_avg_comparison(const std::vector<Image<T>*>& images)
     }
 
     return least_avg_image;
+}
+
 }

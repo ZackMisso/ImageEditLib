@@ -23,6 +23,9 @@
 
 // useful functions
 
+namespace imedit
+{
+
 // clamps val between min and max
 template <typename T>
 inline T im_clamp(T val, T min, T max)
@@ -108,6 +111,58 @@ public:
         avg /= (long double)size();
 
         return double(avg);
+    }
+
+    T max() const
+    {
+        T val = im[0];
+
+        for (int i = 1; i < im.size(); ++i)
+        {
+            if (im[i] > val) val = im[i];
+        }
+
+        return val;
+    }
+
+    void brighten(T factor)
+    {
+        (operator *=)(factor);
+    }
+
+    void contrast(T factor, T midpoint)
+    {
+        (operator -=)(midpoint);
+        (operator *=)(factor);
+        (operator +=)(midpoint);
+    }
+
+    void exposure(T factor)
+    {
+        alterGamma(T(1.0/2.2), T(1.0));
+        brighten(factor);
+        alterGamma(T(1.0), T(1.0/2.2));
+    }
+
+    void alterGamma(T oldGamma, T newGamma)
+    {
+        T power = newGamma / oldGamma;
+        for (int i = 0; i < im.size(); ++i)
+        {
+            im[i] = pow(im[i], power);
+        }
+    }
+
+    T min() const
+    {
+        T val = im[0];
+
+        for (int i = 1; i < im.size(); ++i)
+        {
+            if (im[i] < val) val = im[i];
+        }
+
+        return val;
     }
 
     // The read and write logic is based off of code
@@ -579,3 +634,5 @@ protected:
 
     uint32_t w, h, d;
 };
+
+}

@@ -9,6 +9,9 @@
 #include "image.h"
 #include "noise.h"
 
+namespace imedit
+{
+
 // including z axis for now in case I want to extend this to support procedural
 // voxel maps in the future
 enum ImagePartition
@@ -44,6 +47,105 @@ enum ImagePartition
 };
 
 // void marble_image()
+
+// TODO: maybe connect this to Vec implementation to use instead of pairs
+template <typename T>
+void euclidean_dist_from_points_image(Image<T>& image, std::vector<std::pair<T,T> > pairs)
+{
+    for (int i = 0; i < image.height(); ++i)
+    {
+        for (int j = 0; j < image.width(); ++j)
+        {
+            T val = 10000000.0;
+
+            for (int k = 0; k < pairs.size(); ++k)
+            {
+                T j_val = pairs[k].first - (T(j) + T(0.5));
+                T i_val = pairs[k].second - (T(i) + T(0.5));
+
+                j_val *= j_val;
+                i_val *= i_val;
+
+                T tmp = sqrt(j_val + i_val);
+
+                if (tmp < val) val = tmp;
+            }
+
+            for (int k = 0; k < image.depth(); ++k)
+            {
+                image(j, i, k) = val;
+            }
+        }
+    }
+}
+
+template <typename T>
+void manhattan_dist_from_points_image(Image<T>& image, std::vector<std::pair<int,int> > pairs)
+{
+    for (int i = 0; i < image.height(); ++i)
+    {
+        for (int j = 0; j < image.width(); ++j)
+        {
+            int val = 10000000;
+
+            for (int k = 0; k < pairs.size(); ++k)
+            {
+                int j_val = std::abs(pairs[k].first - j);
+                int i_val = std::abs(pairs[k].second - i);
+
+                int tmp = j_val + i_val;
+
+                if (tmp < val) val = tmp;
+            }
+
+            for (int k = 0; k < image.depth(); ++k)
+            {
+                image(j, i, k) = val;
+            }
+        }
+    }
+}
+
+template <typename T>
+void euclidean_dist_image(Image<T>& image, T xpos, T ypos)
+{
+    for (int i = 0; i < image.height(); ++i)
+    {
+        for (int j = 0; j < image.width(); ++j)
+        {
+            T j_val = xpos - (T(j) + T(0.5));
+            T i_val = ypos - (T(i) + T(0.5));
+
+            j_val *= j_val;
+            i_val *= i_val;
+
+            T val = sqrt(j_val + i_val);
+
+            for (int k = 0; k < image.depth(); ++k)
+            {
+                image(j, i, k) = val;
+            }
+        }
+    }
+}
+
+template <typename T>
+void manhattan_dist_image(Image<T>& image, int xpos, int ypos)
+{
+    for (int i = 0; i < image.height(); ++i)
+    {
+        for (int j = 0; j < image.width(); ++j)
+        {
+            int j_val = std::abs(xpos - j);
+            int i_val = std::abs(ypos - i);
+
+            for (int k = 0; k < image.depth(); ++k)
+            {
+                image(j, i, k) = j_val + i_val;
+            }
+        }
+    }
+}
 
 template <typename T>
 void turbulence_image(Image<T>& image, T period)
@@ -268,4 +370,6 @@ void sin_image(T amplitude,
         //     break;
         // }
     }
+}
+
 }

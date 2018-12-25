@@ -12,21 +12,30 @@
 #include "imedit/im_util.h"
 
 using namespace std;
+using namespace imedit;
 
 bool generate_test_set();
 bool delete_test_set();
 bool getchannel_test();
 bool operator_test();
 
+float randomFloat()
+{
+    return static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+}
+
 bool generate_test_set()
 {
-    Image<float> redImage = Image<float>(128, 128, 3);
-    Image<float> blueImage = Image<float>(128, 128, 3);
-    Image<float> greenImage = Image<float>(128, 128, 3);
+    uint32_t image_res = 128;
+    // uint32_t image_res = 1024;
 
-    for (int i = 0; i < 128; ++i)
+    Image<float> redImage = Image<float>(image_res, image_res, 3);
+    Image<float> blueImage = Image<float>(image_res, image_res, 3);
+    Image<float> greenImage = Image<float>(image_res, image_res, 3);
+
+    for (int i = 0; i < image_res; ++i)
     {
-        for (int j = 0; j < 128; ++j)
+        for (int j = 0; j < image_res; ++j)
         {
             redImage(j, i, 0) = 0.5f;
             redImage(j, i, 1) = 0.f;
@@ -50,9 +59,9 @@ bool generate_test_set()
     Image<float> greenReadImage = Image<float>("greenImage.hdr");
     Image<float> blueReadImage = Image<float>("blueImage.hdr");
 
-    for (int i = 0; i < 128; ++i)
+    for (int i = 0; i < image_res; ++i)
     {
-        for (int j = 0; j < 128; ++j)
+        for (int j = 0; j < image_res; ++j)
         {
             if (redImage(j, i, 0) != 0.5f) return false;
             if (redImage(j, i, 1) != 0.f) return false;
@@ -70,9 +79,9 @@ bool generate_test_set()
 
     // procedural tests
 
-    Image<float> sineImage_X = Image<float>(128, 128, 3);
-    Image<float> sineImage_Y = Image<float>(128, 128, 3);
-    Image<float> sineImage_XY = Image<float>(128, 128, 3);
+    Image<float> sineImage_X = Image<float>(image_res, image_res, 3);
+    Image<float> sineImage_Y = Image<float>(image_res, image_res, 3);
+    Image<float> sineImage_XY = Image<float>(image_res, image_res, 3);
 
     sin_image(0.5f, 10.f, 0.f, 0.5f, sineImage_X, IP_X);
     sin_image(0.5f, 10.f, 0.f, 0.5f, sineImage_Y, IP_Y);
@@ -82,7 +91,7 @@ bool generate_test_set()
     sineImage_Y.write("sine_Y.hdr");
     sineImage_XY.write("sine_XY.hdr");
 
-    Image<float> noiseImage = Image<float>(128, 128, 3);
+    Image<float> noiseImage = Image<float>(image_res, image_res, 3);
 
     noise_image_xy(noiseImage, 1.f);
 
@@ -102,7 +111,7 @@ bool generate_test_set()
     threshold_max.write("threshold_max.hdr");
     noiseImage.write("check.hdr");
 
-    Image<float> noiseImage_two = Image<float>(128, 128, 3);
+    Image<float> noiseImage_two = Image<float>(image_res, image_res, 3);
 
     noise_image_xy(noiseImage_two, 5.f);
 
@@ -121,11 +130,72 @@ bool generate_test_set()
     threshold_min_two.write("threshold_min_two.hdr");
     threshold_max_two.write("threshold_max_two.hdr");
 
-    Image<float> turbulenceImage = Image<float>(128, 128, 3);
+    Image<float> turbulenceImage = Image<float>(image_res, image_res, 3);
 
     turbulence_image_xy(turbulenceImage, 32.f);
 
     turbulenceImage.write("turbImage.hdr");
+
+    Image<float> euclideanImage = Image<float>(image_res, image_res, 3);
+    Image<float> manhattanImage = Image<float>(image_res, image_res, 3);
+
+    euclidean_dist_image(euclideanImage, float(image_res) / 2.f, float(image_res) / 2.f);
+    manhattan_dist_image(manhattanImage, image_res / 2, image_res / 2);
+
+    Image<float> sinEuclideanImage = euclideanImage;
+    Image<float> sinManhattanImage = manhattanImage;
+
+    euclideanImage /= euclideanImage.max();
+    manhattanImage /= manhattanImage.max();
+
+    euclideanImage.write("euclidean_dist.hdr");
+    manhattanImage.write("manhattan_dist.hdr");
+
+    im_sin(sinEuclideanImage);
+    im_sin(sinManhattanImage);
+
+    sinEuclideanImage.write("sin_euclidean_dist.hdr");
+    sinManhattanImage.write("sin_manhattan_dist.hdr");
+
+    vector<pair<float, float> > pts_float = vector<std::pair<float, float> >();
+    vector<pair<int, int> > pts_int = vector<std::pair<int, int> >();
+
+    for (int i = 0; i < 15; ++i)
+    {
+        float one = randomFloat() * float(image_res);
+        float two = randomFloat() * float(image_res);
+
+        int one_int = (int)one;
+        int two_int = (int)two;
+
+        pts_float.push_back(std::pair<float, float>(one, two));
+        pts_int.push_back(std::pair<int, int>(one_int, two_int));
+    }
+
+    pts_float.push_back(std::pair<float, float>(1.0,1.0));
+    pts_int.push_back(std::pair<int, int>(1,1));
+
+    Image<float> eucPointsImage = Image<float>(image_res, image_res, 3);
+    Image<float> manPointsImage = Image<float>(image_res, image_res, 3);
+
+    euclidean_dist_from_points_image(eucPointsImage, pts_float);
+    manhattan_dist_from_points_image(manPointsImage, pts_int);
+
+    eucPointsImage /= eucPointsImage.max();
+    manPointsImage /= manPointsImage.max();
+
+    eucPointsImage.write("euc_points.hdr");
+    manPointsImage.write("man_points.hdr");
+
+    Image<float> voronoi = eucPointsImage;
+    one_minus(voronoi);
+    remap_range_lin(voronoi);
+    voronoi.write("one_minus_euc_points.hdr");
+
+    one_minus(voronoi);
+    thresh_min_image(voronoi, 0.4f);
+
+    voronoi.write("polka.hdr");
 
     return true;
 }
@@ -209,6 +279,9 @@ bool operator_test()
 
 int main()
 {
+    srand(0x31245A);
+    // srand(0x891);
+
     cout << "Beginning Library Tests" << endl;
 
     if (!generate_test_set())

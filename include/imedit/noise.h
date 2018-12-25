@@ -8,6 +8,9 @@
 
 #pragma once
 
+namespace imedit
+{
+
 // #############################################
 // The following code is modified from a similar implementation in PBRT by Matt Pharr et. al. //
 
@@ -152,4 +155,6 @@ T turbulence(T x, T y, T z, T period)
     // if ( val * 0.5 / period < 0.0) std::cout <<  val * 0.5 / period << std::endl;
 
     return (0.5 + val * 0.5 / period) * 0.5;
+}
+
 }
