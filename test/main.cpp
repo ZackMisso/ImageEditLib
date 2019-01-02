@@ -197,6 +197,193 @@ bool generate_test_set()
 
     voronoi.write("polka.hdr");
 
+    Image<float> white = Image<float>(2048, 1024, 3);
+    for (int i = 0; i < white.size(); ++i)
+    {
+        white[i] = 1.0;
+    }
+    white.write("white.png");
+
+    Image<float> turbIm = Image<float>(image_res, image_res, 3);
+
+    turbulence_image_xy(turbIm, 32.f);
+
+    remap_range_lin(turbIm);
+
+    turbIm.write("lin_turb_remap.png");
+
+    Image<float> turbIm2 = turbIm;
+
+    thresh_min_zero(turbIm, 0.05f);
+    turbIm.write("cloud_05.png");
+
+    thresh_min_zero(turbIm, 0.10f);
+    turbIm.write("cloud_10.png");
+
+    thresh_min_zero(turbIm, 0.15f);
+    turbIm.write("cloud_15.png");
+
+    thresh_min_zero(turbIm, 0.20f);
+    turbIm.write("cloud_20.png");
+
+    thresh_min_zero(turbIm, 0.25f);
+    turbIm.write("cloud_25.png");
+
+    thresh_min_zero(turbIm, 0.30f);
+    turbIm.write("cloud_30.png");
+
+    thresh_min_zero(turbIm, 0.35f);
+    turbIm.write("cloud_35.png");
+
+    thresh_min_zero(turbIm, 0.40f);
+    turbIm.write("cloud_40.png");
+
+    thresh_min_zero(turbIm, 0.45f);
+    turbIm.write("cloud_45.png");
+
+    thresh_min_zero(turbIm, 0.50f);
+    turbIm.write("cloud_50.png");
+
+    thresh_min_zero(turbIm, 0.55f);
+    turbIm.write("cloud_55.png");
+
+    thresh_min_zero(turbIm, 0.60f);
+    turbIm.write("cloud_60.png");
+
+    thresh_min_zero(turbIm, 0.65f);
+    turbIm.write("cloud_65.png");
+
+    thresh_min_zero(turbIm, 0.70f);
+    turbIm.write("cloud_70.png");
+
+    thresh_min_zero(turbIm, 0.75f);
+    turbIm.write("cloud_75.png");
+
+    thresh_min_zero(turbIm, 0.80f);
+    turbIm.write("cloud_80.png");
+
+    thresh_min_zero(turbIm, 0.85f);
+    turbIm.write("cloud_85.png");
+
+    thresh_min_zero(turbIm, 0.90f);
+    turbIm.write("cloud_90.png");
+
+    thresh_min_zero(turbIm, 0.95f);
+    turbIm.write("cloud_95.png");
+
+    thresh_max_zero(turbIm2, 0.95f);
+    turbIm2.write("cloud_95_2.png");
+
+    thresh_max_zero(turbIm2, 0.90f);
+    turbIm2.write("cloud_90_2.png");
+
+    thresh_max_zero(turbIm2, 0.85f);
+    turbIm2.write("cloud_85_2.png");
+
+    thresh_max_zero(turbIm2, 0.80f);
+    turbIm2.write("cloud_80_2.png");
+
+    thresh_max_zero(turbIm2, 0.75f);
+    turbIm2.write("cloud_75_2.png");
+
+    thresh_max_zero(turbIm2, 0.70f);
+    turbIm2.write("cloud_70_2.png");
+
+    thresh_max_zero(turbIm2, 0.65f);
+    turbIm2.write("cloud_65_2.png");
+
+    thresh_max_zero(turbIm2, 0.60f);
+    turbIm2.write("cloud_60_2.png");
+
+    thresh_max_zero(turbIm2, 0.55f);
+    turbIm2.write("cloud_55_2.png");
+
+    thresh_max_zero(turbIm2, 0.50f);
+    turbIm2.write("cloud_50_2.png");
+
+    thresh_max_zero(turbIm2, 0.45f);
+    turbIm2.write("cloud_45_2.png");
+
+    thresh_max_zero(turbIm2, 0.40f);
+    turbIm2.write("cloud_40_2.png");
+
+    thresh_max_zero(turbIm2, 0.35f);
+    turbIm2.write("cloud_35_2.png");
+
+    thresh_max_zero(turbIm2, 0.30f);
+    turbIm2.write("cloud_30_2.png");
+
+    thresh_max_zero(turbIm2, 0.25f);
+    turbIm2.write("cloud_25_2.png");
+
+    thresh_max_zero(turbIm2, 0.20f);
+    turbIm2.write("cloud_20_2.png");
+
+    thresh_max_zero(turbIm2, 0.15f);
+    turbIm2.write("cloud_15_2.png");
+
+    thresh_max_zero(turbIm2, 0.10f);
+    turbIm2.write("cloud_10_2.png");
+
+    thresh_max_zero(turbIm2, 0.05f);
+    turbIm2.write("cloud_05_2.png");
+
+
+    Image<float> cloudIm = Image<float>(image_res, image_res, 3);
+
+    turbulence_image_xy(cloudIm, 32.f);
+
+    remap_range_lin(cloudIm);
+
+    Image<float> distIm = Image<float>(image_res, image_res, 3);
+
+    euclidean_dist_image(distIm, float(image_res)/2.f, float(image_res)/2.f);
+
+    distIm.write("dist_whao.png");
+
+    remap_range_lin(distIm);
+    exp_im(distIm, -3.f);
+    // one_minus(distIm);
+    distIm *= 1.7f;
+    clamp_im(distIm);
+    // thresh_min_zero(distIm, 0.1f);
+
+    distIm.write("distim.png");
+
+    cloudIm.write("cloud_1.png");
+    cloudIm *= distIm;
+    cloudIm.write("cloud_2.png");
+
+    Image<float> cloud_50 = cloudIm;
+
+    thresh_max(cloud_50, 0.5f);
+
+    cloud_50.write("cloud_50_test.png");
+
+    Image<float> diff_50 = cloudIm - cloud_50;
+
+    diff_50.write("cloud_diff_50.png");
+
+    Image<float> cloud_25 = cloudIm;
+
+    thresh_max(cloud_25, 0.25f);
+
+    cloud_25.write("cloud_25_test.png");
+
+    Image<float> diff_25 = cloudIm - cloud_25;
+
+    diff_25.write("cloud_diff_25.png");
+
+    Image<float> cloud_75 = cloudIm;
+
+    thresh_max(cloud_75, 0.75f);
+
+    cloud_50.write("cloud_75_test.png");
+
+    Image<float> diff_75 = cloudIm - cloud_75;
+
+    diff_75.write("cloud_diff_75.png");
+
     return true;
 }
 

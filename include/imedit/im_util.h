@@ -18,6 +18,26 @@ namespace imedit
 {
 
 template <typename T>
+void clamp_im(Image<T>& image)
+{
+    for (int i = 0; i < image.size(); ++i)
+    {
+        if (image[i] < 0.0) image[i] = 0.0;
+        if (image[i] > 1.0) image[i] = 1.0;
+    }
+}
+
+template <typename T>
+void clamp_im(Image<T>& image, T min, T max)
+{
+    for (int i = 0; i < image.size(); ++i)
+    {
+        if (image[i] < min) image[i] = min;
+        if (image[i] > max) image[i] = max;
+    }
+}
+
+template <typename T>
 void remap_range_lin(Image<T>& image)
 {
     T min = image.min();
@@ -26,6 +46,40 @@ void remap_range_lin(Image<T>& image)
     for (int i = 0; i < image.size(); ++i)
     {
         image[i] = (image[i] - min) / (max - min);
+    }
+}
+
+template <typename T>
+void exp_im(Image<T>& image, T period)
+{
+    for (int i = 0; i < image.size(); ++i)
+    {
+        image[i] = exp(image[i] * period);
+    }
+}
+
+template <typename T>
+
+void remap_range_lin(std::vector<Image<T> >& images)
+{
+    T min = images[0].min();
+    T max = images[0].max();
+
+    for (int i = 1; i < images.size(); ++i)
+    {
+        T tmp_min = images[i].min();
+        T tmp_max = images[i].max();
+
+        if (min > tmp_min) min = tmp_min;
+        if (max < tmp_max) max = tmp_max;
+    }
+
+    for (int i = 0; i < images.size(); ++i)
+    {
+        for (int j = 0; j < images[i].size(); ++j)
+        {
+            images[i][j] = (images[i][j] - min) / (max - min);
+        }
     }
 }
 
@@ -68,6 +122,15 @@ void thresh_min(Image<T>& image, T threshold)
 }
 
 template <typename T>
+void thresh_min_zero(Image<T>& image, T threshold)
+{
+    for (int i = 0; i < image.size(); ++i)
+    {
+        if (image[i] < threshold) image[i] = 0.0;
+    }
+}
+
+template <typename T>
 void thresh_min_image(Image<T>& image, T threshold)
 {
     for (int i = 0; i < image.size(); ++i)
@@ -83,6 +146,15 @@ void thresh_max(Image<T>& image, T threshold)
     for (int i = 0; i < image.size(); ++i)
     {
         if (image[i] > threshold) image[i] = threshold;
+    }
+}
+
+template <typename T>
+void thresh_max_zero(Image<T>& image, T threshold)
+{
+    for (int i = 0; i < image.size(); ++i)
+    {
+        if (image[i] > threshold) image[i] = 0.0;
     }
 }
 
