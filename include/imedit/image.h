@@ -29,7 +29,7 @@ namespace imedit
 
 // clamps val between min and max
 template <typename T>
-inline T im_clamp(T val, T min, T max)
+static inline T im_clamp(T val, T min, T max)
 {
     return (val >= min) ?
            ((val <= max) ? val : max) : min;
@@ -37,7 +37,7 @@ inline T im_clamp(T val, T min, T max)
 
 //! Returns a modulus b.
 template <typename T>
-inline T im_mod(T a, T b)
+static inline T im_mod(T a, T b)
 {
     int n = (int)(a / b);
     a -= n * b;
@@ -48,7 +48,7 @@ inline T im_mod(T a, T b)
 
 // converts the value to a byte
 template <typename T>
-unsigned char valToByte(T val)
+static unsigned char valToByte(T val)
 {
     T min = 0;
     T max = 1;
@@ -57,13 +57,13 @@ unsigned char valToByte(T val)
 
 // converts the byte to a value
 template <typename T>
-void byteToVal(const unsigned char in, T& val)
+static void byteToVal(const unsigned char in, T& val)
 {
     val = ((T)in) / ((T)255.0);
 }
 
 // returns the extension of a file path
-std::string getExtension(const std::string &filename)
+static std::string getExtension(const std::string &filename)
 {
 	if (filename.find_last_of(".") != std::string::npos)
 		return filename.substr(filename.find_last_of(".") + 1);
