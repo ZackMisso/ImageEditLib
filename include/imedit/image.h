@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string>
 #include <iostream>
+#include <algorithm>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
@@ -254,10 +255,10 @@ public:
 
         std::string extension = getExtension(filename);
 
-        transform(extension.begin(),
-                  extension.end(),
-                  extension.begin(),
-                  ::tolower);
+        std::transform(extension.begin(),
+                       extension.end(),
+                       extension.begin(),
+                       ::tolower);
 
         try
         {

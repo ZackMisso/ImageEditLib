@@ -180,6 +180,23 @@ void turbulence_image_xy(Image<T>& image, T period)
 }
 
 template <typename T>
+void turbulence_image_xyz(Image<T>& image, T period, T z)
+{
+    for (int i = 0; i < image.height(); ++i)
+    {
+        for (int j = 0; j < image.width(); ++j)
+        {
+            T val = turbulence(j + 0.5f, i + 0.5f, z + 0.5f, period);
+
+            for (int k = 0; k < image.depth(); ++k)
+            {
+                image(j, i, k) = val;
+            }
+        }
+    }
+}
+
+template <typename T>
 void noise_image(Image<T>& image, T period)
 {
     for (int i = 0; i < image.height(); ++i)

@@ -464,21 +464,116 @@ bool operator_test()
     return true;
 }
 
+void cloudTests()
+{
+    uint32_t image_res = 1024;
+    float period = 256.f;
+
+    Image<float> turbIm = Image<float>(image_res, image_res, 3);
+
+    turbulence_image_xy(turbIm, period);
+
+    float max = turbIm.max();
+    float min = turbIm.min();
+
+    std::cout << "max: " << max << std::endl;
+    std::cout << "min: " << min << std::endl;
+
+    remap_range_lin(turbIm);
+
+    turbIm.write("lin_turb_remap.png");
+
+    Image<float> turbIm2 = turbIm;
+
+    Image<float> cloudIm = Image<float>(image_res, image_res, 3);
+
+    turbulence_image_xy(cloudIm, period);
+
+    remap_range_lin(cloudIm);
+
+    Image<float> distIm = Image<float>(image_res, image_res, 3);
+
+    euclidean_dist_image(distIm, float(image_res)/2.f, float(image_res)/2.f);
+
+    distIm.write("dist_whao.png");
+
+    remap_range_lin(distIm);
+    exp_im(distIm, -3.f);
+    // one_minus(distIm);
+    distIm *= 1.7f;
+    clamp_im(distIm);
+    // thresh_min_zero(distIm, 0.1f);
+
+    distIm.write("distim.png");
+
+    cloudIm.write("cloud_1.png");
+    cloudIm *= distIm;
+    cloudIm.write("cloud_2.png");
+
+    Image<float> cloud_50 = cloudIm;
+
+    thresh_max(cloud_50, 0.5f);
+
+    cloud_50.write("cloud_50_test.png");
+
+    Image<float> diff_50 = cloudIm - cloud_50;
+
+    diff_50.write("cloud_diff_50.png");
+
+    Image<float> cloud_25 = cloudIm;
+
+    thresh_max(cloud_25, 0.25f);
+
+    cloud_25.write("cloud_25_test.png");
+
+    Image<float> diff_25 = cloudIm - cloud_25;
+
+    diff_25.write("cloud_diff_25.png");
+
+    Image<float> cloud_75 = cloudIm;
+
+    thresh_max(cloud_75, 0.75f);
+
+    cloud_50.write("cloud_75_test.png");
+
+    Image<float> diff_75 = cloudIm - cloud_75;
+
+    diff_75.write("cloud_diff_75.png");
+
+    for (int i = 0; i < image_res; ++i)
+    {
+        std::cout << "i: " << i << std::endl;
+        Image<float> tmpIm = Image<float>(image_res, image_res, 3);
+        turbulence_image_xyz(tmpIm, period, float(i));
+        float tmpMax = tmpIm.max();
+        float tmpMin = tmpIm.min();
+
+        if (tmpMax > max) max = tmpMax;
+        if (tmpMin < min) min = tmpMin;
+    }
+
+    std::cout << "true max: " << max << std::endl;
+    std::cout << "true min: " << min << std::endl;
+}
+
 int main()
 {
     srand(0x31245A);
     // srand(0x891);
 
-    cout << "Beginning Library Tests" << endl;
+    // cout << "Beginning Library Tests" << endl;
+    //
+    // if (!generate_test_set())
+    // {
+    //     cout << "ERROR: Generating Test Set Failed" << endl;
+    // }
+    // if (!operator_test())
+    // {
+    //     cout << "ERROR: Operator Test Failed" << endl;
+    // }
 
-    if (!generate_test_set())
-    {
-        cout << "ERROR: Generating Test Set Failed" << endl;
-    }
-    if (!operator_test())
-    {
-        cout << "ERROR: Operator Test Failed" << endl;
-    }
+    cloudTests();
+
     // todo
     cout << "All Library Tests Passed" << endl;
     return 0;
