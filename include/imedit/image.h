@@ -276,7 +276,7 @@ public:
                     }
                 }
 
-                if (!stbi_write_hdr(filename.c_str(), w, h, d, &pxls[0]))
+                if (!stb::stbi_write_hdr(filename.c_str(), w, h, d, &pxls[0]))
                 {
                     throw std::runtime_error("Could not write HDR image");
                 }
@@ -308,7 +308,7 @@ public:
 
                 if (extension == "png")
                 {
-                    if (!stbi_write_png(filename.c_str(), w, h,
+                    if (!stb::stbi_write_png(filename.c_str(), w, h,
     				                    outC, &pxls[0],
     				                    sizeof(unsigned char) * w * outC))
                     {
@@ -317,7 +317,7 @@ public:
                 }
                 else if (extension == "bmp")
                 {
-                    if (!stbi_write_bmp(filename.c_str(), w, h,
+                    if (!stb::stbi_write_bmp(filename.c_str(), w, h,
     				                    outC, &pxls[0]))
                     {
     					throw std::runtime_error("Could not write BMP image.");
@@ -325,7 +325,7 @@ public:
                 }
                 else if (extension == "tga")
                 {
-                    if (!stbi_write_tga(filename.c_str(), w, h,
+                    if (!stb::stbi_write_tga(filename.c_str(), w, h,
     				                    outC, &pxls[0]))
                     {
     					throw std::runtime_error("Could not write TGA image.");
@@ -333,7 +333,7 @@ public:
                 }
                 else if (extension == "jpg" || extension == "jpeg")
                 {
-                    if (!stbi_write_jpg(filename.c_str(), w, h,
+                    if (!stb::stbi_write_jpg(filename.c_str(), w, h,
     				                    outC, &pxls[0], 100))
                     {
     					throw std::runtime_error("Could not write JPEG image.");
