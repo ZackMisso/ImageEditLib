@@ -556,6 +556,92 @@ void cloudTests()
     std::cout << "true min: " << min << std::endl;
 }
 
+void convert_to_false_color()
+{
+    std::vector<std::string> files = std::vector<std::string>();
+
+    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/const/rat_eff");
+    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/const/rec_hyp_eff");
+    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/const/rec_hyp_poi_eff");
+    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/const/hyp_mis_eff");
+
+    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/cos/rat_eff");
+    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/cos/rec_hyp_eff");
+    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/cos/rec_hyp_poi_eff");
+    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/cos/hyp_mis_eff");
+
+    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/gauss/rat_eff");
+    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/gauss/rec_hyp_eff");
+    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/gauss/rec_hyp_poi_eff");
+    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/gauss/hyp_mis_eff");
+
+    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/hole/rat_eff");
+    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/hole/rec_hyp_eff");
+    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/hole/rec_hyp_poi_eff");
+    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/hole/hyp_mis_eff");
+
+    for (int i = 0; i < files.size(); ++i)
+    {
+        Image<double> image = Image<double>(files[i] + ".png");
+        Image<double> fcImage = image;
+
+        falseColor(image, fcImage);
+
+        fcImage.write(files[i] + "_false_color.png");
+
+        Image<double> image_hdr = Image<double>(files[i] + ".hdr");
+        Image<double> fcImage_hdr = image_hdr;
+
+        falseColor(image_hdr, fcImage_hdr);
+
+        fcImage_hdr.write(files[i] + "_false_color.png");
+    }
+}
+
+void variance_calculaton()
+{
+    std::string path = "/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/";
+
+    std::vector<std::string> ests = std::vector<std::string>();
+    ests.push_back("bidir");
+    ests.push_back("rat");
+    ests.push_back("hyp_mis");
+    ests.push_back("hyp_nfr");
+    ests.push_back("hyp_rat");
+    ests.push_back("nfr");
+    ests.push_back("poi");
+    ests.push_back("rat");
+    ests.push_back("rec_hyp");
+    ests.push_back("tl");
+    ests.push_back("uni");
+
+    std::vector<std::string> tests = std::vector<std::string>();
+    tests.push_back("fox");
+    tests.push_back("vase");
+    tests.push_back("smoke");
+
+    std::cout << std::endl;
+
+    for (int i = 0; i < tests.size(); ++i)
+    {
+        std::cout << tests[i] << std::endl;
+        std::cout << std::endl;
+
+        Image<double> gt = Image<double>(path + tests[i] + "/gt.hdr");
+
+        for (int j = 0; j < ests.size(); ++j)
+        {
+            Image<double> est = Image<double>(path + tests[i] + "/" + ests[j] + ".hdr");
+
+            double err = mean_absolute_difference(gt, est);
+
+            std::cout << ests[j] << ": " << err << std::endl;
+        }
+
+        std::cout << std::endl;
+    }
+}
+
 int main()
 {
     srand(0x31245A);
@@ -572,7 +658,11 @@ int main()
     //     cout << "ERROR: Operator Test Failed" << endl;
     // }
 
-    cloudTests();
+    // cloudTests();
+
+    // convert_to_false_color();
+
+    variance_calculaton();
 
     // todo
     cout << "All Library Tests Passed" << endl;

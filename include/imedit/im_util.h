@@ -13,6 +13,7 @@
 
 #include <imedit/image.h>
 #include <vector>
+#include <tgmath.h>
 
 namespace imedit
 {
@@ -35,6 +36,22 @@ void clamp_im(Image<T>& image, T min, T max)
         if (image[i] < min) image[i] = min;
         if (image[i] > max) image[i] = max;
     }
+}
+
+template <typename T>
+T clamp(T val)
+{
+    if (val < 0.0) return 0.0;
+    if (val > 1.0) return 1.0;
+    return val;
+}
+
+template <typename T>
+T clamp(T val, T min, T max)
+{
+    if (val < min) return min;
+    if (val > max) return max;
+    return val;
 }
 
 template <typename T>
@@ -188,6 +205,28 @@ Image<T>* lerp(T t, const Image<T>& one, const Image<T>& two)
 }
 
 template <typename T>
+void falseColor(const Image<T>& other, Image<T>& image)
+{
+    for (int i = 0; i < other.height(); ++i)
+    {
+        for (int j = 0; j < other.width(); ++j)
+        {
+            T val = 0.212671 * other(j, i, 0) +
+                    0.715160 * other(j, i, 1) +
+                    0.072169 * other(j, i, 2);
+
+            T r = clamp((val < 0.7) ? 4.0 * val - 1.5 : -4.0 * val + 4.5);
+            T g = clamp((val < 0.5) ? 4.0 * val - 0.5 : -4.0 * val + 3.5);
+            T b = clamp((val < 0.3) ? 4.0 * val + 0.5 : -4.0 * val + 2.5);
+
+            image(j, i, 0) = r;
+            image(j, i, 1) = g;
+            image(j, i, 2) = b;
+        }
+    }
+}
+
+template <typename T>
 Image<T>* low_avg_comparison(const std::vector<Image<T>*>& images)
 {
     double lowest = images[0]->average();
@@ -205,6 +244,70 @@ Image<T>* low_avg_comparison(const std::vector<Image<T>*>& images)
     }
 
     return least_avg_image;
+}
+
+template <typename T>
+double mean_sqr_error(const Image<T>& one, const Image<T>& two)
+{
+    double err = 0.0;
+    double size_term = 1.0 / one.size();
+
+    for (int i = 0; i < one.size(); ++i)
+    {
+        err += (one[i] - two[i]) * (one[i] - two[i]);
+    }
+
+    err *= size_term;
+
+    return err;
+}
+
+template <typename T>
+double root_mean_sqr_error(const Image<T>& one, const Image<T>& two)
+{
+    double err = 0.0;
+    double size_term = 1.0 / one.size();
+
+    for (int i = 0; i < one.size(); ++i)
+    {
+        err += (one[i] - two[i]) * (one[i] - two[i]);
+    }
+
+    err *= size_term;
+
+    return sqrt(err);
+}
+
+template <typename T>
+double mean_absolute_difference(const Image<T>& one, const Image<T>& two)
+{
+    double err = 0.0;
+    double size_term = 1.0 / one.size();
+
+    for (int i = 0; i < one.size(); ++i)
+    {
+        err += std::abs(one[i] - two[i]);
+    }
+
+    err *= size_term;
+
+    return err;
+}
+
+template <typename T>
+double mean_absolute_relative_difference(const Image<T>& one, const Image<T>& two)
+{
+    double err = 0.0;
+    double size_term = 1.0 / one.size();
+
+    for (int i = 0; i < one.size(); ++i)
+    {
+        err += std::abs(one[i] - two[i]) / one[i];
+    }
+
+    err *= size_term;
+
+    return err;
 }
 
 }
