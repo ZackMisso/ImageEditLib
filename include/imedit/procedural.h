@@ -107,6 +107,71 @@ void manhattan_dist_from_points_image(Image<T>& image, std::vector<std::pair<int
 }
 
 template <typename T>
+void euclidean_tiled_image(Image<T>& image,
+                           const std::vector<std::pair<T, T> >& pairs,
+                           const std::vector<Pixel>& pixels)
+{
+    for (int i = 0; i < image.height(); ++i)
+    {
+        for (int j = 0; j < image.width(); ++j)
+        {
+            int best_index = -1;
+            T val = image.width() * image.height();
+
+            for (int k = 0; k < pairs.size(); ++k)
+            {
+                T j_val = pairs[k].first - (T(j) + T(0.5));
+                T i_val = pairs[k].second - (T(i) + T(0.5));
+
+                j_val *= j_val;
+                i_val *= i_val;
+
+                T tmp = sqrt(j_val + i_val);
+
+                if (tmp < val)
+                {
+                    val = tmp;
+                    best_index = k;
+                }
+            }
+
+            image.setPixel(j, i, pixels[best_index]);
+        }
+    }
+}
+
+template <typename T>
+void manhattan_tiled_image(Image<T>& image,
+                           const std::vector<std::pair<int,int> >& pairs,
+                           const std::vector<Pixel>& pixels)
+{
+    for (int i = 0; i < image.height(); ++i)
+    {
+        for (int j = 0; j < image.width(); ++j)
+        {
+            int val = image.width() * image.height();
+            int best_index = -1;
+
+            for (int k = 0; k < pairs.size(); ++k)
+            {
+                int j_val = std::abs(pairs[k].first - j);
+                int i_val = std::abs(pairs[k].second - i);
+
+                int tmp = j_val + i_val;
+
+                if (tmp < val)
+                {
+                    val = tmp;
+                    best_index = k;
+                }
+            }
+
+            image.setPixel(j, i, pixels[best_index]);
+        }
+    }
+}
+
+template <typename T>
 void euclidean_dist_image(Image<T>& image, T xpos, T ypos)
 {
     for (int i = 0; i < image.height(); ++i)

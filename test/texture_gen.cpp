@@ -3,6 +3,7 @@
 #include "imedit/procedural.h"
 #include "imedit/filter.h"
 #include "imedit/im_util.h"
+#include "pcg/pcg32.h"
 
 using namespace std;
 using namespace imedit;
@@ -15,14 +16,16 @@ float randomFloat()
 void noise_one()
 {
     int res = 4096;
+    std::string extension = ".png";
     double turb_period = double(res) / 64.0;
     double noise_period = double(res) / 16.0;
     double sharp_weight = 0.3;
+    int num_tiles = 45;
 
     std::cout << "creating turb image" << std::endl;
     Image<double> turb_image = Image<double>(res, res, 3);
     turbulence_image_xy(turb_image, turb_period);
-    turb_image.write("turb.hdr");
+    turb_image.write("turb"+extension);
     remap_range_lin(turb_image);
 
     std::cout << "creating noise image" << std::endl;
@@ -30,31 +33,12 @@ void noise_one()
     noise_image_xy(noise_image, noise_period);
     im_abs(noise_image);
 
-    // for (int i = 0; i < res; ++i)
-    //     for (int j = 0; j < res; ++j)
-    //     {
-    //         if (j < res / 2)
-    //         {
-    //             noise_image(j, i, 0) = 1.0;
-    //             noise_image(j, i, 1) = 0.0;
-    //             noise_image(j, i, 2) = 0.0;
-    //         }
-    //         else
-    //         {
-    //             noise_image(j, i, 0) = 0.0;
-    //             noise_image(j, i, 1) = 0.0;
-    //             noise_image(j, i, 2) = 1.0;
-    //         }
-    //     }
-
-    // noise_image.write("noise.hdr");
-
     std::cout << "creating sharp image" << std::endl;
     Image<double> sharp_image = Image<double>(res, res, 3);
     sharpen3x3(turb_image, sharp_image);
     remap_avg(sharp_image, 0.0);
     sharp_image = sharp_image * sharp_weight + turb_image;
-    sharp_image.write("sharp.hdr");
+    sharp_image.write("sharp"+extension);
 
     std::cout << "creating green image" << std::endl;
     Image<double> green_image = Image<double>(res, res, 3);
@@ -63,16 +47,76 @@ void noise_one()
 
     std::cout << "finishing up noise image" << std::endl;
     noise_image = noise_image * green_image * 2.0;
-    noise_image.write("noise.hdr");
+    noise_image.write("noise"+extension);
 
     std::cout << "creating sharp green image" << std::endl;
-    green_image.write("green.hdr");
+    green_image.write("green"+extension);
     green_image = green_image * sharp_image;
     double max = green_image.max();
     Image<double> max_image = Image<double>(res, res, 3);
     max_image.setPixels(max, max, max);
     green_image = max_image - green_image;
-    green_image.write("green_sharp.hdr");
+    green_image.write("green_sharp"+extension);
+
+    std::cout << "creating manhattan distance tile image" << std::endl;
+    Image<double> man_tile_image = Image<double>(res, res, 3);
+    std::vector<std::pair<int, int> > pts = std::vector<std::pair<int, int> >();
+    pcg32 rng = pcg32(0x135fa, 0xdbc45);
+    for (int i = 0; i < num_tiles; ++i)
+    {
+        int one = (int)(rng.nextDouble() * res);
+        int two = (int)(rng.nextDouble() * res);
+
+        pts.push_back(std::pair<int, int>(one, two));
+    }
+    manhattan_dist_from_points_image(man_tile_image, pts);
+    man_tile_image /= man_tile_image.max();
+    man_tile_image.write("man_tile"+extension);
+
+    std::cout << "creating manhattan tiled image" << std::endl;
+    Image<double> tile_image = Image<double>(res, res, 3);
+    std::vector<Pixel> pixels = std::vector<Pixel>();
+    for (int i = 0; i < num_tiles; ++i)
+    {
+        Pixel pixel;
+        pixel.r = rng.nextDouble();
+        pixel.g = rng.nextDouble();
+        pixel.b = rng.nextDouble();
+
+        pixels.push_back(pixel);
+    }
+    manhattan_tiled_image(tile_image, pts, pixels);
+    tile_image.write("tiled"+extension);
+
+    std::cout << "creating euclidean distance tile image" << std::endl;
+    Image<double> euc_dist_image = Image<double>(res, res, 3);
+    std::vector<std::pair<double, double> > euc_pts = std::vector<std::pair<double, double> >();
+    // pcg32 rng = pcg32(0x135fa, 0xdbc45);
+    for (int i = 0; i < num_tiles; ++i)
+    {
+        double one = (double)(rng.nextDouble() * double(res));
+        double two = (double)(rng.nextDouble() * double(res));
+
+        euc_pts.push_back(std::pair<double, double>(one, two));
+    }
+    euclidean_dist_from_points_image(euc_dist_image, euc_pts);
+    euc_dist_image /= euc_dist_image.max();
+    euc_dist_image.write("euc_dist"+extension);
+
+    std::cout << "creating euclidean tiled image" << std::endl;
+    Image<double> euc_tile_image = Image<double>(res, res, 3);
+    pixels.clear();
+    for (int i = 0; i < num_tiles; ++i)
+    {
+        Pixel pixel;
+        pixel.r = rng.nextDouble();
+        pixel.g = rng.nextDouble();
+        pixel.b = rng.nextDouble();
+
+        pixels.push_back(pixel);
+    }
+    euclidean_tiled_image(euc_tile_image, euc_pts, pixels);
+    euc_tile_image.write("euc_tiled"+extension);
 }
 
 int main()

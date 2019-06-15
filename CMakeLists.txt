@@ -44,6 +44,8 @@ include_directories(# Include directory
                     ${CMAKE_CURRENT_SOURCE_DIR}/include/
                     # STB library for image io
                     ${PROJECT_SOURCE_DIR}/ext/stb/
+                    # PCG library for random numbers
+                    ${PROJECT_SOURCE_DIR}/ext/pcg/
                     ext/
 )
 
@@ -58,6 +60,8 @@ set(imedit_srcs
     ext/stb/stb_image_write.h
     ext/stb/stb_image.h
 
+    ext/pcg/pcg32.h
+
     include/imedit/image.h
     include/imedit/procedural.h
 
@@ -67,6 +71,8 @@ set(imedit_srcs
 set(texture_gen_srcs
     ext/stb/stb_image_write.h
     ext/stb/stb_image.h
+
+    ext/pcg/pcg32.h
 
     include/imedit/image.h
     include/imedit/procedural.h

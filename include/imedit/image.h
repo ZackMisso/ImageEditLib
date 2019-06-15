@@ -27,6 +27,13 @@
 namespace imedit
 {
 
+struct Pixel
+{
+    double r;
+    double g;
+    double b;
+};
+
 // clamps val between min and max
 template <typename T>
 static inline T im_clamp(T val, T min, T max)
@@ -403,6 +410,13 @@ public:
                 operator()(j, i, 2) = b;
             }
         }
+    }
+
+    void setPixel(int j, int i, Pixel p)
+    {
+        operator()(j, i, 0) = p.r;
+        operator()(j, i, 1) = p.g;
+        operator()(j, i, 2) = p.b;
     }
 
     Image<T> operator+(const Image<T>& other) const
