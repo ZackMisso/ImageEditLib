@@ -8,11 +8,6 @@
 using namespace std;
 using namespace imedit;
 
-float randomFloat()
-{
-    return static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-}
-
 void noise_one()
 {
     int res = 4096;
@@ -119,11 +114,140 @@ void noise_one()
     euc_tile_image.write("euc_tiled"+extension);
 }
 
+void create_tiled_image(const std::string& name,
+                        const std::vector<Pixel>& colors,
+                        unsigned long seed_one,
+                        unsigned long seed_two,
+                        int res,
+                        bool is_manhatan)
+{
+    pcg32 rng = pcg32(seed_one, seed_two);
+
+    Image<double> image = Image<double>(res, res, 3);
+
+    if (is_manhatan)
+    {
+        std::vector<std::pair<int, int> > pts = std::vector<std::pair<int, int> >();
+        for (int i = 0; i < colors.size(); ++i)
+        {
+            int one = (int)(rng.nextDouble() * res);
+            int two = (int)(rng.nextDouble() * res);
+
+            pts.push_back(std::pair<int, int>(one, two));
+        }
+        manhattan_tiled_image(image, pts, colors);
+    }
+    else
+    {
+        std::vector<std::pair<double, double> > euc_pts = std::vector<std::pair<double, double> >();
+        for (int i = 0; i < colors.size(); ++i)
+        {
+            double one = (double)(rng.nextDouble() * double(res));
+            double two = (double)(rng.nextDouble() * double(res));
+
+            euc_pts.push_back(std::pair<double, double>(one, two));
+        }
+        euclidean_tiled_image(image, euc_pts, colors);
+    }
+
+    image.write(name);
+}
+
+void create_pokedot_image(std::string name,
+                          Pixel base,
+                          double min_dist,
+                          double max_dist,
+                          unsigned long seed_one,
+                          unsigned long seed_two,
+                          int dots,
+                          int res,
+                          bool is_manhatan)
+{
+    pcg32 rng = pcg32(seed_one, seed_two);
+
+    Image<double> image = Image<double>(res, res, 3);
+    image.setPixels(0.0, 0.0, 0.0);
+
+    if (is_manhatan)
+    {
+        for (int i = 0; i < dots; ++i)
+        {
+            int dist = int(rng.nextDouble() * (max_dist - min_dist) + min_dist);
+            int xpos = int(rng.nextDouble() * double(res));
+            int ypos = int(rng.nextDouble() * double(res));
+
+            splat_manhattan(image, base, xpos, ypos, dist);
+        }
+    }
+    else
+    {
+        for (int i = 0; i < dots; ++i)
+        {
+            double dist = rng.nextDouble() * (max_dist - min_dist) + min_dist;
+            double xpos = rng.nextDouble() * double(res);
+            double ypos = rng.nextDouble() * double(res);
+
+            splat_euclidean(image, base, xpos, ypos, dist);
+        }
+    }
+
+    image.write(name);
+}
+
+void generate_pawn_scene_board(const std::vector<Pixel>& pixels,
+                               Pixel dot_base,
+                               const std::string base_name,
+                               unsigned long seed_one,
+                               unsigned long seed_two,
+                               double min_dot_dist,
+                               double max_dot_dist,
+                               int res,
+                               int dots,
+                               bool manhattan)
+{
+    pcg32 global_rng = pcg32(seed_one, seed_two);
+
+    for (int i = 0; i < 8; ++i)
+    {
+        for (int j = 0; j < 8; ++j)
+        {
+            std::cout << "creating texture for tile: (" << j << "," << i << ")" << std::endl;
+
+            std::string name = base_name + "_" + to_string(i) + "_" + to_string(j) + ".png";
+
+            if ((i+j)%2 == 0)
+            {
+                // create tiled image
+                create_tiled_image(name,
+                                   pixels,
+                                   global_rng.nextUInt(),
+                                   global_rng.nextUInt(),
+                                   res,
+                                   manhattan);
+            }
+            else
+            {
+                // create dotted image
+                create_pokedot_image(name,
+                                     dot_base,
+                                     min_dot_dist,
+                                     max_dot_dist,
+                                     global_rng.nextUInt(),
+                                     global_rng.nextUInt(),
+                                     dots,
+                                     res,
+                                     manhattan);
+            }
+        }
+    }
+}
+
 int main()
 {
-    srand(0x31245A);
-
     noise_one();
+
+    // todo - create main script
+    // todo - create interpolation of colors in hsl space
 
     return 0;
 }

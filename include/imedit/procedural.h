@@ -212,6 +212,61 @@ void manhattan_dist_image(Image<T>& image, int xpos, int ypos)
     }
 }
 
+// Note: I know this is inefficient - TODO: fix
+template <typename T>
+void splat_manhattan(Image<T>& image,
+                     Pixel color,
+                     int xpos,
+                     int ypos,
+                     int radius)
+{
+    for (int i = 0; i < image.height(); ++i)
+    {
+        for (int j = 0; j < image.width(); ++j)
+        {
+            int j_val = std::abs(xpos - j);
+            int i_val = std::abs(ypos - i);
+
+            if (j_val + i_val < radius)
+            {
+                image(j, i, 0) += color.r;
+                image(j, i, 1) += color.g;
+                image(j, i, 2) += color.b;
+            }
+        }
+    }
+}
+
+// Note: I know this is inefficient - TODO: fix
+template <typename T>
+void splat_euclidean(Image<T>& image,
+                     Pixel color,
+                     T xpos,
+                     T ypos,
+                     T radius)
+{
+    for (int i = 0; i < image.height(); ++i)
+    {
+        for (int j = 0; j < image.width(); ++j)
+        {
+            T j_val = xpos - (T(j) + T(0.5));
+            T i_val = ypos - (T(i) + T(0.5));
+
+            j_val *= j_val;
+            i_val *= i_val;
+
+            T val = sqrt(j_val + i_val);
+
+            if (val < radius)
+            {
+                image(j, i, 0) += color.r;
+                image(j, i, 1) += color.g;
+                image(j, i, 2) += color.b;
+            }
+        }
+    }
+}
+
 template <typename T>
 void turbulence_image(Image<T>& image, T period)
 {
