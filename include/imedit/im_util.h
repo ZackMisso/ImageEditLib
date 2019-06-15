@@ -320,4 +320,104 @@ double mean_absolute_relative_difference(const Image<T>& one, const Image<T>& tw
     return err;
 }
 
+void hsl_to_rgb(Pixel& pixel)
+{
+    // h=r; s=g; l=b
+    Pixel new_pix;
+
+    if (pixel.g == 0.0)
+    {
+        pixel.r = pixel.b;
+        pixel.g = pixel.b;
+        return;
+    }
+
+    double tmp_1 = 0.0;
+    if (pixel.b < 0.5)
+    {
+        tmp_1 = pixel.b * (1.0 + pixel.g);
+    }
+    else
+    {
+        tmp_1 = pixel.b + pixel.g - (pixel.b * pixel.g);
+    }
+
+    double tmp_2 = 2.0 * pixel.b - tmp_1;
+
+    double tmp_R = pixel.r + 0.3333;
+    double tmp_G = pixel.r;
+    double tmp_B = pixel.r - 0.3333;
+
+    // convert the red channel
+    if (tmp_R > 1.0 or tmp_R < 0.0)
+    {
+        new_pix.r = 0.0;
+    }
+    else if (6.0 * tmp_R < 1.0)
+    {
+        new_pix.r = (tmp_2 + (tmp_1 - tmp_2) * 6.0 * tmp_R);
+    }
+    else if (2.0 * tmp_R < 1.0)
+    {
+        new_pix.r = tmp_1;
+    }
+    else if (3.0 * tmp_R < 2.0)
+    {
+        new_pix.r = tmp_2 + (tmp_1 - tmp_2) * (0.667 - tmp_R) * 6.0;
+    }
+    else
+    {
+        new_pix.r = tmp_2;
+    }
+
+    // convert the green channel
+    if (tmp_G > 1.0 or tmp_G < 0.0)
+    {
+        new_pix.g = 0.0;
+    }
+    else if (6.0 * tmp_G < 1.0)
+    {
+        new_pix.g = tmp_2 + (tmp_1 - tmp_2) * 6.0 * tmp_G;
+    }
+    else if (2.0 * tmp_G < 1.0)
+    {
+        new_pix.g = tmp_1;
+    }
+    else if (3.0 * tmp_G < 2.0)
+    {
+        new_pix.g = tmp_2 + (tmp_1 - tmp_2) * (0.667 - tmp_G) * 6.0;
+    }
+    else
+    {
+        new_pix.g = tmp_2;
+    }
+
+    // convert the blue channel
+    if (tmp_B >= 1.0 or tmp_B <= 0.0)
+    {
+        new_pix.b = 0.0;
+    }
+    else if (6.0 * tmp_B < 1.0)
+    {
+        new_pix.b = tmp_2 + (tmp_1 - tmp_2) * 6.0 * tmp_B;
+    }
+    else if (2.0 * tmp_B < 1.0)
+    {
+        new_pix.b = tmp_1;
+    }
+    else if (3.0 * tmp_B < 2.0)
+    {
+        new_pix.b = tmp_2 + (tmp_1 - tmp_2) * (0.667 - tmp_B) * 6.0;
+    }
+    else
+    {
+        new_pix.b = tmp_2;
+    }
+
+    pixel.r = new_pix.r;
+    pixel.g = new_pix.g;
+    pixel.b = new_pix.b;
+}
+
+
 }

@@ -11,7 +11,7 @@ using namespace imedit;
 void noise_one()
 {
     int res = 4096;
-    std::string extension = ".png";
+    std::string extension = ".hdr";
     double turb_period = double(res) / 64.0;
     double noise_period = double(res) / 16.0;
     double sharp_weight = 0.3;
@@ -213,7 +213,7 @@ void generate_pawn_scene_board(const std::vector<Pixel>& pixels,
         {
             std::cout << "creating texture for tile: (" << j << "," << i << ")" << std::endl;
 
-            std::string name = base_name + "_" + to_string(i) + "_" + to_string(j) + ".png";
+            std::string name = base_name + "_" + to_string(i) + "_" + to_string(j) + ".hdr";
 
             if ((i+j)%2 == 0)
             {
@@ -242,12 +242,69 @@ void generate_pawn_scene_board(const std::vector<Pixel>& pixels,
     }
 }
 
+std::vector<Pixel> create_pixels(double min_h, double max_h,
+                                 double min_s, double max_s,
+                                 double min_l, double max_l,
+                                 unsigned seed_one, unsigned seed_two,
+                                 int num_pixels)
+{
+    std::vector<Pixel> pixels = std::vector<Pixel>();
+    pcg32 rng = pcg32(seed_one, seed_two);
+
+    for (int i = 0; i < num_pixels; ++i)
+    {
+        Pixel pixel;
+        pixel.r = rng.nextDouble() * (max_h - min_h) + min_h;
+        pixel.g = rng.nextDouble() * (max_s - min_s) + min_s;
+        pixel.b = rng.nextDouble() * (max_l - min_l) + min_l;
+
+        hsl_to_rgb(pixel);
+
+        pixels.push_back(pixel);
+    }
+
+    return pixels;
+}
+
 int main()
 {
     noise_one();
 
-    // todo - create main script
-    // todo - create interpolation of colors in hsl space
+    pcg32 rng = pcg32(0xfa23a, 0x980ac);
+    Pixel base_dot;
+    double min_h = 55.0 / 360.0;
+    double max_h = 105.0 / 360.0;
+    double min_s = 0.35;
+    double max_s = 0.75;
+    double min_l = 0.32;
+    double max_l = 0.53;
+    int res = 4096;
+    int num_tiles = 45;
+    int num_dots = 20;
+    double min_dot_dist = double(res) / 10.0;
+    double max_dot_dist = double(res) / 6.0;
+
+    base_dot.r = 337.0 / 360.0;
+    base_dot.g = 0.66;
+    base_dot.b = 0.86;
+    hsl_to_rgb(base_dot);
+
+    std::vector<Pixel> colors = create_pixels(min_h, max_h,
+                                              min_s, max_s,
+                                              min_l, max_l,
+                                              rng.nextUInt(), rng.nextUInt(),
+                                              num_tiles);
+
+    generate_pawn_scene_board(colors,
+                              base_dot,
+                              "/Users/corneria/Documents/Research/testscenes/chess/textures/generated/board",
+                              rng.nextUInt(),
+                              rng.nextUInt(),
+                              min_dot_dist,
+                              max_dot_dist,
+                              res,
+                              num_dots,
+                              false);
 
     return 0;
 }
