@@ -390,6 +390,21 @@ public:
         return image;
     }
 
+    void setPixels(T r, T b, T g)
+    {
+        if (d != 3) return;
+
+        for (int i = 0; i < h; ++i)
+        {
+            for (int j = 0; j < w; ++j)
+            {
+                operator()(j, i, 0) = r;
+                operator()(j, i, 1) = g;
+                operator()(j, i, 2) = b;
+            }
+        }
+    }
+
     Image<T> operator+(const Image<T>& other) const
     {
         Image<T> image = Image<T>(w, h, d);
@@ -607,6 +622,30 @@ public:
     T operator()(int x, int y, int z) const
     {
         // return im[z * w * h + y * w + x];
+        return im[(z * h + y) * w + x];
+    }
+
+    T& filter_index(int x, int y, int z)
+    {
+        if (x < 0) x = 0;
+        if (x > w-1) x = w-1;
+        if (y < 0) y = 0;
+        if (y > h-1) y = h-1;
+        if (z < 0) z = 0;
+        if (z > d-1) z = d-1;
+
+        return im[(z * h + y) * w + x];
+    }
+
+    T filter_index(int x, int y, int z) const
+    {
+        if (x < 0) x = 0;
+        if (x > w-1) x = w-1;
+        if (y < 0) y = 0;
+        if (y > h-1) y = h-1;
+        if (z < 0) z = 0;
+        if (z > d-1) z = d-1;
+
         return im[(z * h + y) * w + x];
     }
 

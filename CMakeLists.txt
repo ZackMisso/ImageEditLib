@@ -36,9 +36,6 @@ if (APPLE)
   list(APPEND LIBNANOGUI_EXTRA_SOURCE src/darwin.mm)
  endif()
 
-# set(EIGEN_INCLUDE_DIR
-#   ${CMAKE_CURRENT_SOURCE_DIR}/ext/nanogui/ext/eigen)
-
 find_package(PythonLibs REQUIRED)
 include_directories(${PYTHON_INCLUDE_DIRS})
 
@@ -57,10 +54,6 @@ set(ext_stb_srcs
 
 add_definitions(-DDATA_DIR=R\"\(${PROJECT_SOURCE_DIR}/data\)\")
 
-#set_target_properties(common_lib PROPERTIES LINKER_LANGUAGE CXX)
-
-#SOURCE_GROUP("ext\\stb" FILES ${ext_stb_srcs})
-
 set(imedit_srcs
     ext/stb/stb_image_write.h
     ext/stb/stb_image.h
@@ -71,10 +64,22 @@ set(imedit_srcs
     test/main.cpp
 )
 
-add_executable(imedit ${imedit_srcs})                                               # a5
+set(texture_gen_srcs
+    ext/stb/stb_image_write.h
+    ext/stb/stb_image.h
 
-target_link_libraries(imedit ${PYTHON_LIBRARIES})                                    # a5
-#SOURCE_GROUP("src" FILES ${imedit_srcs})
+    include/imedit/image.h
+    include/imedit/procedural.h
+    include/imedit/filter.h
+
+    test/texture_gen.cpp
+)
+
+add_executable(imedit ${imedit_srcs})
+add_executable(texture_gen ${texture_gen_srcs})
+
+target_link_libraries(imedit ${PYTHON_LIBRARIES})
+target_link_libraries(texture_gen ${PYTHON_LIBRARIES})
 
 set(CompilerFlags
       CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
@@ -82,8 +87,7 @@ set(CompilerFlags
       CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_MINSIZEREL
       CMAKE_C_FLAGS_RELWITHDEBINFO COMPILE_DEFINITIONS U_CMAKE_BUILD_TYPE
       CMAKE_MACOSX_RPATH
-)                                      # a5
-                                                                            # a5
+)
 
 # Create the output data directory
-add_custom_command(TARGET imedit POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_SOURCE_DIR}/data/output") # a5
+# add_custom_command(TARGET imedit POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_SOURCE_DIR}/data/output") # a5

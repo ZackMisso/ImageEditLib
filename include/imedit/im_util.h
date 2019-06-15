@@ -76,7 +76,6 @@ void exp_im(Image<T>& image, T period)
 }
 
 template <typename T>
-
 void remap_range_lin(std::vector<Image<T> >& images)
 {
     T min = images[0].min();
@@ -97,6 +96,17 @@ void remap_range_lin(std::vector<Image<T> >& images)
         {
             images[i][j] = (images[i][j] - min) / (max - min);
         }
+    }
+}
+
+template <typename T>
+void remap_avg(Image<T>& image, T new_avg)
+{
+    T avg = image.average();
+
+    for (int i = 0; i < image.size(); ++i)
+    {
+        image[i] -= avg;
     }
 }
 

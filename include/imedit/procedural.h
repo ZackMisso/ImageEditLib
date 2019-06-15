@@ -156,7 +156,7 @@ void turbulence_image(Image<T>& image, T period)
         {
             for (int k = 0; k < image.depth(); ++k)
             {
-                image(j, i, k) = turbulence(j + 0.5f, i + 0.5f, k + 0.5f, period);
+                image(j, i, k) = turbulence(T(j + 0.5), T(i + 0.5), T(k + 0.5), period);
             }
         }
     }
@@ -169,7 +169,7 @@ void turbulence_image_xy(Image<T>& image, T period)
     {
         for (int j = 0; j < image.width(); ++j)
         {
-            T val = turbulence(j + 0.5f, i + 0.5f, 0.f, period);
+            T val = turbulence(T(j + 0.5), T(i + 0.5), T(0.0), period);
 
             for (int k = 0; k < image.depth(); ++k)
             {
@@ -218,7 +218,7 @@ void noise_image_xy(Image<T>& image, T period)
     {
         for (int j = 0; j < image.width(); ++j)
         {
-            T val = noise(j + 0.5f, i + 0.5f, 0.f, period);
+            T val = noise(T(j + 0.5), T(i + 0.5), T(0.0), period);
 
             for (int k = 0; k < image.depth(); ++k)
             {
