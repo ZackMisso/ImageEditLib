@@ -332,13 +332,13 @@ void noise_image(Image<T>& image, T period)
 }
 
 template <typename T>
-void noise_image_xy(Image<T>& image, T period)
+void noise_image_xy(Image<T>& image, T period, int xtrans=0.0, int ytrans=0.0)
 {
     for (int i = 0; i < image.height(); ++i)
     {
         for (int j = 0; j < image.width(); ++j)
         {
-            T val = noise(T(j + 0.5), T(i + 0.5), T(0.0), period);
+            T val = noise(T(j + 0.5) + xtrans, T(i + 0.5) + ytrans, T(0.0), period);
 
             for (int k = 0; k < image.depth(); ++k)
             {

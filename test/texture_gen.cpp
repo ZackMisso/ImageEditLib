@@ -150,6 +150,8 @@ void create_tiled_image(const std::string& name,
         euclidean_tiled_image(image, euc_pts, colors);
     }
 
+    image *= 2.0;
+
     image.write(name);
 }
 
@@ -191,6 +193,14 @@ void create_pokedot_image(std::string name,
         }
     }
 
+    image /= image.max();
+    // image.setDark(1.0);
+
+    Image<double> one_image = Image<double>(res, res, 3);
+    one_image.setPixels(1.0, 1.0, 1.0);
+    image = one_image - image;
+    image *= 2.0;
+
     image.write(name);
 }
 
@@ -207,9 +217,9 @@ void generate_pawn_scene_board(const std::vector<Pixel>& pixels,
 {
     pcg32 global_rng = pcg32(seed_one, seed_two);
 
-    for (int i = 0; i < 8; ++i)
+    for (int i = 0; i < 11; ++i)
     {
-        for (int j = 0; j < 8; ++j)
+        for (int j = 0; j < 11; ++j)
         {
             std::cout << "creating texture for tile: (" << j << "," << i << ")" << std::endl;
 
@@ -266,25 +276,71 @@ std::vector<Pixel> create_pixels(double min_h, double max_h,
     return pixels;
 }
 
+void generate_mesh_image(std::string name,
+                         double min_period,
+                         double max_period,
+                         unsigned long seed_one,
+                         unsigned long seed_two,
+                         int num_meshes,
+                         int res,
+                         double min_h,
+                         double max_h,
+                         double min_s,
+                         double max_s,
+                         double min_l,
+                         double max_l)
+{
+    pcg32 rng = pcg32(seed_one, seed_two);
+
+    for (int i = 0; i < num_meshes; ++i)
+    {
+        double noise_period = (max_period - min_period) + min_period;
+
+        Pixel pixel;
+        pixel.r = rng.nextDouble() * (max_h - min_h) + min_h;
+        pixel.g = rng.nextDouble() * (max_s - min_s) + min_s;
+        pixel.b = rng.nextDouble() * (max_l - min_l) + min_l;
+
+        hsl_to_rgb(pixel);
+
+        Image<double> noise_image = Image<double>(res, res, 3);
+        Image<double> color_image = Image<double>(res, res, 3);
+
+        color_image.setPixels(pixel);
+
+        noise_image_xy(noise_image, noise_period, rng.nextUInt(), rng.nextUInt());
+        im_abs(noise_image);
+        noise_image = noise_image * color_image * 4.0;
+        noise_image.write(name + "_" + std::to_string(i) + ".hdr");
+    }
+}
+
 int main()
 {
-    noise_one();
+    // noise_one();
 
     pcg32 rng = pcg32(0xfa23a, 0x980ac);
     Pixel base_dot;
-    double min_h = 55.0 / 360.0;
-    double max_h = 105.0 / 360.0;
-    double min_s = 0.35;
-    double max_s = 0.75;
-    double min_l = 0.32;
-    double max_l = 0.53;
-    int res = 4096;
+    // double min_h = 55.0 / 360.0;
+    // double max_h = 105.0 / 360.0;
+    // double min_s = 0.35;
+    // double max_s = 0.75;
+    // double min_l = 0.32;
+    // double max_l = 0.53;
+    double min_h = 330.0 / 360.0;
+    double max_h = 360.0 / 360.0;
+    double min_s = 0.20;
+    double max_s = 0.60;
+    double min_l = 0.30;
+    double max_l = 0.56;
+    int res_obj = 4096;
+    int res_board = 512;
     int num_tiles = 45;
-    int num_dots = 20;
-    double min_dot_dist = double(res) / 10.0;
-    double max_dot_dist = double(res) / 6.0;
+    int num_dots = 50;
+    double min_dot_dist = double(res_board) / 10.0;
+    double max_dot_dist = double(res_board) / 5.0;
 
-    base_dot.r = 337.0 / 360.0;
+    base_dot.r = 1.0 - 337.0 / 360.0;
     base_dot.g = 0.66;
     base_dot.b = 0.86;
     hsl_to_rgb(base_dot);
@@ -297,14 +353,39 @@ int main()
 
     generate_pawn_scene_board(colors,
                               base_dot,
-                              "/Users/corneria/Documents/Research/testscenes/chess/textures/generated/board",
+                              "/Users/corneria/Documents/Research/testscenes/chess/textures/generated_2/board",
                               rng.nextUInt(),
                               rng.nextUInt(),
                               min_dot_dist,
                               max_dot_dist,
-                              res,
+                              res_board,
                               num_dots,
                               false);
+
+    int mesh_res = 1024;
+    double mesh_min_period = double(mesh_res / 40.0);
+    double mesh_max_period = double(mesh_res / 16.0);
+    double mesh_min_h = 100.0 / 360.0;
+    double mesh_max_h = 140.0 / 360.0;
+    double mesh_min_s = 0.62;
+    double mesh_max_s = 0.84;
+    double mesh_min_l = 0.60;
+    double mesh_max_l = 0.90;
+    int num_meshes = 16;
+
+    generate_mesh_image("/Users/corneria/Documents/Research/testscenes/chess/textures/generated_2/mesh",
+                        mesh_min_period,
+                        mesh_max_period,
+                        rng.nextUInt(),
+                        rng.nextUInt(),
+                        num_meshes,
+                        mesh_res,
+                        mesh_min_h,
+                        mesh_max_h,
+                        mesh_min_s,
+                        mesh_max_s,
+                        mesh_min_l,
+                        mesh_max_l);
 
     return 0;
 }

@@ -34,6 +34,11 @@ struct Pixel
     double b;
 };
 
+// std::string im_ext(std::string filename)
+// {
+//     return filename.
+// }
+
 // clamps val between min and max
 template <typename T>
 static inline T im_clamp(T val, T min, T max)
@@ -173,8 +178,7 @@ public:
         return val;
     }
 
-    // The read and write logic is based off of code
-    // written by Wojciech Jarosz
+    // The read and write logic is based off of code written by Wojciech Jarosz
     bool read(const std::string& filename)
     {
         int wid;
@@ -183,6 +187,7 @@ public:
 
         try
         {
+            if (filename )
             if (stbi_is_hdr(filename.c_str()))
             {
                 float* pxls = stbi_loadf(filename.c_str(),
@@ -412,12 +417,49 @@ public:
         }
     }
 
+    void setPixels(Pixel p)
+    {
+        if (d != 3) return;
+
+        for (int i = 0; i < h; ++i)
+        {
+            for (int j = 0; j < w; ++j)
+            {
+                operator()(j, i, 0) = p.r;
+                operator()(j, i, 1) = p.g;
+                operator()(j, i, 2) = p.b;
+            }
+        }
+    }
+
     void setPixel(int j, int i, Pixel p)
     {
         operator()(j, i, 0) = p.r;
         operator()(j, i, 1) = p.g;
         operator()(j, i, 2) = p.b;
     }
+
+    // sort of a hack
+    // void setDark(T val)
+    // {
+    //     for (int i = 0; i < h; ++i)
+    //     {
+    //         for (int j = 0; j < w; ++j)
+    //         {
+    //             T sum = 0.0;
+    //             for (int k = 0; k < 3; ++k)
+    //             {
+    //                 sum += operator()(j, i, k);
+    //             }
+    //             if (sum < 0.05)
+    //             {
+    //                 operator()(j, i, 0) = val;
+    //                 operator()(j, i, 1) = val;
+    //                 operator()(j, i, 2) = val;
+    //             }
+    //         }
+    //     }
+    // }
 
     Image<T> operator+(const Image<T>& other) const
     {
