@@ -3,7 +3,8 @@
     <zackary.t.misso.gr@dartmouth.edu>
 
     All code here is free to use as long as
-    proper credit is given to the author
+    proper credit is given to the author and
+    any works referenced by the author
 */
 
 #pragma once
@@ -134,25 +135,30 @@ T noise(T x, T y, T z, T period)
 }
 
 template <typename T>
+T noise(T x,
+        T y,
+        T z,
+        T x_period,
+        T y_period,
+        T z_period)
+{
+    return pbrtPerlinNoise<T>(x / x_period,
+                              y / y_period,
+                              z / z_period);
+}
+
+template <typename T>
 T turbulence(T x, T y, T z, T period)
 {
     T val = 0.0;
     T scale = period;
-    // T pixelSize = 1.0 / period;
     T totalScale = 0.0;
 
     while (scale > 1.0)
     {
-        // x /= scale;
-        // y /= scale;
-        // z /= scale;
-
         val = val + (noise<T>(x, y, z, scale)) * scale;
-        // totalScale += scale;
         scale /= 2.0;
     }
-
-    // if ( val * 0.5 / period < 0.0) std::cout <<  val * 0.5 / period << std::endl;
 
     return (0.5 + val * 0.5 / period) * 0.5;
 }

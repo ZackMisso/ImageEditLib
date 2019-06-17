@@ -1,6 +1,6 @@
 #pragma once
 
-#include <imedit/image.h>
+#include "image.h"
 #include <vector>
 
 namespace imedit

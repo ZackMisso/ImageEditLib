@@ -13,6 +13,10 @@
 #include <string>
 #include <iostream>
 #include <algorithm>
+#include <fstream>
+
+#define STB_IMAGE_STATIC
+#define STB_IMAGE_WRITE_STATIC
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
@@ -34,28 +38,12 @@ struct Pixel
     double b;
 };
 
-// std::string im_ext(std::string filename)
-// {
-//     return filename.
-// }
-
 // clamps val between min and max
 template <typename T>
 static inline T im_clamp(T val, T min, T max)
 {
     return (val >= min) ?
            ((val <= max) ? val : max) : min;
-}
-
-//! Returns a modulus b.
-template <typename T>
-static inline T im_mod(T a, T b)
-{
-    int n = (int)(a / b);
-    a -= n * b;
-    if (a < 0)
-        a += b;
-    return a;
 }
 
 // converts the value to a byte
@@ -82,6 +70,14 @@ static std::string getExtension(const std::string &filename)
 	return "";
 }
 
+enum ImageMode
+{
+    IM_GREYSCALE,
+    IM_COLOR,
+    IM_3D_COLORED_TEXTURE,
+    IM_3D_GRAYSCALE_TEXTURE
+};
+
 template <typename T>
 class Image
 {
@@ -89,18 +85,36 @@ public:
     Image() :
         w(0), h(0), d(0)
     {
+        mode = IM_COLOR;
         im = std::vector<T>();
     }
 
     Image(int w, int h, int d) :
         w(w), h(h), d(d)
     {
+        if (d == 1) mode = IM_GREYSCALE;
+        else if (d == 3) mode = IM_COLOR;
+        else if (d % 3 == 0) mode = IM_3D_COLORED_TEXTURE;
+        else mode = IM_3D_GRAYSCALE_TEXTURE;
+
+        im = std::vector<T>(w * h * d);
+    }
+
+    Image(int w, int h, int d, ImageMode mode) :
+        w(w), h(h), d(d), mode(mode)
+    {
+        // TODO: assert mode
         im = std::vector<T>(w * h * d);
     }
 
     Image(const std::string& filename)
     {
         read(filename);
+
+        if (d == 1) mode = IM_GREYSCALE;
+        else if (d == 3) mode = IM_COLOR;
+        else if (d % 3 == 0) mode = IM_3D_COLORED_TEXTURE;
+        else mode = IM_3D_GRAYSCALE_TEXTURE;
     }
 
     void clear()
@@ -111,6 +125,7 @@ public:
         }
     }
 
+    // TODO: convert this form of averaging to be in-place
     double average() const
     {
         // use long double for precision
@@ -126,6 +141,31 @@ public:
         return double(avg);
     }
 
+    // TODO: convert this form of averaging to be in-place
+    Pixel average_pixel() const
+    {
+        Pixel avg;
+        avg.r = 0.0;
+        avg.g = 0.0;
+        avg.b = 0.0;
+
+        for (int i = 0; i < height(); ++i)
+        {
+            for (int j = 0; j < width(); ++j)
+            {
+                avg.r += operator()(j, i, 0);
+                avg.g += operator()(j, i, 1);
+                avg.b += operator()(j, i, 2);
+            }
+        }
+
+        avg.r /= double(size());
+        avg.g /= double(size());
+        avg.b /= double(size());
+
+        return avg;
+    }
+
     T max() const
     {
         T val = im[0];
@@ -136,6 +176,60 @@ public:
         }
 
         return val;
+    }
+
+    T min() const
+    {
+        T val = im[0];
+
+        for (int i = 1; i < im.size(); ++i)
+        {
+            if (im[i] < val) val = im[i];
+        }
+
+        return val;
+    }
+
+    Pixel max_channel() const
+    {
+        Pixel max;
+
+        max.r = operator()(0, 0, 0);
+        max.g = operator()(0, 0, 1);
+        max.b = operator()(0, 0, 2);
+
+        for (int i = 0; i < height(); ++i)
+        {
+            for (int j = 0; j < width(); ++j)
+            {
+                if (operator()(j, i, 0) > max.r) max.r = operator()(j, i, 0);
+                if (operator()(j, i, 1) > max.g) max.g = operator()(j, i, 1);
+                if (operator()(j, i, 2) > max.b) max.b = operator()(j, i, 2);
+            }
+        }
+
+        return max;
+    }
+
+    Pixel min_channel() const
+    {
+        Pixel min;
+
+        min.r = operator()(0, 0, 0);
+        min.g = operator()(0, 0, 1);
+        min.b = operator()(0, 0, 2);
+
+        for (int i = 0; i < height(); ++i)
+        {
+            for (int j = 0; j < width(); ++j)
+            {
+                if (operator()(j, i, 0) < min.r) min.r = operator()(j, i, 0);
+                if (operator()(j, i, 1) < min.g) min.g = operator()(j, i, 1);
+                if (operator()(j, i, 2) < min.b) min.b = operator()(j, i, 2);
+            }
+        }
+
+        return min;
     }
 
     void brighten(T factor)
@@ -166,18 +260,6 @@ public:
         }
     }
 
-    T min() const
-    {
-        T val = im[0];
-
-        for (int i = 1; i < im.size(); ++i)
-        {
-            if (im[i] < val) val = im[i];
-        }
-
-        return val;
-    }
-
     // The read and write logic is based off of code written by Wojciech Jarosz
     bool read(const std::string& filename)
     {
@@ -187,8 +269,35 @@ public:
 
         try
         {
-            if (filename )
-            if (stbi_is_hdr(filename.c_str()))
+            if (getExtension(filename) == "txt")
+            {
+                std::string line;
+                std::ifstream file(filename);
+
+                std::getline(file, line);
+                int wid = std::stoi(line);
+                std::getline(file, line);
+                int hei = std::stoi(line);
+                std::getline(file, line);
+                int dep = std::stoi(line);
+
+                resize(wid, hei, dep);
+
+                for (int y = 0; y < h; ++y)
+                {
+                    for (int x = 0; x < w; ++x)
+                    {
+                        for (int z = 0; z < d; ++z)
+                        {
+                            std::getline(file, line);
+                            operator()(x, y, z) = (T)std::stod(line);
+                        }
+                    }
+                }
+
+                return true;
+            }
+            else if (stbi_is_hdr(filename.c_str()))
             {
                 float* pxls = stbi_loadf(filename.c_str(),
                                          &wid,
@@ -259,107 +368,130 @@ public:
 
     bool write(const std::string& filename)
     {
-        if (d != 1 && d != 3 && d != 4)
+        if (getExtension(filename) == ".txt")
         {
-            std::cout << "Image must have 1, 3, or 4 channels" << std::endl;
-            return false;
-        }
+            std::ofstream file(filename);
+            file << width() << "\n";
+            file << height() << "\n";
+            file << depth() << "\n";
 
-        std::string extension = getExtension(filename);
-
-        std::transform(extension.begin(),
-                       extension.end(),
-                       extension.begin(),
-                       ::tolower);
-
-        try
-        {
-            if (extension == "hdr")
+            for (int x = 0; x < w; ++x)
             {
-                std::vector<float> pxls(h * w * 3, 1.f);
-                for (int x = 0; x < w; ++x)
+                for (int y = 0; y < h; ++y)
                 {
-                    for (int y = 0; y < h; ++y)
+                    for (int z = 0; z < d; ++z)
                     {
-                        for (int z = 0; z < d; ++z)
-                        {
-                            pxls[z + 3 * (x + y * w)] = (float)operator()(x, y, z);
-                        }
+                        file << operator()(x, y, z) << "\n";
                     }
-                }
-
-                if (!stb::stbi_write_hdr(filename.c_str(), w, h, d, &pxls[0]))
-                {
-                    throw std::runtime_error("Could not write HDR image");
                 }
             }
-            else if (extension == "png" ||
-                     extension == "bmp" ||
-                     extension == "tga" ||
-                     extension == "jpg" ||
-                     extension == "jpeg")
+
+            file.close();
+        }
+        else
+        {
+            if (d != 1 && d != 3 && d != 4)
             {
-                int outC = 4;
-                std::vector<unsigned char> pxls(h * w * outC, 255);
+                std::cout << "Image must have 1, 3, or 4 channels" << std::endl;
+                return false;
+            }
 
-                for (int x = 0; x < w; ++x)
-                {
-                    for (int y = 0; y < h; ++y)
-                    {
-                        int z;
-                        for (z = 0; z < d; ++z)
-                        {
-                            pxls[z + outC * (x + y * w)] = valToByte(operator()(x, y, z));
-                        }
-                        for (; z < 3; ++z)
-                        {
-                            pxls[z + outC * (x + y * w)] = valToByte(operator()(x, y, 0));
-                        }
-                    }
-                }
+            std::string extension = getExtension(filename);
 
-                if (extension == "png")
+            std::transform(extension.begin(),
+                           extension.end(),
+                           extension.begin(),
+                           ::tolower);
+
+            try
+            {
+                if (extension == "hdr")
                 {
-                    if (!stb::stbi_write_png(filename.c_str(), w, h,
-    				                    outC, &pxls[0],
-    				                    sizeof(unsigned char) * w * outC))
+                    std::vector<float> pxls(h * w * 3, 1.f);
+                    for (int x = 0; x < w; ++x)
                     {
-    					throw std::runtime_error("Could not write PNG image.");
+                        for (int y = 0; y < h; ++y)
+                        {
+                            for (int z = 0; z < d; ++z)
+                            {
+                                pxls[z + 3 * (x + y * w)] = (float)operator()(x, y, z);
+                            }
+                        }
+                    }
+
+                    if (!stb::stbi_write_hdr(filename.c_str(), w, h, d, &pxls[0]))
+                    {
+                        throw std::runtime_error("Could not write HDR image");
                     }
                 }
-                else if (extension == "bmp")
+                else if (extension == "png" ||
+                         extension == "bmp" ||
+                         extension == "tga" ||
+                         extension == "jpg" ||
+                         extension == "jpeg")
                 {
-                    if (!stb::stbi_write_bmp(filename.c_str(), w, h,
-    				                    outC, &pxls[0]))
+                    int outC = 4;
+                    std::vector<unsigned char> pxls(h * w * outC, 255);
+
+                    for (int x = 0; x < w; ++x)
                     {
-    					throw std::runtime_error("Could not write BMP image.");
+                        for (int y = 0; y < h; ++y)
+                        {
+                            int z;
+                            for (z = 0; z < d; ++z)
+                            {
+                                pxls[z + outC * (x + y * w)] = valToByte(operator()(x, y, z));
+                            }
+                            for (; z < 3; ++z)
+                            {
+                                pxls[z + outC * (x + y * w)] = valToByte(operator()(x, y, 0));
+                            }
+                        }
                     }
-                }
-                else if (extension == "tga")
-                {
-                    if (!stb::stbi_write_tga(filename.c_str(), w, h,
-    				                    outC, &pxls[0]))
+
+                    if (extension == "png")
                     {
-    					throw std::runtime_error("Could not write TGA image.");
+                        if (!stb::stbi_write_png(filename.c_str(), w, h,
+        				                    outC, &pxls[0],
+        				                    sizeof(unsigned char) * w * outC))
+                        {
+        					throw std::runtime_error("Could not write PNG image.");
+                        }
                     }
-                }
-                else if (extension == "jpg" || extension == "jpeg")
-                {
-                    if (!stb::stbi_write_jpg(filename.c_str(), w, h,
-    				                    outC, &pxls[0], 100))
+                    else if (extension == "bmp")
                     {
-    					throw std::runtime_error("Could not write JPEG image.");
+                        if (!stb::stbi_write_bmp(filename.c_str(), w, h,
+        				                    outC, &pxls[0]))
+                        {
+        					throw std::runtime_error("Could not write BMP image.");
+                        }
                     }
-                }
-                else
-                {
-                    throw std::invalid_argument("Invalid extension");
+                    else if (extension == "tga")
+                    {
+                        if (!stb::stbi_write_tga(filename.c_str(), w, h,
+        				                    outC, &pxls[0]))
+                        {
+        					throw std::runtime_error("Could not write TGA image.");
+                        }
+                    }
+                    else if (extension == "jpg" || extension == "jpeg")
+                    {
+                        if (!stb::stbi_write_jpg(filename.c_str(), w, h,
+        				                    outC, &pxls[0], 100))
+                        {
+        					throw std::runtime_error("Could not write JPEG image.");
+                        }
+                    }
+                    else
+                    {
+                        throw std::invalid_argument("Invalid extension");
+                    }
                 }
             }
-        }
-        catch (const std::exception &e)
-        {
-            std::cout << "ERROR :: Image::write(" << filename << ") :: " << e.what() << std::endl;
+            catch (const std::exception &e)
+            {
+                std::cout << "ERROR :: Image::write(" << filename << ") :: " << e.what() << std::endl;
+            }
         }
 
         return true;
@@ -728,6 +860,7 @@ public:
 protected:
     std::vector<T> im;
 
+    ImageMode mode;
     uint32_t w, h, d;
 };
 

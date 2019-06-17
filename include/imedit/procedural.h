@@ -267,46 +267,43 @@ void splat_euclidean(Image<T>& image,
     }
 }
 
+// template <typename T>
+// void turbulence_image_xyz(Image<T>& image,
+//                           T period,
+//                           T xtrans = T(0.0))
+//                           //T ytrans = T(0.0),
+//                           //T ztrans = T(0.0))
+// {
+// //     for (int i = 0; i < image.height(); ++i)
+// //     {
+// //         for (int j = 0; j < image.width(); ++j)
+// //         {
+// //             for (int k = 0; k < image.depth(); ++k)
+// //             {
+// //                 image(j, i, k) = turbulence(T(j + 0.5) + xtrans,
+// //                                             T(i + 0.5) + ytrans,
+// //                                             T(k + 0.5) + ztrans,
+// //                                             period);
+// //             }
+// //         }
+// //     }
+// }
+
 template <typename T>
-void turbulence_image(Image<T>& image, T period)
+void turbulence_image_xy(Image<T>& image,
+                         T period,
+                         T xtrans = (T)0.0,
+                         T ytrans = (T)0.0,
+                         T zloc = (T)0.0)
 {
     for (int i = 0; i < image.height(); ++i)
     {
         for (int j = 0; j < image.width(); ++j)
         {
-            for (int k = 0; k < image.depth(); ++k)
-            {
-                image(j, i, k) = turbulence(T(j + 0.5), T(i + 0.5), T(k + 0.5), period);
-            }
-        }
-    }
-}
-
-template <typename T>
-void turbulence_image_xy(Image<T>& image, T period)
-{
-    for (int i = 0; i < image.height(); ++i)
-    {
-        for (int j = 0; j < image.width(); ++j)
-        {
-            T val = turbulence(T(j + 0.5), T(i + 0.5), T(0.0), period);
-
-            for (int k = 0; k < image.depth(); ++k)
-            {
-                image(j, i, k) = val;
-            }
-        }
-    }
-}
-
-template <typename T>
-void turbulence_image_xyz(Image<T>& image, T period, T z)
-{
-    for (int i = 0; i < image.height(); ++i)
-    {
-        for (int j = 0; j < image.width(); ++j)
-        {
-            T val = turbulence(j + 0.5f, i + 0.5f, z + 0.5f, period);
+            T val = turbulence(T(j + 0.5) + xtrans,
+                               T(i + 0.5) + ytrans,
+                               zloc,
+                               period);
 
             for (int k = 0; k < image.depth(); ++k)
             {
@@ -317,28 +314,80 @@ void turbulence_image_xyz(Image<T>& image, T period, T z)
 }
 
 template <typename T>
-void noise_image(Image<T>& image, T period)
+void turbulence_image_xyz(Image<T>& image,
+                          T period,
+                          T xtrans = (T)0.0,
+                          T ytrans = (T)0.0,
+                          T ztrans = (T)0.0)
 {
-    for (int i = 0; i < image.height(); ++i)
+    if (image.depth() == 3)
     {
-        for (int j = 0; j < image.width(); ++j)
+        for (int i = 0; i < image.height(); ++i)
         {
-            for (int k = 0; k < image.depth(); ++k)
+            for (int j = 0; j < image.width(); ++j)
             {
-                image(j, i, k) = noise(j + 0.5f, i + 0.5f, k + 0.5f, period);
+                T val = turbulence(j + 0.5f + xtrans,
+                                   i + 0.5f + ytrans,
+                                   0.5f + ztrans,
+                                   period);
+
+                for (int k = 0; k < image.depth(); ++k)
+                {
+                    image(j, i, k) = val;
+                }
+            }
+        }
+    }
+    else if (image.depth() % 3 == 0)
+    {
+        // TODO
+    }
+    else
+    {
+        // not supported
+    }
+}
+
+template <typename T>
+void noise_image(Image<T>& image,
+                 T period,
+                 T xtrans = 0.0,
+                 T ytrans = 0.0,
+                 T ztrans = 0.0)
+{
+    if (image.depth() == 3)
+    {
+        for (int i = 0; i < image.height(); ++i)
+        {
+            for (int j = 0; j < image.width(); ++j)
+            {
+                for (int k = 0; k < image.depth(); ++k)
+                {
+                    image(j, i, k) = noise(j + 0.5f + xtrans,
+                                           i + 0.5f + ytrans,
+                                           k + 0.5f + ztrans,
+                                           period);
+                }
             }
         }
     }
 }
 
 template <typename T>
-void noise_image_xy(Image<T>& image, T period, int xtrans=0.0, int ytrans=0.0)
+void noise_image_xy(Image<T>& image,
+                    T period,
+                    T xtrans = 0.0,
+                    T ytrans = 0.0,
+                    T zloc = 0.0)
 {
     for (int i = 0; i < image.height(); ++i)
     {
         for (int j = 0; j < image.width(); ++j)
         {
-            T val = noise(T(j + 0.5) + xtrans, T(i + 0.5) + ytrans, T(0.0), period);
+            T val = noise(T(j + 0.5) + xtrans,
+                          T(i + 0.5) + ytrans,
+                          zloc,
+                          period);
 
             for (int k = 0; k < image.depth(); ++k)
             {
@@ -507,6 +556,18 @@ void sin_image(T amplitude,
         //     break;
         // }
     }
+}
+
+template <typename T>
+void perlin_flow_field(Image<T>& image,
+                       T period,
+                       T initial_speed = 1.0,
+                       int num_particles,
+                       T xtrans = 0.0,
+                       T ytrans = 0.0,
+                       T ztrans = 0.0)
+{
+    // TODO
 }
 
 }

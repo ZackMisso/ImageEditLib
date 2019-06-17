@@ -308,7 +308,7 @@ void generate_mesh_image(std::string name,
 
         color_image.setPixels(pixel);
 
-        noise_image_xy(noise_image, noise_period, rng.nextUInt(), rng.nextUInt());
+        noise_image_xy(noise_image, noise_period, (double)rng.nextUInt(), (double)rng.nextUInt());
         im_abs(noise_image);
         noise_image = noise_image * color_image * 4.0;
         noise_image.write(name + "_" + std::to_string(i) + ".hdr");
