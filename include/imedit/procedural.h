@@ -561,8 +561,8 @@ void sin_image(T amplitude,
 template <typename T>
 void perlin_flow_field(Image<T>& image,
                        T period,
-                       T initial_speed = 1.0,
                        int num_particles,
+                       T initial_speed = 1.0,
                        T xtrans = 0.0,
                        T ytrans = 0.0,
                        T ztrans = 0.0)

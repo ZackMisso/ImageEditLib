@@ -294,12 +294,18 @@ void generate_mesh_image(std::string name,
 
     for (int i = 0; i < num_meshes; ++i)
     {
+        std::cout << "mesh: " << i << std::endl;
+
         double noise_period = (max_period - min_period) + min_period;
 
         Pixel pixel;
         pixel.r = rng.nextDouble() * (max_h - min_h) + min_h;
         pixel.g = rng.nextDouble() * (max_s - min_s) + min_s;
         pixel.b = rng.nextDouble() * (max_l - min_l) + min_l;
+
+        std::cout << "hue: " << pixel.r << std::endl;
+        std::cout << "sat: " << pixel.g << std::endl;
+        std::cout << std::endl;
 
         hsl_to_rgb(pixel);
 

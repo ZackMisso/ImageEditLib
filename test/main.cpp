@@ -558,44 +558,44 @@ void cloudTests()
 
 void convert_to_false_color()
 {
-    std::vector<std::string> files = std::vector<std::string>();
-
-    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/const/rat_eff");
-    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/const/rec_hyp_eff");
-    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/const/rec_hyp_poi_eff");
-    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/const/hyp_mis_eff");
-
-    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/cos/rat_eff");
-    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/cos/rec_hyp_eff");
-    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/cos/rec_hyp_poi_eff");
-    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/cos/hyp_mis_eff");
-
-    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/gauss/rat_eff");
-    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/gauss/rec_hyp_eff");
-    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/gauss/rec_hyp_poi_eff");
-    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/gauss/hyp_mis_eff");
-
-    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/hole/rat_eff");
-    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/hole/rec_hyp_eff");
-    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/hole/rec_hyp_poi_eff");
-    files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/hole/hyp_mis_eff");
-
-    for (int i = 0; i < files.size(); ++i)
-    {
-        Image<double> image = Image<double>(files[i] + ".png");
-        Image<double> fcImage = image;
-
-        falseColor(image, fcImage);
-
-        fcImage.write(files[i] + "_false_color.png");
-
-        Image<double> image_hdr = Image<double>(files[i] + ".hdr");
-        Image<double> fcImage_hdr = image_hdr;
-
-        falseColor(image_hdr, fcImage_hdr);
-
-        fcImage_hdr.write(files[i] + "_false_color.png");
-    }
+    // std::vector<std::string> files = std::vector<std::string>();
+    //
+    // files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/const/rat_eff");
+    // files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/const/rec_hyp_eff");
+    // files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/const/rec_hyp_poi_eff");
+    // files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/const/hyp_mis_eff");
+    //
+    // files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/cos/rat_eff");
+    // files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/cos/rec_hyp_eff");
+    // files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/cos/rec_hyp_poi_eff");
+    // files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/cos/hyp_mis_eff");
+    //
+    // files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/gauss/rat_eff");
+    // files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/gauss/rec_hyp_eff");
+    // files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/gauss/rec_hyp_poi_eff");
+    // files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/gauss/hyp_mis_eff");
+    //
+    // files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/hole/rat_eff");
+    // files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/hole/rec_hyp_eff");
+    // files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/hole/rec_hyp_poi_eff");
+    // files.push_back("/Users/corneria/Documents/Research/TransmittanceSIGGRAPH2019/paper/results/jans/hole/hyp_mis_eff");
+    //
+    // for (int i = 0; i < files.size(); ++i)
+    // {
+    //     Image<double> image = Image<double>(files[i] + ".png");
+    //     Image<double> fcImage = image;
+    //
+    //     falseColor(image, fcImage);
+    //
+    //     fcImage.write(files[i] + "_false_color.png");
+    //
+    //     Image<double> image_hdr = Image<double>(files[i] + ".hdr");
+    //     Image<double> fcImage_hdr = image_hdr;
+    //
+    //     falseColor(image_hdr, fcImage_hdr);
+    //
+    //     fcImage_hdr.write(files[i] + "_false_color.png");
+    // }
 }
 
 void variance_calculaton()
