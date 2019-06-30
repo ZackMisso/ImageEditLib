@@ -204,6 +204,49 @@ void create_pokedot_image(std::string name,
     image.write(name);
 }
 
+void create_white_image(const std::string& name,
+                        const std::vector<Pixel>& colors,
+                        unsigned long seed_one,
+                        unsigned long seed_two,
+                        int res,
+                        bool is_manhatan)
+{
+    pcg32 rng = pcg32(seed_one, seed_two);
+
+    Image<double> image = Image<double>(res, res, 3);
+
+    for (int i = 0; i < image.size(); ++i)
+    {
+        image[i] = 0.9;
+    }
+
+    image.write(name);
+}
+
+void create_black_image(const std::string& name,
+                        const std::vector<Pixel>& colors,
+                        unsigned long seed_one,
+                        unsigned long seed_two,
+                        int res,
+                        bool is_manhatan)
+{
+    pcg32 rng = pcg32(seed_one, seed_two);
+
+    Image<double> image = Image<double>(res, res, 3);
+
+    for (int i = 0; i < image.height(); ++i)
+    {
+        for (int j = 0; j < image.width(); ++j)
+        {
+            image(j, i, 0) = 0.04;
+            image(j, i, 1) = 0.04;
+            image(j, i, 2) = 0.04;
+        }
+    }
+
+    image.write(name);
+}
+
 void generate_pawn_scene_board(const std::vector<Pixel>& pixels,
                                Pixel dot_base,
                                const std::string base_name,
@@ -227,8 +270,15 @@ void generate_pawn_scene_board(const std::vector<Pixel>& pixels,
 
             if ((i+j)%2 == 0)
             {
-                // create tiled image
-                create_tiled_image(name,
+                // // create tiled image
+                // create_tiled_image(name,
+                //                    pixels,
+                //                    global_rng.nextUInt(),
+                //                    global_rng.nextUInt(),
+                //                    res,
+                //                    manhattan);
+
+                create_black_image(name,
                                    pixels,
                                    global_rng.nextUInt(),
                                    global_rng.nextUInt(),
@@ -237,16 +287,23 @@ void generate_pawn_scene_board(const std::vector<Pixel>& pixels,
             }
             else
             {
-                // create dotted image
-                create_pokedot_image(name,
-                                     dot_base,
-                                     min_dot_dist,
-                                     max_dot_dist,
-                                     global_rng.nextUInt(),
-                                     global_rng.nextUInt(),
-                                     dots,
-                                     res,
-                                     manhattan);
+                // // create dotted image
+                // create_pokedot_image(name,
+                //                      dot_base,
+                //                      min_dot_dist,
+                //                      max_dot_dist,
+                //                      global_rng.nextUInt(),
+                //                      global_rng.nextUInt(),
+                //                      dots,
+                //                      res,
+                //                      manhattan);
+
+                create_white_image(name,
+                                   pixels,
+                                   global_rng.nextUInt(),
+                                   global_rng.nextUInt(),
+                                   res,
+                                   manhattan);
             }
         }
     }

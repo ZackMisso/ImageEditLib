@@ -368,18 +368,18 @@ public:
 
     bool write(const std::string& filename)
     {
-        if (getExtension(filename) == ".txt")
+        if (getExtension(filename) == "txt")
         {
             std::ofstream file(filename);
             file << width() << "\n";
             file << height() << "\n";
             file << depth() << "\n";
 
-            for (int x = 0; x < w; ++x)
+            for (int z = 0; z < d; ++z)
             {
-                for (int y = 0; y < h; ++y)
+                for (int x = 0; x < w; ++x)
                 {
-                    for (int z = 0; z < d; ++z)
+                    for (int y = 0; y < h; ++y)
                     {
                         file << operator()(x, y, z) << "\n";
                     }
@@ -440,11 +440,11 @@ public:
                             int z;
                             for (z = 0; z < d; ++z)
                             {
-                                pxls[z + outC * (x + y * w)] = valToByte(operator()(x, y, z));
+                                pxls[z + outC * (x + y * w)] = valToByte(pow(operator()(x, y, z), 1.0/2.2));
                             }
                             for (; z < 3; ++z)
                             {
-                                pxls[z + outC * (x + y * w)] = valToByte(operator()(x, y, 0));
+                                pxls[z + outC * (x + y * w)] = valToByte(pow(operator()(x, y, 0), 1.0/2.2));
                             }
                         }
                     }

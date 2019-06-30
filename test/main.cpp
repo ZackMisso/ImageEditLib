@@ -642,6 +642,44 @@ void variance_calculaton()
     }
 }
 
+void contour_test()
+{
+    Image<double> image = Image<double>(512, 512, 3);
+
+    for (int i = 0; i < 512; ++i)
+    {
+        for (int j = 0; j < 512; ++j)
+        {
+            double val = 0.0;
+            if (j >= 2*i)
+            {
+                val = 0.25;
+            }
+            else if (j >= i)
+            {
+                val = 0.5;
+            }
+            else if (i >= 2*j)
+            {
+                val = 1.0;
+            }
+            else
+            {
+                val = 0.75;
+            }
+
+            // double x = double(j - 256);
+            // double y = double(i - 256);
+            // val = std::sqrt(x*x + y*y) / std::sqrt(2.0 * 256.0 * 256.0);
+
+            for (int k = 0; k < 3; ++k) image(j, i, k) = 1.0 - val;
+        }
+    }
+
+    image.write("contour.jpeg");
+    image.write("contour.txt");
+}
+
 int main()
 {
     srand(0x31245A);
@@ -662,7 +700,9 @@ int main()
 
     // convert_to_false_color();
 
-    variance_calculaton();
+    contour_test();
+
+    // variance_calculaton();
 
     // todo
     cout << "All Library Tests Passed" << endl;
