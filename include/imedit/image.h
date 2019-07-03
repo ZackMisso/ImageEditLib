@@ -35,35 +35,34 @@
 namespace imedit
 {
 
+typedef double Float;
+
 struct Pixel
 {
-    double r;
-    double g;
-    double b;
+    Float r;
+    Float g;
+    Float b;
 };
 
 // clamps val between min and max
-template <typename T>
-static inline T im_clamp(T val, T min, T max)
+static inline Float im_clamp(Float val, Float min, Float max)
 {
     return (val >= min) ?
            ((val <= max) ? val : max) : min;
 }
 
 // converts the value to a byte
-template <typename T>
-static unsigned char valToByte(T val)
+static unsigned char valToByte(Float val)
 {
-    T min = 0;
-    T max = 1;
+    Float min = 0;
+    Float max = 1;
     return int(255.0 * im_clamp(val, min, max));
 }
 
 // converts the byte to a value
-template <typename T>
-static void byteToVal(const unsigned char in, T& val)
+static void byteToVal(const unsigned char in, Float& val)
 {
-    val = ((T)in) / ((T)255.0);
+    val = ((Float)in) / ((Float)255.0);
 }
 
 // returns the extension of a file path
@@ -82,7 +81,6 @@ enum ImageMode
     IM_3D_GRAYSCALE_TEXTURE
 };
 
-template <typename T>
 class Image
 {
 public:
@@ -90,7 +88,7 @@ public:
         w(0), h(0), d(0)
     {
         mode = IM_COLOR;
-        im = std::vector<T>();
+        im = std::vector<Float>();
     }
 
     Image(int w, int h, int d) :
@@ -101,14 +99,14 @@ public:
         else if (d % 3 == 0) mode = IM_3D_COLORED_TEXTURE;
         else mode = IM_3D_GRAYSCALE_TEXTURE;
 
-        im = std::vector<T>(w * h * d);
+        im = std::vector<Float>(w * h * d);
     }
 
     Image(int w, int h, int d, ImageMode mode) :
         w(w), h(h), d(d), mode(mode)
     {
         // TODO: assert mode
-        im = std::vector<T>(w * h * d);
+        im = std::vector<Float>(w * h * d);
     }
 
     Image(const std::string& filename)
@@ -170,9 +168,9 @@ public:
         return avg;
     }
 
-    T max() const
+    Float max() const
     {
-        T val = im[0];
+        Float val = im[0];
 
         for (int i = 1; i < im.size(); ++i)
         {
@@ -182,9 +180,9 @@ public:
         return val;
     }
 
-    T min() const
+    Float min() const
     {
-        T val = im[0];
+        Float val = im[0];
 
         for (int i = 1; i < im.size(); ++i)
         {
@@ -236,26 +234,26 @@ public:
         return min;
     }
 
-    void brighten(T factor)
+    void brighten(Float factor)
     {
         (operator *=)(factor);
     }
 
-    void contrast(T factor, T midpoint)
+    void contrast(Float factor, Float midpoint)
     {
         (operator -=)(midpoint);
         (operator *=)(factor);
         (operator +=)(midpoint);
     }
 
-    void exposure(T factor)
+    void exposure(Float factor)
     {
-        alterGamma(T(1.0/2.2), T(1.0));
+        alterGamma(Float(1.0/2.2), Float(1.0));
         brighten(factor);
-        alterGamma(T(1.0), T(1.0/2.2));
+        alterGamma(Float(1.0), Float(1.0/2.2));
     }
 
-    void alterGamma(T oldGamma, T newGamma)
+    void alterGamma(Float oldGamma, Float newGamma)
     {
         T power = newGamma / oldGamma;
         for (int i = 0; i < im.size(); ++i)
@@ -327,7 +325,7 @@ public:
                         {
                             for (int z = 0; z < d; ++z)
                             {
-                                operator()(x, y, z) = (T)out[4 * (x + y * w) + z];
+                                operator()(x, y, z) = (Float)out[4 * (x + y * w) + z];
                             }
                         }
                     }
@@ -353,7 +351,7 @@ public:
                         {
                             for (int z = 0; z < d; ++z)
                             {
-                                operator()(x, y, z) = (T)pxls[3 * (x + y * w) + z];
+                                operator()(x, y, z) = (Float)pxls[3 * (x + y * w) + z];
                             }
                         }
                     }
@@ -623,9 +621,9 @@ public:
         }
     }
 
-    Image<T> getChannel(int ch)
+    Image getChannel(int ch)
     {
-        Image<T> image = Image<T>(w, h, 1);
+        Image image = Image(w, h, 1);
 
         for (int i = 0; i < h; ++i)
         {
@@ -697,9 +695,9 @@ public:
     //     }
     // }
 
-    Image<T> operator+(const Image<T>& other) const
+    Image operator+(const Image& other) const
     {
-        Image<T> image = Image<T>(w, h, d);
+        Image image = Image(w, h, d);
 
         int size = w * h * d;
 
@@ -726,9 +724,9 @@ public:
     }
 
     // this is component-wise multiplication
-    Image<T> operator*(const Image<T>& other) const
+    Image operator*(const Image& other) const
     {
-        Image<T> image = Image<T>(w, h, d);
+        Image image = Image(w, h, d);
 
         int size = w * h * d;
 
@@ -741,9 +739,9 @@ public:
     }
 
     // this is component-wise division
-    Image<T> operator/(const Image<T>& other) const
+    Image operator/(const Image& other) const
     {
-        Image<T> image = Image<T>(w, h, d);
+        Image image = Image(w, h, d);
 
         int size = w * h * d;
 
@@ -755,9 +753,9 @@ public:
         return image;
     }
 
-    Image<T> operator+(T val) const
+    Image operator+(Float val) const
     {
-        Image<T> image = Image<T>(w, h, d);
+        Image image = Image(w, h, d);
 
         int size = w * h * d;
 
@@ -769,9 +767,9 @@ public:
         return image;
     }
 
-    Image<T> operator-(T val) const
+    Image operator-(Float val) const
     {
-        Image<T> image = Image<T>(w, h, d);
+        Image image = Image(w, h, d);
 
         int size = w * h * d;
 
@@ -783,9 +781,9 @@ public:
         return image;
     }
 
-    Image<T> operator*(T val) const
+    Image operator*(Float val) const
     {
-        Image<T> image = Image<T>(w, h, d);
+        Image image = Image(w, h, d);
 
         int size = w * h * d;
 
@@ -797,9 +795,9 @@ public:
         return image;
     }
 
-    Image<T> operator/(T val) const
+    Image operator/(Float val) const
     {
-        Image<T> image = Image<T>(w, h, d);
+        Image image = Image(w, h, d);
 
         int size = w * h * d;
 
@@ -811,7 +809,7 @@ public:
         return image;
     }
 
-    void operator+=(const Image<T>& other)
+    void operator+=(const Image& other)
     {
         int size = w * h * d;
 
@@ -821,7 +819,7 @@ public:
         }
     }
 
-    void operator-=(const Image<T>& other)
+    void operator-=(const Image& other)
     {
         int size = w * h * d;
 
@@ -832,7 +830,7 @@ public:
     }
 
     // component wise multiplication
-    void operator*=(const Image<T>& other)
+    void operator*=(const Image& other)
     {
         int size = w * h * d;
 
@@ -843,7 +841,7 @@ public:
     }
 
     // component wise division
-    void operator/=(const Image<T>& other)
+    void operator/=(const Image& other)
     {
         int size = w * h * d;
 
@@ -853,7 +851,7 @@ public:
         }
     }
 
-    void operator+=(T val)
+    void operator+=(Float val)
     {
         int size = w * h * d;
 
@@ -863,7 +861,7 @@ public:
         }
     }
 
-    void operator-=(T val)
+    void operator-=(Float val)
     {
         int size = w * h * d;
 
@@ -874,7 +872,7 @@ public:
     }
 
     // component wise multiplication
-    void operator*=(T val)
+    void operator*=(Float val)
     {
         int size = w * h * d;
 
@@ -885,7 +883,7 @@ public:
     }
 
     // component wise division
-    void operator/=(T val)
+    void operator/=(Float val)
     {
         int size = w * h * d;
 
@@ -895,29 +893,29 @@ public:
         }
     }
 
-    T& operator[](int index)
+    Float& operator[](int index)
     {
         return im[index];
     }
 
-    T operator[](int index) const
+    Float operator[](int index) const
     {
         return im[index];
     }
 
-    T& operator()(int x, int y, int z)
+    Float& operator()(int x, int y, int z)
     {
         // return im[z * w * h + y * w + x];
         return im[(z * h + y) * w + x];
     }
 
-    T operator()(int x, int y, int z) const
+    Float operator()(int x, int y, int z) const
     {
         // return im[z * w * h + y * w + x];
         return im[(z * h + y) * w + x];
     }
 
-    T& filter_index(int x, int y, int z)
+    Float& filter_index(int x, int y, int z)
     {
         if (x < 0) x = 0;
         if (x > w-1) x = w-1;
@@ -929,7 +927,7 @@ public:
         return im[(z * h + y) * w + x];
     }
 
-    T filter_index(int x, int y, int z) const
+    Float filter_index(int x, int y, int z) const
     {
         if (x < 0) x = 0;
         if (x > w-1) x = w-1;
@@ -962,7 +960,7 @@ public:
     }
 
 protected:
-    std::vector<T> im;
+    std::vector<Float> im;
 
     ImageMode mode;
     uint32_t w, h, d;
