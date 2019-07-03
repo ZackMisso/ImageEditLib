@@ -46,6 +46,8 @@ include_directories(# Include directory
                     ${PROJECT_SOURCE_DIR}/ext/stb/
                     # PCG library for random numbers
                     ${PROJECT_SOURCE_DIR}/ext/pcg/
+                    # TinyEXR library for EXR support
+                    ${PROJECT_SOURCE_DIR}/ext/tinyexr/
                     ext/
 )
 
@@ -62,6 +64,8 @@ set(imedit_srcs
 
     ext/pcg/pcg32.h
 
+    ext/tinyexr/tinyexr.h
+
     include/imedit/image.h
     include/imedit/procedural.h
 
@@ -73,6 +77,8 @@ set(texture_gen_srcs
     ext/stb/stb_image.h
 
     ext/pcg/pcg32.h
+
+    ext/tinyexr/tinyexr.h
 
     include/imedit/image.h
     include/imedit/procedural.h

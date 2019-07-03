@@ -680,6 +680,18 @@ void contour_test()
     image.write("contour.txt");
 }
 
+void test_exr()
+{
+    Image<double> image = Image<double>("tiled.hdr");
+    std::cout << "writing exr" << std::endl;
+    image.write("tiled.exr");
+    image.write("first.png");
+    std::cout << "reading exr" << std::endl;
+    image.read("tiled.exr");
+    std::cout << "writing png" << std::endl;
+    image.write("tiled.png");
+}
+
 int main()
 {
     srand(0x31245A);
@@ -700,7 +712,9 @@ int main()
 
     // convert_to_false_color();
 
-    contour_test();
+    // contour_test();
+
+    test_exr();
 
     // variance_calculaton();
 

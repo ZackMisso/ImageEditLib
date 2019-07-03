@@ -24,6 +24,10 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb/stb_image_write.h>
 
+#define TINYEXR_IMPLEMENTATION
+#include <tinyexr/tinyexr.h>
+// #include <tinyexr.h>
+
 #pragma once
 
 // useful functions
@@ -297,6 +301,41 @@ public:
 
                 return true;
             }
+            else if (getExtension(filename) == "exr")
+            {
+                float* out;
+                int tmp_w;
+                int tmp_h;
+                const char* err = nullptr;
+
+                int ret = LoadEXR(&out, &tmp_w, &tmp_h, filename.c_str(), &err);
+                if (ret != TINYEXR_SUCCESS)
+                {
+                    if (err)
+                    {
+                        std::cout << err << std::endl;
+                        FreeEXRErrorMessage(err);
+                    }
+                }
+                else
+                {
+                    resize(tmp_w, tmp_h, 3);
+
+                    for (int y = 0; y < h; ++y)
+                    {
+                        for (int x = 0; x < w; ++x)
+                        {
+                            for (int z = 0; z < d; ++z)
+                            {
+                                operator()(x, y, z) = (T)out[4 * (x + y * w) + z];
+                            }
+                        }
+                    }
+
+                    free(out);
+                    return true;
+                }
+            }
             else if (stbi_is_hdr(filename.c_str()))
             {
                 float* pxls = stbi_loadf(filename.c_str(),
@@ -423,6 +462,71 @@ public:
                     {
                         throw std::runtime_error("Could not write HDR image");
                     }
+                }
+                else if (extension == "exr")
+                {
+                    EXRHeader header;
+                    InitEXRHeader(&header);
+
+                    EXRImage image;
+                    InitEXRImage(&image);
+
+                    image.num_channels = 3;
+
+                    std::vector<float> images[3];
+                    images[0].resize(w * h);
+                    images[1].resize(w * h);
+                    images[2].resize(w * h);
+
+                    for (int i = 0; i < h; i++)
+                    {
+                        for (int j = 0; j < w; ++j)
+                        {
+                            images[0][i*w+j] = im[0*(w*h)+i*w+j];
+                            images[1][i*w+j] = im[1*(w*h)+i*w+j];
+                            images[2][i*w+j] = im[2*(w*h)+i*w+j];
+                        }
+                    }
+
+                    float* image_ptr[3];
+                    image_ptr[0] = &(images[2].at(0)); // B
+                    image_ptr[1] = &(images[1].at(0)); // G
+                    image_ptr[2] = &(images[0].at(0)); // R
+
+                    image.images = (unsigned char**)image_ptr;
+                    image.width = w;
+                    image.height = h;
+
+                    header.num_channels = 3;
+                    header.channels = (EXRChannelInfo *)malloc(sizeof(EXRChannelInfo) * header.num_channels);
+                    // Must be BGR(A) order, since most of EXR viewers expect this channel order.
+                    strncpy(header.channels[0].name, "B", 255); header.channels[0].name[strlen("B")] = '\0';
+                    strncpy(header.channels[1].name, "G", 255); header.channels[1].name[strlen("G")] = '\0';
+                    strncpy(header.channels[2].name, "R", 255); header.channels[2].name[strlen("R")] = '\0';
+
+                    header.pixel_types = (int *)malloc(sizeof(int) * header.num_channels);
+                    header.requested_pixel_types = (int *)malloc(sizeof(int) * header.num_channels);
+
+                    for (int i = 0; i < header.num_channels; i++)
+                    {
+                        header.pixel_types[i] = TINYEXR_PIXELTYPE_FLOAT; // pixel type of input image
+                        header.requested_pixel_types[i] = TINYEXR_PIXELTYPE_HALF; // pixel type of output image to be stored in .EXR
+                    }
+
+                    const char* err;
+                    int ret = SaveEXRImageToFile(&image, &header, filename.c_str(), &err);
+
+                    if (ret != TINYEXR_SUCCESS)
+                    {
+                        fprintf(stderr, "Save EXR err: %s\n", err);
+                        return ret;
+                    }
+
+                    free(header.channels);
+                    free(header.pixel_types);
+                    free(header.requested_pixel_types);
+
+                    return true;
                 }
                 else if (extension == "png" ||
                          extension == "bmp" ||
