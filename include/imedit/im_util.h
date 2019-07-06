@@ -15,13 +15,10 @@
 #include <vector>
 #include <tgmath.h>
 
-// TODO: make these all static
-
 namespace imedit
 {
 
-template <typename T>
-void clamp_im(Image<T>& image)
+static void clamp_im(Image& image)
 {
     for (int i = 0; i < image.size(); ++i)
     {
@@ -30,8 +27,7 @@ void clamp_im(Image<T>& image)
     }
 }
 
-template <typename T>
-void clamp_im(Image<T>& image, T min, T max)
+static void clamp_im(Image& image, Float min, Float max)
 {
     for (int i = 0; i < image.size(); ++i)
     {
@@ -40,27 +36,24 @@ void clamp_im(Image<T>& image, T min, T max)
     }
 }
 
-template <typename T>
-T clamp(T val)
+static Float clamp(Float val)
 {
     if (val < 0.0) return 0.0;
     if (val > 1.0) return 1.0;
     return val;
 }
 
-template <typename T>
-T clamp(T val, T min, T max)
+static Float clamp(Float val, Float min, Float max)
 {
     if (val < min) return min;
     if (val > max) return max;
     return val;
 }
 
-template <typename T>
-void remap_range_lin(Image<T>& image)
+static void remap_range_lin(Image& image)
 {
-    T min = image.min();
-    T max = image.max();
+    Float min = image.min();
+    Float max = image.max();
 
     for (int i = 0; i < image.size(); ++i)
     {
@@ -68,8 +61,7 @@ void remap_range_lin(Image<T>& image)
     }
 }
 
-template <typename T>
-void exp_im(Image<T>& image, T period)
+static void exp_im(Image& image, Float period)
 {
     for (int i = 0; i < image.size(); ++i)
     {
@@ -77,16 +69,15 @@ void exp_im(Image<T>& image, T period)
     }
 }
 
-template <typename T>
-void remap_range_lin(std::vector<Image<T> >& images)
+static void remap_range_lin(std::vector<Image>& images)
 {
-    T min = images[0].min();
-    T max = images[0].max();
+    Float min = images[0].min();
+    Float max = images[0].max();
 
     for (int i = 1; i < images.size(); ++i)
     {
-        T tmp_min = images[i].min();
-        T tmp_max = images[i].max();
+        Float tmp_min = images[i].min();
+        Float tmp_max = images[i].max();
 
         if (min > tmp_min) min = tmp_min;
         if (max < tmp_max) max = tmp_max;
@@ -101,10 +92,9 @@ void remap_range_lin(std::vector<Image<T> >& images)
     }
 }
 
-template <typename T>
-void remap_avg(Image<T>& image, T new_avg)
+static void remap_avg(Image& image, Float new_avg)
 {
-    T avg = image.average();
+    Float avg = image.average();
 
     for (int i = 0; i < image.size(); ++i)
     {
@@ -112,10 +102,9 @@ void remap_avg(Image<T>& image, T new_avg)
     }
 }
 
-// template <typename T>
-// void color_map_image(Image<T>& image,
-//                      const std::vector<Color3<T> >& colors,
-//                      const std::vector<T>& stops)
+// static void color_map_image(Image& image,
+//                      const std::vector<Color3>& colors,
+//                      const std::vector<Float>& stops)
 // {
 //     assert(colors.size() == stops.size());
 //
@@ -129,7 +118,7 @@ void remap_avg(Image<T>& image, T new_avg)
 //             {
 //                 if (stops[k] >= val)
 //                 {
-//                     T t = (val - stops[k-1]) / (stops[k] - stops[k - 1]);
+//                     Float t = (val - stops[k-1]) / (stops[k] - stops[k - 1]);
 //
 //                     image(j, i, 0) = (1.0 - t) * colors[k-1].r + t * colors[k].r;
 //                     image(j, i, 1) = (1.0 - t) * colors[k-1].g + t * colors[k].g;
@@ -144,8 +133,7 @@ void remap_avg(Image<T>& image, T new_avg)
 
 // TODO: create tone map functionality
 
-template <typename T>
-void im_sin(Image<T>& image)
+static void im_sin(Image& image)
 {
     for (int i = 0; i < image.size(); ++i)
     {
@@ -153,8 +141,7 @@ void im_sin(Image<T>& image)
     }
 }
 
-template <typename T>
-void im_cos(Image<T>& image)
+static void im_cos(Image& image)
 {
     for (int i = 0; i < image.size(); ++i)
     {
@@ -162,17 +149,15 @@ void im_cos(Image<T>& image)
     }
 }
 
-template <typename T>
-void one_minus(Image<T>& image)
+static void one_minus(Image& image)
 {
     for (int i = 0; i < image.size(); ++i)
     {
-        image[i] = (T)1.0 - image[i];
+        image[i] = (Float)1.0 - image[i];
     }
 }
 
-template <typename T>
-void thresh_min(Image<T>& image, T threshold)
+static void thresh_min(Image& image, Float threshold)
 {
     for (int i = 0; i < image.size(); ++i)
     {
@@ -180,8 +165,7 @@ void thresh_min(Image<T>& image, T threshold)
     }
 }
 
-template <typename T>
-void thresh_min_zero(Image<T>& image, T threshold)
+static void thresh_min_zero(Image& image, Float threshold)
 {
     for (int i = 0; i < image.size(); ++i)
     {
@@ -189,8 +173,7 @@ void thresh_min_zero(Image<T>& image, T threshold)
     }
 }
 
-template <typename T>
-void thresh_min_image(Image<T>& image, T threshold)
+static void thresh_min_image(Image& image, Float threshold)
 {
     for (int i = 0; i < image.size(); ++i)
     {
@@ -199,8 +182,7 @@ void thresh_min_image(Image<T>& image, T threshold)
     }
 }
 
-template <typename T>
-void thresh_max(Image<T>& image, T threshold)
+static void thresh_max(Image& image, Float threshold)
 {
     for (int i = 0; i < image.size(); ++i)
     {
@@ -208,8 +190,7 @@ void thresh_max(Image<T>& image, T threshold)
     }
 }
 
-template <typename T>
-void thresh_max_zero(Image<T>& image, T threshold)
+static void thresh_max_zero(Image& image, Float threshold)
 {
     for (int i = 0; i < image.size(); ++i)
     {
@@ -217,8 +198,7 @@ void thresh_max_zero(Image<T>& image, T threshold)
     }
 }
 
-template <typename T>
-void thresh_max_image(Image<T>& image, T threshold)
+static void thresh_max_image(Image& image, Float threshold)
 {
     for (int i = 0; i < image.size(); ++i)
     {
@@ -227,8 +207,7 @@ void thresh_max_image(Image<T>& image, T threshold)
     }
 }
 
-template <typename T>
-void im_abs(Image<T>& image)
+static void im_abs(Image& image)
 {
     for (int i = 0; i < image.size(); ++i)
     {
@@ -236,30 +215,50 @@ void im_abs(Image<T>& image)
     }
 }
 
-template <typename T>
-Image<T>* lerp(T t, const Image<T>& one, const Image<T>& two)
+// TODO: why is this a pointer???
+static Image* lerp(Float t, const Image& one, const Image& two)
 {
-    Image<T>* img = new Image<T>(one.width(), one.height(), one.depth());
+    Image* img = new Image(one.width(), one.height(), one.depth());
 
-    img = (1.0 - t) * one + t * two;
+    *img = one * (1.0 - t) + two * t;
 
     return img;
 }
 
+static void false_color_proxies(const Image& other,
+                                std::vector<Float>& proxies,
+                                Float min,
+                                Float max)
+{
+    Float logmin = -std::log(min + 0.0000000001);
+    Float logmax = -std::log(max + 0.0000000001);
+
+    for (int i = 0; i < other.height(); ++i)
+    {
+        for (int j = 0; j < other.width(); ++j)
+        {
+            Float val = other(j, i, 0);
+
+            Float logval = -std::log(val + 0.0000000001);
+
+            proxies.push_back((logval - logmin) / (logmax - logmin));
+        }
+    }
+}
+
 // it is assumed the bins have already been given a size
 // and that size is larger than 1
-template <typename T>
-void false_color_proxies_bins(const Image<T>& other,
-                              std::vector<int>& bins,
-                              T min,
-                              T max,
-                              std::pair<T, T> range = std::pair<T, T>(0.0, 1.0))
+static void false_color_proxies_bins(const Image& other,
+                                     std::vector<int>& bins,
+                                     Float min,
+                                     Float max,
+                                     std::pair<Float, Float> range = std::pair<Float, Float>(0.0, 1.0))
 {
     assert(bins.size() > 1);
 
-    T step = T(1.0) / T(bins.size() - 1);
+    Float step = Float(1.0) / Float(bins.size() - 1);
 
-    std::vector<T> proxies = std::vector<T>();
+    std::vector<Float> proxies = std::vector<Float>();
 
     false_color_proxies(other,
                         proxies,
@@ -269,30 +268,6 @@ void false_color_proxies_bins(const Image<T>& other,
     for (int i = 0; i < proxies.size(); ++i)
     {
         bins[std::floor((proxies[i] - range.first) / (range.second - range.first) / step)]++;
-    }
-}
-
-template <typename T>
-void false_color_proxies(const Image<T>& other,
-                         std::vector<T>& proxies,
-                         T min,
-                         T max)
-{
-    T logmin = -std::log(min + 0.0000000001);
-    T logmax = -std::log(max + 0.0000000001);
-
-    for (int i = 0; i < other.height(); ++i)
-    {
-        for (int j = 0; j < other.width(); ++j)
-        {
-            T val = other(j, i, 0);
-
-            T logval = -std::log(val + 0.0000000001);
-
-            proxies.push_back((logval - logmin) / (logmax - logmin));
-
-            // proxies.push_back((val - min) / (max - min));
-        }
     }
 }
 
@@ -351,27 +326,26 @@ void false_color_proxies(const Image<T>& other,
 // }
 
 // Note: this only applies a uniform color scaling
-template <typename T>
-void falseColorProxy(const Image<T>& other,
-                     Image<T>& image,
-                     T min,
-                     T max,
-                     std::pair<T, T> range = std::pair<T, T>(0.0, 1.0))
+static void falseColorProxy(const Image& other,
+                            Image& image,
+                            Float min,
+                            Float max,
+                            std::pair<Float, Float> range = std::pair<Float, Float>(0.0, 1.0))
 {
     for (int i = 0; i < other.height(); ++i)
     {
         for (int j = 0; j < other.width(); ++j)
         {
             // other is assumed to be black and white so o[0] == o[1] == o[2]
-            T val = other(j, i, 0);
+            Float val = other(j, i, 0);
 
-            T logmin = -std::log(min + 0.0000000001);
-            T logmax = -std::log(max + 0.0000000001);
-            T logval = -std::log(val + 0.0000000001);
+            Float logmin = -std::log(min + 0.0000000001);
+            Float logmax = -std::log(max + 0.0000000001);
+            Float logval = -std::log(val + 0.0000000001);
 
-            T partial = (logval - logmin) / (logmax - logmin);
+            Float partial = (logval - logmin) / (logmax - logmin);
 
-            T proxy = partial;
+            Float proxy = partial;
 
             if (partial < range.first)
             {
@@ -393,22 +367,18 @@ void falseColorProxy(const Image<T>& other,
     }
 }
 
-template <typename T>
-void histogram_grayscale(const Image<T>& image,
-                         std::vector<int>& hist,
-                         T min = 0.0,
-                         T max = 1.0)
+static void histogram_grayscale(const Image& image,
+                                std::vector<int>& hist,
+                                Float min = 0.0,
+                                Float max = 1.0)
 {
     assert(hist.size() != 0);
-
-    // std::cout << "MIN: " << min << std::endl;
-    // std::cout << "MAX: " << max << std::endl;
 
     for (int i = 0; i < image.height(); ++i)
     {
         for (int j = 0; j < image.width(); ++j)
         {
-            T val = (image(j, i, 0) / (max - min)) * hist.size();
+            Float val = (image(j, i, 0) / (max - min)) * hist.size();
 
             int index = std::floor(val);
 
@@ -571,11 +541,10 @@ void histogram_grayscale(const Image<T>& image,
 //     }
 // }
 
-template <typename T>
-Image<T>* low_avg_comparison(const std::vector<Image<T>*>& images)
+static Image* low_avg_comparison(const std::vector<Image*>& images)
 {
     double lowest = images[0]->average();
-    Image<T>* least_avg_image = images[0];
+    Image* least_avg_image = images[0];
 
     for (int i = 1; i < images.size(); ++i)
     {
@@ -591,8 +560,7 @@ Image<T>* low_avg_comparison(const std::vector<Image<T>*>& images)
     return least_avg_image;
 }
 
-template <typename T>
-double mean_sqr_error(const Image<T>& one, const Image<T>& two)
+static double mean_sqr_error(const Image& one, const Image& two)
 {
     double err = 0.0;
     double size_term = 1.0 / one.size();
@@ -607,8 +575,7 @@ double mean_sqr_error(const Image<T>& one, const Image<T>& two)
     return err;
 }
 
-template <typename T>
-double root_mean_sqr_error(const Image<T>& one, const Image<T>& two)
+static double root_mean_sqr_error(const Image& one, const Image& two)
 {
     double err = 0.0;
     double size_term = 1.0 / one.size();
@@ -623,8 +590,7 @@ double root_mean_sqr_error(const Image<T>& one, const Image<T>& two)
     return sqrt(err);
 }
 
-template <typename T>
-double mean_absolute_difference(const Image<T>& one, const Image<T>& two)
+static double mean_absolute_difference(const Image& one, const Image& two)
 {
     double err = 0.0;
     double size_term = 1.0 / one.size();
@@ -639,8 +605,7 @@ double mean_absolute_difference(const Image<T>& one, const Image<T>& two)
     return err;
 }
 
-template <typename T>
-double mean_absolute_relative_difference(const Image<T>& one, const Image<T>& two)
+static double mean_absolute_relative_difference(const Image& one, const Image& two)
 {
     double err = 0.0;
     double size_term = 1.0 / one.size();

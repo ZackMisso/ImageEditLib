@@ -8,6 +8,7 @@
 
 #include "image.h"
 #include "noise.h"
+#include <tgmath.h>
 
 namespace imedit
 {
@@ -49,24 +50,25 @@ enum ImagePartition
 // void marble_image()
 
 // TODO: maybe connect this to Vec implementation to use instead of pairs
-template <typename T>
-void euclidean_dist_from_points_image(Image<T>& image, std::vector<std::pair<T,T> > pairs)
+
+static void euclidean_dist_from_points_image(Image& image,
+                                             std::vector<std::pair<Float,Float> > pairs)
 {
     for (int i = 0; i < image.height(); ++i)
     {
         for (int j = 0; j < image.width(); ++j)
         {
-            T val = 10000000.0;
+            Float val = 10000000.0;
 
             for (int k = 0; k < pairs.size(); ++k)
             {
-                T j_val = pairs[k].first - (T(j) + T(0.5));
-                T i_val = pairs[k].second - (T(i) + T(0.5));
+                Float j_val = pairs[k].first - (Float(j) + Float(0.5));
+                Float i_val = pairs[k].second - (Float(i) + Float(0.5));
 
                 j_val *= j_val;
                 i_val *= i_val;
 
-                T tmp = sqrt(j_val + i_val);
+                Float tmp = sqrt(j_val + i_val);
 
                 if (tmp < val) val = tmp;
             }
@@ -79,8 +81,8 @@ void euclidean_dist_from_points_image(Image<T>& image, std::vector<std::pair<T,T
     }
 }
 
-template <typename T>
-void manhattan_dist_from_points_image(Image<T>& image, std::vector<std::pair<int,int> > pairs)
+static void manhattan_dist_from_points_image(Image& image,
+                                             std::vector<std::pair<int,int> > pairs)
 {
     for (int i = 0; i < image.height(); ++i)
     {
@@ -106,27 +108,26 @@ void manhattan_dist_from_points_image(Image<T>& image, std::vector<std::pair<int
     }
 }
 
-template <typename T>
-void euclidean_tiled_image(Image<T>& image,
-                           const std::vector<std::pair<T, T> >& pairs,
-                           const std::vector<Pixel>& pixels)
+static void euclidean_tiled_image(Image& image,
+                                  const std::vector<std::pair<Float, Float> >& pairs,
+                                  const std::vector<Pixel>& pixels)
 {
     for (int i = 0; i < image.height(); ++i)
     {
         for (int j = 0; j < image.width(); ++j)
         {
             int best_index = -1;
-            T val = image.width() * image.height();
+            Float val = image.width() * image.height();
 
             for (int k = 0; k < pairs.size(); ++k)
             {
-                T j_val = pairs[k].first - (T(j) + T(0.5));
-                T i_val = pairs[k].second - (T(i) + T(0.5));
+                Float j_val = pairs[k].first - (Float(j) + Float(0.5));
+                Float i_val = pairs[k].second - (Float(i) + Float(0.5));
 
                 j_val *= j_val;
                 i_val *= i_val;
 
-                T tmp = sqrt(j_val + i_val);
+                Float tmp = sqrt(j_val + i_val);
 
                 if (tmp < val)
                 {
@@ -140,10 +141,9 @@ void euclidean_tiled_image(Image<T>& image,
     }
 }
 
-template <typename T>
-void manhattan_tiled_image(Image<T>& image,
-                           const std::vector<std::pair<int,int> >& pairs,
-                           const std::vector<Pixel>& pixels)
+static void manhattan_tiled_image(Image& image,
+                                  const std::vector<std::pair<int,int> >& pairs,
+                                  const std::vector<Pixel>& pixels)
 {
     for (int i = 0; i < image.height(); ++i)
     {
@@ -171,20 +171,19 @@ void manhattan_tiled_image(Image<T>& image,
     }
 }
 
-template <typename T>
-void euclidean_dist_image(Image<T>& image, T xpos, T ypos)
+static void euclidean_dist_image(Image& image, Float xpos, Float ypos)
 {
     for (int i = 0; i < image.height(); ++i)
     {
         for (int j = 0; j < image.width(); ++j)
         {
-            T j_val = xpos - (T(j) + T(0.5));
-            T i_val = ypos - (T(i) + T(0.5));
+            Float j_val = xpos - (Float(j) + Float(0.5));
+            Float i_val = ypos - (Float(i) + Float(0.5));
 
             j_val *= j_val;
             i_val *= i_val;
 
-            T val = sqrt(j_val + i_val);
+            Float val = sqrt(j_val + i_val);
 
             for (int k = 0; k < image.depth(); ++k)
             {
@@ -194,8 +193,7 @@ void euclidean_dist_image(Image<T>& image, T xpos, T ypos)
     }
 }
 
-template <typename T>
-void manhattan_dist_image(Image<T>& image, int xpos, int ypos)
+static void manhattan_dist_image(Image& image, int xpos, int ypos)
 {
     for (int i = 0; i < image.height(); ++i)
     {
@@ -213,12 +211,11 @@ void manhattan_dist_image(Image<T>& image, int xpos, int ypos)
 }
 
 // Note: I know this is inefficient - TODO: fix
-template <typename T>
-void splat_manhattan(Image<T>& image,
-                     Pixel color,
-                     int xpos,
-                     int ypos,
-                     int radius)
+static void splat_manhattan(Image& image,
+                            Pixel color,
+                            int xpos,
+                            int ypos,
+                            int radius)
 {
     for (int i = 0; i < image.height(); ++i)
     {
@@ -238,24 +235,23 @@ void splat_manhattan(Image<T>& image,
 }
 
 // Note: I know this is inefficient - TODO: fix
-template <typename T>
-void splat_euclidean(Image<T>& image,
-                     Pixel color,
-                     T xpos,
-                     T ypos,
-                     T radius)
+static void splat_euclidean(Image& image,
+                            Pixel color,
+                            Float xpos,
+                            Float ypos,
+                            Float radius)
 {
     for (int i = 0; i < image.height(); ++i)
     {
         for (int j = 0; j < image.width(); ++j)
         {
-            T j_val = xpos - (T(j) + T(0.5));
-            T i_val = ypos - (T(i) + T(0.5));
+            Float j_val = xpos - (Float(j) + Float(0.5));
+            Float i_val = ypos - (Float(i) + Float(0.5));
 
             j_val *= j_val;
             i_val *= i_val;
 
-            T val = sqrt(j_val + i_val);
+            Float val = sqrt(j_val + i_val);
 
             if (val < radius)
             {
@@ -289,21 +285,20 @@ void splat_euclidean(Image<T>& image,
 // //     }
 // }
 
-template <typename T>
-void turbulence_image_xy(Image<T>& image,
-                         T period,
-                         T xtrans = (T)0.0,
-                         T ytrans = (T)0.0,
-                         T zloc = (T)0.0)
+static void turbulence_image_xy(Image& image,
+                                Float period,
+                                Float xtrans = (Float)0.0,
+                                Float ytrans = (Float)0.0,
+                                Float zloc = (Float)0.0)
 {
     for (int i = 0; i < image.height(); ++i)
     {
         for (int j = 0; j < image.width(); ++j)
         {
-            T val = turbulence(T(j + 0.5) + xtrans,
-                               T(i + 0.5) + ytrans,
-                               zloc,
-                               period);
+            Float val = turbulence(Float(j + 0.5) + xtrans,
+                                   Float(i + 0.5) + ytrans,
+                                   zloc,
+                                   period);
 
             for (int k = 0; k < image.depth(); ++k)
             {
@@ -313,12 +308,11 @@ void turbulence_image_xy(Image<T>& image,
     }
 }
 
-template <typename T>
-void turbulence_image_xyz(Image<T>& image,
-                          T period,
-                          T xtrans = (T)0.0,
-                          T ytrans = (T)0.0,
-                          T ztrans = (T)0.0)
+static void turbulence_image_xyz(Image& image,
+                                 Float period,
+                                 Float xtrans = (Float)0.0,
+                                 Float ytrans = (Float)0.0,
+                                 Float ztrans = (Float)0.0)
 {
     if (image.depth() == 3)
     {
@@ -326,10 +320,10 @@ void turbulence_image_xyz(Image<T>& image,
         {
             for (int j = 0; j < image.width(); ++j)
             {
-                T val = turbulence(j + 0.5f + xtrans,
-                                   i + 0.5f + ytrans,
-                                   0.5f + ztrans,
-                                   period);
+                Float val = turbulence(j + 0.5f + xtrans,
+                                       i + 0.5f + ytrans,
+                                       0.5f + ztrans,
+                                       period);
 
                 for (int k = 0; k < image.depth(); ++k)
                 {
@@ -348,12 +342,11 @@ void turbulence_image_xyz(Image<T>& image,
     }
 }
 
-template <typename T>
-void noise_image(Image<T>& image,
-                 T period,
-                 T xtrans = 0.0,
-                 T ytrans = 0.0,
-                 T ztrans = 0.0)
+static void noise_image(Image& image,
+                        Float period,
+                        Float xtrans = 0.0,
+                        Float ytrans = 0.0,
+                        Float ztrans = 0.0)
 {
     if (image.depth() == 3)
     {
@@ -373,21 +366,20 @@ void noise_image(Image<T>& image,
     }
 }
 
-template <typename T>
-void noise_image_xy(Image<T>& image,
-                    T period,
-                    T xtrans = 0.0,
-                    T ytrans = 0.0,
-                    T zloc = 0.0)
+static void noise_image_xy(Image& image,
+                           Float period,
+                           Float xtrans = 0.0,
+                           Float ytrans = 0.0,
+                           Float zloc = 0.0)
 {
     for (int i = 0; i < image.height(); ++i)
     {
         for (int j = 0; j < image.width(); ++j)
         {
-            T val = noise(T(j + 0.5) + xtrans,
-                          T(i + 0.5) + ytrans,
-                          zloc,
-                          period);
+            Float val = noise(Float(j + 0.5) + xtrans,
+                              Float(i + 0.5) + ytrans,
+                              zloc,
+                              period);
 
             for (int k = 0; k < image.depth(); ++k)
             {
@@ -397,13 +389,12 @@ void noise_image_xy(Image<T>& image,
     }
 }
 
-template <typename T>
-void sin_image(T amplitude,
-               T period,
-               T phase,
-               T offset,
-               Image<T>& image,
-               ImagePartition part)
+static void sin_image(Float amplitude,
+                      Float period,
+                      Float phase,
+                      Float offset,
+                      Image& image,
+                      ImagePartition part)
 {
     switch(part)
     {
@@ -411,7 +402,7 @@ void sin_image(T amplitude,
         {
             for (int j = 0; j < image.width(); ++j)
             {
-                T val = amplitude * sin(j / period + phase) + offset;
+                Float val = amplitude * std::sin(j / period + phase) + offset;
 
                 for (int k = 0; k < image.depth(); ++k)
                 {
@@ -428,7 +419,7 @@ void sin_image(T amplitude,
         {
             for (int i = 0; i < image.height(); ++i)
             {
-                T val = amplitude * sin(i / period + phase) + offset;
+                Float val = amplitude * std::sin(i / period + phase) + offset;
 
                 for (int k = 0; k < image.depth(); ++k)
                 {
@@ -474,7 +465,7 @@ void sin_image(T amplitude,
                 {
                     // TODO: how should this be implemented to support different
                     //       periods for x and y
-                    T val = amplitude * sin((i + j) / period + phase) + offset;
+                    Float val = amplitude * std::sin((i + j) / period + phase) + offset;
 
                     for (int k = 0; k < image.depth(); ++k)
                     {
@@ -558,14 +549,13 @@ void sin_image(T amplitude,
     }
 }
 
-template <typename T>
-void perlin_flow_field(Image<T>& image,
-                       T period,
+void perlin_flow_field(Image& image,
+                       Float period,
                        int num_particles,
-                       T initial_speed = 1.0,
-                       T xtrans = 0.0,
-                       T ytrans = 0.0,
-                       T ztrans = 0.0)
+                       Float initial_speed = 1.0,
+                       Float xtrans = 0.0,
+                       Float ytrans = 0.0,
+                       Float ztrans = 0.0)
 {
     // TODO
 }

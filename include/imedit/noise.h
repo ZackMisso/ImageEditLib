@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <tgmath.h>
+
 namespace imedit
 {
 
@@ -53,41 +55,39 @@ static int NoiseTable[512] = {
     243, 141, 128, 195, 78, 66, 215, 61, 156, 180
 };
 
-template <typename T>
-T lerp(T t, T one, T two)
+Float lerp(Float t, Float one, Float two)
 {
     return (1.0 - t) * one + t * two;
 }
 
-template <typename T>
-T noiseW(T t)
+Float noiseW(Float t)
 {
-    T one = t * t * t;
-    T two = one * t;
+    Float one = t * t * t;
+    Float two = one * t;
     return 6.0 * two * t - 15.0 * two + 10.0 * one;
 }
 
-template <typename T>
-T gradient(int x, int y, int z, T dx, T dy, T dz) {
+Float gradient(int x, int y, int z, Float dx, Float dy, Float dz)
+{
     int val = NoiseTable[NoiseTable[NoiseTable[x] + y] + z];
 
     val &= 15;
 
-    T u = val < 8 || val == 12 || val == 13 ? dx : dy;
-    T v = val < 4 || val == 12 || val == 13 ? dy : dz;
+    Float u = val < 8 || val == 12 || val == 13 ? dx : dy;
+    Float v = val < 4 || val == 12 || val == 13 ? dy : dz;
+
     return ((val & 1) ? -u : u) + ((val & 2) ? -v : v);
 }
 
-template <typename T>
-T pbrtPerlinNoise(T x, T y, T z)
+Float pbrtPerlinNoise(Float x, Float y, Float z)
 {
     int xIndex = floor(x);
     int yIndex = floor(y);
     int zIndex = floor(z);
 
-    T dx = x - xIndex;
-    T dy = y - yIndex;
-    T dz = z - zIndex;
+    Float dx = x - xIndex;
+    Float dy = y - yIndex;
+    Float dz = z - zIndex;
 
     xIndex = xIndex & NoiseTableSize - 1;
     yIndex = yIndex & NoiseTableSize - 1;
@@ -97,66 +97,63 @@ T pbrtPerlinNoise(T x, T y, T z)
     int yip1 = yIndex + 1;
     int zip1 = zIndex + 1;
 
-    T dxm1 = dx - 1;
-    T dym1 = dy - 1;
-    T dzm1 = dz - 1;
+    Float dxm1 = dx - 1;
+    Float dym1 = dy - 1;
+    Float dzm1 = dz - 1;
 
-    T g100 = gradient<T>(xip1, yIndex, zIndex, dxm1, dy, dz);
-    T g010 = gradient<T>(xIndex, yip1, zIndex, dx, dym1, dz);
-    T g001 = gradient<T>(xIndex, yIndex, zip1, dx, dy, dym1);
-    T g110 = gradient<T>(xip1, yip1, zIndex, dxm1, dym1, dz);
-    T g101 = gradient<T>(xip1, yIndex, zip1, dxm1, dy, dzm1);
-    T g011 = gradient<T>(xIndex, yip1, zip1, dx, dym1, dzm1);
-    T g111 = gradient<T>(xip1, yip1, zip1, dxm1, dym1, dzm1);
-    T g000 = gradient<T>(xIndex, yIndex, zIndex, dx, dy, dz);
+    Float g100 = gradient(xip1, yIndex, zIndex, dxm1, dy, dz);
+    Float g010 = gradient(xIndex, yip1, zIndex, dx, dym1, dz);
+    Float g001 = gradient(xIndex, yIndex, zip1, dx, dy, dym1);
+    Float g110 = gradient(xip1, yip1, zIndex, dxm1, dym1, dz);
+    Float g101 = gradient(xip1, yIndex, zip1, dxm1, dy, dzm1);
+    Float g011 = gradient(xIndex, yip1, zip1, dx, dym1, dzm1);
+    Float g111 = gradient(xip1, yip1, zip1, dxm1, dym1, dzm1);
+    Float g000 = gradient(xIndex, yIndex, zIndex, dx, dy, dz);
 
-    T nwx = noiseW<T>(dx);
-    T nwy = noiseW<T>(dy);
-    T nwz = noiseW<T>(dz);
+    Float nwx = noiseW(dx);
+    Float nwy = noiseW(dy);
+    Float nwz = noiseW(dz);
 
     // trilinear interpolation
-    T x00 = lerp(nwx, g000, g100);
-    T x10 = lerp(nwx, g010, g110);
-    T x01 = lerp(nwx, g001, g101);
-    T x11 = lerp(nwx, g011, g111);
-    T y0 = lerp(nwy, x00, x10);
-    T y1 = lerp(nwy, x01, x11);
+    Float x00 = lerp(nwx, g000, g100);
+    Float x10 = lerp(nwx, g010, g110);
+    Float x01 = lerp(nwx, g001, g101);
+    Float x11 = lerp(nwx, g011, g111);
+    Float y0 = lerp(nwy, x00, x10);
+    Float y1 = lerp(nwy, x01, x11);
 
     return lerp(nwz, y0, y1);
 }
 
 // #############################################
 
-template <typename T>
-T noise(T x, T y, T z, T period)
+Float noise(Float x, Float y, Float z, Float period)
 {
     // TODO: experiment with new versions of noise
-    return pbrtPerlinNoise<T>(x / period, y / period, z / period);
+    return pbrtPerlinNoise(x / period, y / period, z / period);
 }
 
-template <typename T>
-T noise(T x,
-        T y,
-        T z,
-        T x_period,
-        T y_period,
-        T z_period)
+Float noise(Float x,
+            Float y,
+            Float z,
+            Float x_period,
+            Float y_period,
+            Float z_period)
 {
-    return pbrtPerlinNoise<T>(x / x_period,
-                              y / y_period,
-                              z / z_period);
+    return pbrtPerlinNoise(x / x_period,
+                           y / y_period,
+                           z / z_period);
 }
 
-template <typename T>
-T turbulence(T x, T y, T z, T period)
+Float turbulence(Float x, Float y, Float z, Float period)
 {
-    T val = 0.0;
-    T scale = period;
-    T totalScale = 0.0;
+    Float val = 0.0;
+    Float scale = period;
+    Float totalScale = 0.0;
 
     while (scale > 1.0)
     {
-        val = val + (noise<T>(x, y, z, scale)) * scale;
+        val = val + (noise(x, y, z, scale)) * scale;
         scale /= 2.0;
     }
 

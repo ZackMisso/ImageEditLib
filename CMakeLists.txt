@@ -69,6 +69,8 @@ set(imedit_srcs
     include/imedit/image.h
     include/imedit/procedural.h
 
+    src/image.cpp
+
     test/main.cpp
 )
 
@@ -83,6 +85,8 @@ set(texture_gen_srcs
     include/imedit/image.h
     include/imedit/procedural.h
     include/imedit/filter.h
+
+    src/image.cpp
 
     test/texture_gen.cpp
 )
