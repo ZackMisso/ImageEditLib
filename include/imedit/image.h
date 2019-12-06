@@ -15,6 +15,7 @@
 #pragma once
 
 // useful functions
+// TODO: rewrite all of this in terms of templates
 
 namespace imedit
 {
@@ -23,6 +24,9 @@ typedef double Float;
 
 struct Pixel
 {
+    Pixel() : r(0.f), g(0.f), b(0.f) { }
+    Pixel(Float r, Float g, Float b) : r(r), g(g), b(b) { }
+
     Float r;
     Float g;
     Float b;

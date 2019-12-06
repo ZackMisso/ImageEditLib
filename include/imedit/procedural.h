@@ -171,6 +171,23 @@ static void manhattan_tiled_image(Image& image,
     }
 }
 
+static void manhattan_tiled_image(Image& image,
+                                  const std::vector<std::pair<Float,Float> >& pairs,
+                                  const std::vector<Pixel>& pixels)
+{
+    std::vector<std::pair<int,int> > new_pairs = std::vector<std::pair<int,int> >(pairs.size());
+
+    for (int i = 0; i < pairs.size(); ++i)
+    {
+        new_pairs[i].first = (int)pairs[i].first;
+        new_pairs[i].second = (int)pairs[i].second;
+    }
+
+    manhattan_tiled_image(image,
+                          new_pairs,
+                          pixels);
+}
+
 static void euclidean_dist_image(Image& image, Float xpos, Float ypos)
 {
     for (int i = 0; i < image.height(); ++i)

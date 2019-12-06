@@ -91,11 +91,30 @@ set(texture_gen_srcs
     test/texture_gen.cpp
 )
 
+set(move_demo_srcs
+    ext/stb/stb_image_write.h
+    ext/stb/stb_image.h
+
+    ext/pcg/pcg32.h
+
+    ext/tinyexr/tinyexr.h
+
+    include/imedit/image.h
+    include/imedit/procedural.h
+    include/imedit/filter.h
+
+    src/image.cpp
+
+    test/move_demo.cpp
+)
+
 add_executable(imedit ${imedit_srcs})
 add_executable(texture_gen ${texture_gen_srcs})
+add_executable(move_demo ${move_demo_srcs})
 
 target_link_libraries(imedit ${PYTHON_LIBRARIES})
 target_link_libraries(texture_gen ${PYTHON_LIBRARIES})
+target_link_libraries(move_demo ${PYTHON_LIBRARIES})
 
 set(CompilerFlags
       CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
@@ -104,6 +123,3 @@ set(CompilerFlags
       CMAKE_C_FLAGS_RELWITHDEBINFO COMPILE_DEFINITIONS U_CMAKE_BUILD_TYPE
       CMAKE_MACOSX_RPATH
 )
-
-# Create the output data directory
-# add_custom_command(TARGET imedit POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_SOURCE_DIR}/data/output") # a5
