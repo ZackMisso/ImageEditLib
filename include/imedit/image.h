@@ -110,6 +110,8 @@ public:
     void setPixels(Pixel p);
     void setPixel(int j, int i, Pixel p);
 
+    void operator~();
+
     Image operator+(const Image& other) const;
     Image operator-(const Image& other) const;
     // this is component-wise multiplication
@@ -140,16 +142,16 @@ public:
     Float& filter_index(int x, int y, int z);
     Float filter_index(int x, int y, int z) const;
 
-    uint32_t width() const { return w; }
-    uint32_t height() const { return h; }
-    uint32_t depth() const { return d; }
+    int width() const { return w; }
+    int height() const { return h; }
+    int depth() const { return d; }
     uint32_t size() const { return w * h * d; }
 
 protected:
     std::vector<Float> im;
 
     ImageMode mode;
-    uint32_t w, h, d;
+    int w, h, d;
 };
 
 }

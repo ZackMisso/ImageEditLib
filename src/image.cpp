@@ -197,11 +197,11 @@ bool Image::read(const std::string& filename)
     int hei;
     int dep;
 
-    std::cout << "reading" << std::endl;
+    // std::cout << "reading" << std::endl;
 
     try
     {
-        std::cout << "hi" << std::endl;
+        // std::cout << "hi" << std::endl;
         if (getExtension(filename) == "txt")
         {
             std::string line;
@@ -542,6 +542,7 @@ void Image::resize(int cols, int rows, int channels)
     w = cols;
     h = rows;
     d = channels;
+    // std::cout << "w: " << w << " h: " << h << " d: " << d << std::endl;
 }
 
 void Image::setZero()
@@ -592,6 +593,16 @@ void Image::setPixel(int j, int i, Pixel p)
     operator()(j, i, 0) = p.r;
     operator()(j, i, 1) = p.g;
     operator()(j, i, 2) = p.b;
+}
+
+void Image::operator~()
+{
+    int size = w * h * d;
+
+    for (int i = 0; i < size; ++i)
+    {
+        operator[](i) = 1.f - operator[](i);
+    }
 }
 
 Image Image::operator+(const Image& other) const

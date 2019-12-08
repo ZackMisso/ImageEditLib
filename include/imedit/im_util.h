@@ -69,6 +69,14 @@ static void exp_im(Image& image, Float period)
     }
 }
 
+static void pow_im(Image& image, Float exponent)
+{
+    for (int i = 0; i < image.size(); ++i)
+    {
+        image[i] = pow(image[i], exponent);
+    }
+}
+
 static void remap_range_lin(std::vector<Image>& images)
 {
     Float min = images[0].min();
@@ -387,6 +395,26 @@ static void histogram_grayscale(const Image& image,
             else hist[index]++;
         }
     }
+}
+
+static Image edge_image(const Image& image)
+{
+    Image edge = Image(image.width(), image.height(), 3);
+
+    for (int i = 1; i < edge.height()-1; ++i)
+    {
+        for (int j = 1; j < edge.width()-1; ++j)
+        {
+            edge(j, i, 0) = (image(j+1, i, 0) - image(j-1, i, 0) +
+                            image(j, i+1, 0) - image(j, i-1, 0)) / 4.0;
+            edge(j, i, 1) = (image(j+1, i, 1) - image(j-1, i, 1) +
+                            image(j, i+1, 1) - image(j, i-1, 1)) / 4.0;
+            edge(j, i, 2) = (image(j+1, i, 2) - image(j-1, i, 2) +
+                            image(j, i+1, 2) - image(j, i-1, 2)) / 4.0;
+        }
+    }
+
+    return edge;
 }
 
 // // a false color scheme with arbitrary locations for all color stops

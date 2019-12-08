@@ -141,6 +141,56 @@ static void euclidean_tiled_image(Image& image,
     }
 }
 
+static void euclidean_edge_image(Image& image,
+                                 const std::vector<std::pair<Float, Float> >& pairs,
+                                 Float threshold = -1.0)
+{
+    if (threshold < 0.0)
+        threshold = 3.0;
+
+    for (int i = 0; i < image.height(); ++i)
+    {
+        for (int j = 0; j < image.width(); ++j)
+        {
+            int best_index = -1;
+            int second_best_index = -1;
+            Float best_val = image.width() * image.height();
+            Float second_best_val = image.width() * image.height();
+
+            for (int k = 0; k < pairs.size(); ++k)
+            {
+                Float j_val = pairs[k].first - (Float(j) + Float(0.5));
+                Float i_val = pairs[k].second - (Float(i) + Float(0.5));
+
+                j_val *= j_val;
+                i_val *= i_val;
+
+                Float tmp = sqrt(j_val + i_val);
+
+                if (tmp < best_val)
+                {
+                    second_best_val = best_val;
+                    best_val = tmp;
+                    second_best_index = best_index;
+                    best_index = k;
+                }
+                else if (tmp < second_best_val)
+                {
+                    second_best_val = tmp;
+                    second_best_index = k;
+                }
+            }
+
+            if (abs(best_val - second_best_val) < threshold)
+            {
+                image(j, i, 0) = 1.0;
+                image(j, i, 1) = 1.0;
+                image(j, i, 2) = 1.0;
+            }
+        }
+    }
+}
+
 static void manhattan_tiled_image(Image& image,
                                   const std::vector<std::pair<int,int> >& pairs,
                                   const std::vector<Pixel>& pixels)
@@ -206,6 +256,40 @@ static void euclidean_dist_image(Image& image, Float xpos, Float ypos)
             {
                 image(j, i, k) = val;
             }
+        }
+    }
+}
+
+static void euclidean_dist_image(Image& image,
+                                 const std::vector<std::pair<Float, Float> >& pairs)
+{
+    for (int i = 0; i < image.height(); ++i)
+    {
+        for (int j = 0; j < image.width(); ++j)
+        {
+            int best_index = -1;
+            Float val = image.width() * image.height();
+
+            for (int k = 0; k < pairs.size(); ++k)
+            {
+                Float j_val = pairs[k].first - (Float(j) + Float(0.5));
+                Float i_val = pairs[k].second - (Float(i) + Float(0.5));
+
+                j_val *= j_val;
+                i_val *= i_val;
+
+                Float tmp = sqrt(j_val + i_val);
+
+                if (tmp < val)
+                {
+                    val = tmp;
+                    best_index = k;
+                }
+            }
+
+            image(j, i, 0) = val;
+            image(j, i, 1) = val;
+            image(j, i, 2) = val;
         }
     }
 }
