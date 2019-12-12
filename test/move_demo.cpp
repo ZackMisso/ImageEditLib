@@ -291,6 +291,11 @@ int main(int argc, char* argv[])
         char str[4];
         snprintf(str, 4, "%03d", i);
 
+
+        imedit::Image edge_image = imedit::edge_image(image);
+        edge_image *= 4.0;
+
         image.write(path_to_results + "frame_" + std::string(str) + ".png");
+        edge_image.write(path_to_results + "edge_" + std::string(str) + ".png");
     }
 }

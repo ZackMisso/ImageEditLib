@@ -77,6 +77,8 @@ public:
     Image(int w, int h, int d, ImageMode mode);
     Image(const std::string& filename);
 
+    void scale_to_fit(const Image& other);
+
     void clear();
 
     // TODO: convert this form of averaging to be in-place
@@ -138,6 +140,8 @@ public:
     Float operator[](int index) const;
     Float& operator()(int x, int y, int z);
     Float operator()(int x, int y, int z) const;
+
+    Float operator()(float x, float y, float z) const;
 
     Float& filter_index(int x, int y, int z);
     Float filter_index(int x, int y, int z) const;

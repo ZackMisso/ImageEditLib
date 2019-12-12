@@ -36,6 +36,24 @@ static void clamp_im(Image& image, Float min, Float max)
     }
 }
 
+static void apply_mask(Image& image,
+                       const Image& mask,
+                       Float threshold = 0.f,
+                       Float scale = 0.f)
+{
+    for (int i = 0; i < image.size(); ++i)
+    {
+        if (mask[i] < 0.f)
+        {
+            image[i] = 0.f;
+        }
+        else if (mask[i] < threshold)
+        {
+            image[i] *= scale;
+        }
+    }
+}
+
 static Float clamp(Float val)
 {
     if (val < 0.0) return 0.0;

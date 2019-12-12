@@ -490,6 +490,44 @@ static void noise_image_xy(Image& image,
     }
 }
 
+static Image mirror_along_x_axis(const Image& image, int location)
+{
+    Image ret = Image(image.width(), image.height(), image.depth());
+
+    for (int i = 0; i < image.height(); ++i)
+    {
+        for (int j = 0; j < image.width(); ++j)
+        {
+            int x = location - abs(j - location);
+
+            ret(j, i, 0) = image(x, i, 0);
+            ret(j, i, 1) = image(x, i, 1);
+            ret(j, i, 2) = image(x, i, 2);
+        }
+    }
+
+    return ret;
+}
+
+static Image mirror_along_y_axis(const Image& image, int location)
+{
+    Image ret = Image(image.width(), image.height(), image.depth());
+
+    for (int i = 0; i < image.height(); ++i)
+    {
+        for (int j = 0; j < image.width(); ++j)
+        {
+            int y = location - abs(i - location);
+
+            ret(j, i, 0) = image(j, y, 0);
+            ret(j, i, 1) = image(j, y, 1);
+            ret(j, i, 2) = image(j, y, 2);
+        }
+    }
+
+    return ret;
+}
+
 static void sin_image(Float amplitude,
                       Float period,
                       Float phase,

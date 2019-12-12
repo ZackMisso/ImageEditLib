@@ -50,6 +50,17 @@ Image::Image(const std::string& filename)
     else mode = IM_3D_GRAYSCALE_TEXTURE;
 }
 
+void Image::scale_to_fit(const Image& other)
+{
+    for (int i = 0; i < h; ++i)
+    {
+        for (int j = 0; j < w; ++j)
+        {
+            // TODO
+        }
+    }
+}
+
 void Image::clear()
 {
     for (int i = 0; i < size(); ++i)
@@ -823,6 +834,14 @@ Float Image::operator()(int x, int y, int z) const
 {
     // return im[z * w * h + y * w + x];
     return im[(z * h + y) * w + x];
+}
+
+Float Image::operator()(float x, float y, float z) const
+{
+    // TODO
+    // return im[z * w * h + y * w + x];
+    // return im[(z * h + y) * w + x];
+    return 0.0;
 }
 
 Float& Image::filter_index(int x, int y, int z)
