@@ -335,6 +335,50 @@ void test_one()
     // mirrored.write("initial_mirrored.png");
 }
 
+struct Operator
+{
+    virtual ~Operator() { }
+
+    // Pix evaluate_pixel(float x, float y)
+    // {
+    //     return Pix(evaluate(x, y, 0),
+    //                evaluate(x, y, 1),
+    //                evaluate(x, y, 2));
+    // }
+
+    virtual float evaluate(float val, float t) = 0;
+};
+
+struct SinOperator : public Operator
+{
+    SinOperator() { }
+
+    virtual float evaluate(float val, float t)
+    {
+
+        // TODO
+        return 0.f;
+    }
+};
+
+struct LinOperator : public Operator
+{
+    LinOperator(float min, float max, float period, float start_t = 0.f)
+        : min(min), max(max), period(period), start_t(start_t) { }
+
+    virtual float evaluate(float val, float t)
+    {
+        float period_index = (t - start_t) / period;
+        float interp = period_index - floor(period_index);
+        return (max - min) * interp + min;
+    }
+
+    float min;
+    float max;
+    float period;
+    float start_t;
+};
+
 void test_two()
 {
     // initialize global parameters
