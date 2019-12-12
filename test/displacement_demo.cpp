@@ -23,6 +23,16 @@ struct Location_Time
     int time;
 };
 
+struct KeyFrame
+{
+    KeyFrame(float xpos, float ypos, float time)
+        : xpos(xpos), ypos(ypos), time(time) { }
+
+    float xpos;
+    float ypos;
+    float time;
+};
+
 // TODO: make this a library function
 void copy_image_if_pos_with_mask(imedit::Image& image, imedit::Image& mask, imedit::Image& copy, double cx, double cy)
 {
@@ -66,7 +76,7 @@ void check_mask(imedit::Image& image, imedit::Image& mask)
     imedit::apply_mask(image, mask, 40.f, 0.985f);
 }
 
-int main(int argc, char* argv[])
+void test_one()
 {
     // initialize global parameters
     pcg32 rng = pcg32(0x4235, 0xac42);
@@ -77,8 +87,8 @@ int main(int argc, char* argv[])
     std::string rm_command = "rm -rf " + location;
     std::string mkdir_command = "mkdir " + location;
 
-    std::string publish_command_1 = "ffmpeg -r 60 -f image2 -s 1024x1024 -i " + location + "/disp_%04d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p " + location + "/test_1.mp4";
-    std::string publish_command_2 = "ffmpeg -r 60 -f image2 -s 1024x1024 -i " + location + "/mask_%04d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p " + location + "/test_1_mask.mp4";
+    std::string publish_command_1 = "ffmpeg -r 60 -f image2 -s 1024x1024 -i " + location + "/disp_%04d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p " + location + "/test_2.mp4";
+    std::string publish_command_2 = "ffmpeg -r 60 -f image2 -s 1024x1024 -i " + location + "/mask_%04d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p " + location + "/test_2_mask.mp4";
 
     system(rm_command.c_str());
     system(mkdir_command.c_str());
@@ -132,12 +142,12 @@ int main(int argc, char* argv[])
     // std::cout << "end_T: " << end_t << std::endl;
     // std::cout << "last_T: " << last_t << std::endl;
 
-    int last_t = 4 * word_image.width() / 2;
+    int last_t = 4 * word_image.width() / 2 + 60;
 
     end_t /= 2;
 
     int time_diff = 1002;
-    time_diff = word_image.width();
+    time_diff = word_image.width() * 3;
 
     Pff last_one = Pff(cos(180.0 * PI / 180.0) * double(time_diff) + end_x, end_y - sin(180.0 * PI / 180.0) * double(time_diff));
     Pff last_two = Pff(cos(157.5 * PI / 180.0) * double(time_diff) + end_x, end_y - sin(157.5 * PI / 180.0) * double(time_diff));
@@ -179,6 +189,8 @@ int main(int argc, char* argv[])
     for (int i = 0; i < frames; ++i)
     {
         std::cout << "creating frame: " << (i+1) << " out of: " << frames << " frames" << std::endl;
+
+        current_image.clear();
 
         if (i > time_stamps_one[time_stamp].time && time_stamp < time_stamps_one.size())
         {
@@ -290,21 +302,21 @@ int main(int argc, char* argv[])
             }
         }
 
-        check_mask(current_image, current_mask);
+        // check_mask(current_image, current_mask);
 
         current_image = mirror_along_x_axis(current_image, current_image.width() / 2);
-        current_mask = mirror_along_x_axis(current_mask, current_mask.width() / 2);
+        // current_mask = mirror_along_x_axis(current_mask, current_mask.width() / 2);
 
         current_image = mirror_along_y_axis(current_image, 4 * current_image.height() / 5);
-        current_mask = mirror_along_y_axis(current_mask, 4 * current_mask.height() / 5);
+        // current_mask = mirror_along_y_axis(current_mask, 4 * current_mask.height() / 5);
 
         char str[5];
         snprintf(str, 5, "%04d", i);
 
-        imedit::Image normalized_mask = current_mask / float(mask_timer);
+        // imedit::Image normalized_mask = current_mask / float(mask_timer);
 
         current_image.write(location + "disp_" + std::string(str) + ".png");
-        normalized_mask.write(location + "mask_" + std::string(str) + ".png");
+        // normalized_mask.write(location + "mask_" + std::string(str) + ".png");
 
         // imedit::Image backed_image = current_image * background;
         // imedit::Image backed_mask = normalized_mask * background;
@@ -317,10 +329,39 @@ int main(int argc, char* argv[])
     // as functions?
 
     system(publish_command_1.c_str());
-    system(publish_command_2.c_str());
+    // system(publish_command_2.c_str());
 
     // imedit::Image mirrored = mirror_along_x_axis(word_image, word_image.width()/2);
     // mirrored.write("initial_mirrored.png");
+}
+
+void test_two()
+{
+    // initialize global parameters
+    pcg32 rng = pcg32(0x4235, 0xac42);
+    int res = 1024;
+    int frames = 1000;
+    std::string location = "displacement/";
+
+    std::string rm_command = "rm -rf " + location;
+    std::string mkdir_command = "mkdir " + location;
+
+    std::string publish_command_1 = "ffmpeg -r 60 -f image2 -s 1024x1024 -i " + location + "/disp_%04d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p " + location + "/test_2.mp4";
+    std::string publish_command_2 = "ffmpeg -r 60 -f image2 -s 1024x1024 -i " + location + "/mask_%04d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p " + location + "/test_2_mask.mp4";
+
+    system(rm_command.c_str());
+    system(mkdir_command.c_str());
+
+    imedit::Image word_image = imedit::Image("../data/ernie_ball.png");
+    ~word_image;
+
+
+}
+
+int main(int argc, char* argv[])
+{
+    test_one();
+    // test_two();
 
     return 0;
 }
