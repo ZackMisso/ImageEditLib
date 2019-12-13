@@ -6,7 +6,7 @@
 #include "imedit/im_util.h"
 #include "pcg/pcg32.h"
 
-typedef std::pair<double, double> Pff;
+typedef std::pair<float, float> Pff;
 typedef imedit::Pixel Pix;
 
 #define PI 3.14159265
@@ -346,14 +346,37 @@ struct Operator
     //                evaluate(x, y, 2));
     // }
 
-    virtual float evaluate(float val, float t) = 0;
+    virtual float evaluate(float val) { return 0.f; }
+    virtual Pff evaluate_location(float xpos, float ypos) { return Pff(0.f, 0.f); }
+    virtual Pix evaluate_color(float xpos, float ypos) { return Pix(); }
+
+    imedit::Image evaluate_image(imedit::Image& image)
+    {
+        imedit::Image new_image = imedit::Image(image.width(), image.height(), 3);
+
+        for (int i = 0; i < image.height(); ++i)
+        {
+            for (int j = 0; j < image.width(); ++j)
+            {
+                Pff loc = evaluate_location(j, i);
+                int xpos = floor(loc.first);
+                int ypos = floor(loc.second);
+
+                new_image(j, i, 0) = image(xpos, ypos, 0);
+                new_image(j, i, 1) = image(xpos, ypos, 1);
+                new_image(j, i, 2) = image(xpos, ypos, 2);
+            }
+        }
+
+        return new_image;
+    }
 };
 
 struct SinOperator : public Operator
 {
     SinOperator() { }
 
-    virtual float evaluate(float val, float t)
+    virtual float evaluate(float val)
     {
 
         // TODO
@@ -366,9 +389,9 @@ struct LinOperator : public Operator
     LinOperator(float min, float max, float period, float start_t = 0.f)
         : min(min), max(max), period(period), start_t(start_t) { }
 
-    virtual float evaluate(float val, float t)
+    virtual float evaluate(float val)
     {
-        float period_index = (t - start_t) / period;
+        float period_index = (val - start_t) / period;
         float interp = period_index - floor(period_index);
         return (max - min) * interp + min;
     }
@@ -379,19 +402,118 @@ struct LinOperator : public Operator
     float start_t;
 };
 
+struct MirrorOperator : public Operator
+{
+    MirrorOperator(Pff point, Pff tmp_dir, bool flip) : point(point), flip(flip)
+    {
+        // std::cout << tmp_dir.first << std::endl;
+        // std::cout << tmp_dir.second << std::endl;
+        dir.first = tmp_dir.first;
+        dir.second = tmp_dir.second;
+
+        // std::cout << dir.first << std::endl;
+        // std::cout << dir.second << std::endl;
+
+        float mag = sqrt(dir.first * dir.first + dir.second * dir.second);
+        // std::cout << "mag: " << mag << std::endl;
+        dir.first /= mag;
+        dir.second /= mag;
+
+        float tmp = dir.first;
+        dir.first = -dir.second;
+        dir.second = tmp;
+
+        if (flip)
+        {
+            dir.first = -dir.first;
+            dir.second = -dir.second;
+        }
+
+        // std::cout << dir.first << std::endl;
+        // std::cout << dir.second << std::endl;
+    }
+
+    virtual Pff evaluate_location(float xpos, float ypos)
+    {
+        float p_m_x = xpos - point.first;
+        float p_m_y = ypos - point.second;
+
+        float dot = p_m_x * dir.first + p_m_y * dir.second;
+
+        float proj_x = dir.first * dot;
+        float proj_y = dir.second * dot;
+
+        float norm_x = proj_x;
+        float norm_y = proj_y;
+
+        // if (flip && proj_y > 0.f)
+        // {
+        //     norm_x = -norm_x;
+        //     norm_y = -norm_y;
+        // }
+
+        // std::cout << "xpos: " << xpos << std::endl;
+        // // std::cout << "ypos: " << ypos << std::endl;
+        // // // std::cout << std::endl;
+        // // // std::cout << "p_x: " << point.first << std::endl;
+        // // // std::cout << "p_y: " << point.second << std::endl;
+        // // // std::cout << std::endl;
+        // // std::cout << "p_m_x: " << p_m_x << std::endl;
+        // // std::cout << "p_m_y: " << p_m_y << std::endl;
+        // // // std::cout << std::endl;
+        // std::cout << "norm_x: " << norm_x << std::endl;
+        // // std::cout << "norm_y: " << norm_y << std::endl;
+        // // // std::cout << std::endl;
+        // // // std::cout << "proj_x: " << proj_x << std::endl;
+        // // // std::cout << "proj_y: " << proj_y << std::endl;
+        // // std::cout << std::endl;
+        // // std::cout << "dir_x: " << dir.first << std::endl;
+        // // std::cout << "dir_y: " << dir.second << std::endl;
+        // // std::cout << std::endl;
+        // //
+        // // float decide_dot = dir.first * p_m_x + dir.second * p_m_y;
+        // // std::cout << "decision: " << decide_dot << std::endl;
+
+        if (dot > 0.f)
+        {
+            // dont mirror
+            return Pff(xpos, ypos);
+        }
+        else
+        {
+            // mirror
+            return Pff(xpos - 2.f * norm_x, ypos - 2.f * norm_y);
+        }
+
+        // float proj_p_x = proj_x - p_m_x;
+        // float proj_p_y = proj_y - p_m_y;
+        //
+        // if (flip && proj_p_y > 0.f)
+        // {
+        //     proj_p_y = -proj_p_y;
+        // }
+        //
+        // return Pff(0.f, 0.f);
+    }
+
+    Pff point;
+    Pff dir;
+    bool flip;
+};
+
 void test_two()
 {
     // initialize global parameters
     pcg32 rng = pcg32(0x4235, 0xac42);
     int res = 1024;
-    int frames = 1000;
+    int frames = 400;
     std::string location = "displacement/";
 
     std::string rm_command = "rm -rf " + location;
     std::string mkdir_command = "mkdir " + location;
 
-    std::string publish_command_1 = "ffmpeg -r 60 -f image2 -s 1024x1024 -i " + location + "/disp_%04d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p " + location + "/test_2.mp4";
-    std::string publish_command_2 = "ffmpeg -r 60 -f image2 -s 1024x1024 -i " + location + "/mask_%04d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p " + location + "/test_2_mask.mp4";
+    std::string publish_command_1 = "ffmpeg -r 60 -f image2 -s 1024x1024 -i " + location + "/disp_%04d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p " + location + "/test_5.mp4";
+    std::string publish_command_2 = "ffmpeg -r 60 -f image2 -s 1024x1024 -i " + location + "/mask_%04d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p " + location + "/test_5_mask.mp4";
 
     system(rm_command.c_str());
     system(mkdir_command.c_str());
@@ -399,13 +521,57 @@ void test_two()
     imedit::Image word_image = imedit::Image("../data/ernie_ball.png");
     ~word_image;
 
+    LinOperator x_operator = LinOperator(0, word_image.width(), 100, 0);
+    LinOperator y_operator = LinOperator(0, word_image.height(), 100, 0);
 
+    MirrorOperator y_mirror = MirrorOperator(Pff(res / 2, 0), Pff(0, 1), false);
+    MirrorOperator bl_mirror = MirrorOperator(Pff(res / 2, res), Pff(-1, -1), false);
+    MirrorOperator tl_mirror = MirrorOperator(Pff(res / 2, 0), Pff(-1, 1), true);
+
+    imedit::Image current_image = imedit::Image(res, res, 3);
+
+    // TODO: this currently only works if all of the time stamps are the same
+    for (int t = 0; t < frames; ++t)
+    {
+        std::cout << "creating frame: " << (t+1) << " out of: " << frames << " frames" << std::endl;
+
+        current_image.clear();
+
+        for (int i = 0; i < current_image.height(); ++i)
+        {
+            for (int j = 0; j < current_image.width(); ++j)
+            {
+                // TODO: change to float
+                int xpos = floor(x_operator.evaluate(0.25 * float(t + j)));
+                int ypos = floor(y_operator.evaluate(0.5 * float(i)));
+
+                current_image(j, i, 0) = word_image(xpos, ypos, 0);
+                current_image(j, i, 1) = word_image(xpos, ypos, 1);
+                current_image(j, i, 2) = word_image(xpos, ypos, 2);
+            }
+        }
+
+        current_image = bl_mirror.evaluate_image(current_image);
+        current_image = tl_mirror.evaluate_image(current_image);
+        current_image = y_mirror.evaluate_image(current_image);
+
+        // current_image = mirror_along_x_axis(current_image, current_image.width() / 2);
+        // current_image
+        // current_image = mirror_along_y_axis(current_image, 4 * current_image.height() / 5);
+
+        char str[5];
+        snprintf(str, 5, "%04d", t);
+
+        current_image.write(location + "disp_" + std::string(str) + ".png");
+    }
+
+    system(publish_command_1.c_str());
 }
 
 int main(int argc, char* argv[])
 {
-    test_one();
-    // test_two();
+    // test_one();
+    test_two();
 
     return 0;
 }
