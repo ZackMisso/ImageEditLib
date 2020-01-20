@@ -159,12 +159,48 @@ set(color_map_srcs
     test/color_maps.cpp
 )
 
+set(noise_sandbox_srcs
+    ext/stb/stb_image_write.h
+    ext/stb/stb_image.h
+
+    ext/pcg/pcg32.h
+
+    ext/tinyexr/tinyexr.h
+
+    include/imedit/image.h
+    include/imedit/procedural.h
+    include/imedit/filter.h
+
+    src/image.cpp
+
+    test/noise_sandbox.cpp
+)
+
+set(wavy_stuff_srcs
+    ext/stb/stb_image_write.h
+    ext/stb/stb_image.h
+
+    ext/pcg/pcg32.h
+
+    ext/tinyexr/tinyexr.h
+
+    include/imedit/image.h
+    include/imedit/procedural.h
+    include/imedit/filter.h
+
+    src/image.cpp
+
+    test/wavy_stuff.cpp
+)
+
 add_executable(imedit ${imedit_srcs})
 add_executable(texture_gen ${texture_gen_srcs})
 add_executable(move_demo ${move_demo_srcs})
 add_executable(adrien_name_demo ${adrien_name_demo_srcs})
 add_executable(displacement_demo ${displacement_demo_srcs})
 add_executable(color_maps ${color_map_srcs})
+add_executable(noise_sandbox ${noise_sandbox_srcs})
+add_executable(wavy_stuff ${wavy_stuff_srcs})
 
 target_link_libraries(imedit ${PYTHON_LIBRARIES})
 target_link_libraries(texture_gen ${PYTHON_LIBRARIES})
@@ -172,6 +208,7 @@ target_link_libraries(move_demo ${PYTHON_LIBRARIES})
 target_link_libraries(adrien_name_demo ${PYTHON_LIBRARIES})
 target_link_libraries(displacement_demo ${PYTHON_LIBRARIES})
 target_link_libraries(color_maps ${PYTHON_LIBRARIES})
+target_link_libraries(noise_sandbox ${PYTHON_LIBRARIES})
 
 set(CompilerFlags
       CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE

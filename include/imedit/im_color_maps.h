@@ -5,7 +5,7 @@
 namespace imedit
 {
 
-Pixel color_from_proxy(const std::vector<Pixel>& colors, float proxy)
+static Pixel color_from_proxy(const std::vector<Pixel>& colors, float proxy)
 {
     float location = proxy * float(colors.size() - 1);
     float diff = location - floor(location);
@@ -21,7 +21,7 @@ Pixel color_from_proxy(const std::vector<Pixel>& colors, float proxy)
                  color_one.b * (1.f - proxy) + color_two.b * proxy);
 }
 
-void color_map_inferno(std::vector<Pixel>& colors)
+static void color_map_inferno(std::vector<Pixel>& colors)
 {
     colors.push_back(Pixel(1.46159096e-03, 4.66127766e-04, 1.38655200e-02));
     colors.push_back(Pixel(2.26726368e-03, 1.26992553e-03, 1.85703520e-02));
@@ -281,7 +281,7 @@ void color_map_inferno(std::vector<Pixel>& colors)
     colors.push_back(Pixel(9.88362068e-01, 9.98364143e-01, 6.44924005e-01));
 }
 
-void color_map_magma(std::vector<Pixel>& colors)
+static void color_map_magma(std::vector<Pixel>& colors)
 {
     colors.push_back(Pixel(1.46159096e-03, 4.66127766e-04, 1.38655200e-02));
     colors.push_back(Pixel(2.25764007e-03, 1.29495431e-03, 1.83311461e-02));
@@ -541,7 +541,7 @@ void color_map_magma(std::vector<Pixel>& colors)
     colors.push_back(Pixel(9.87052509e-01, 9.91437853e-01, 7.49504188e-01));
 }
 
-void color_map_plasma(std::vector<Pixel>& colors)
+static void color_map_plasma(std::vector<Pixel>& colors)
 {
     colors.push_back(Pixel(5.03832136e-02, 2.98028976e-02, 5.27974883e-01));
     colors.push_back(Pixel(6.35363639e-02, 2.84259729e-02, 5.33123681e-01));
@@ -801,7 +801,7 @@ void color_map_plasma(std::vector<Pixel>& colors)
     colors.push_back(Pixel(9.40015097e-01, 9.75158357e-01, 1.31325517e-01));
 }
 
-void color_map_viridis(std::vector<Pixel>& colors)
+static void color_map_viridis(std::vector<Pixel>& colors)
 {
     colors.push_back(Pixel(0.267004, 0.004874, 0.329415));
     colors.push_back(Pixel(0.268510, 0.009605, 0.335427));
