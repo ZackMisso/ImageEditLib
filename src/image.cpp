@@ -559,6 +559,18 @@ bool Image::writeChannel(const std::string& filename, int ch)
     return getChannel(ch).write(filename);
 }
 
+float Image::safeAccess(int j, int i, int k)
+{
+    if (j < 0) j = 0;
+    if (j >= w) j = w-1;
+    if (i < 0) i = 0;
+    if (i >= h) i = h;
+    if (k < 0) k = 0;
+    if (k >= 3) k = 2;
+
+    return operator()(j,i,k);
+}
+
 void Image::resize(int cols, int rows, int channels)
 {
     im.resize(cols * rows * channels);
