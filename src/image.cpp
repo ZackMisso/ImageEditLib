@@ -42,6 +42,8 @@ Image::Image(int w, int h, int d, ImageMode mode)
 
 Image::Image(const std::string& filename)
 {
+    im = std::vector<Float>();
+
     read(filename);
 
     if (d == 1) mode = IM_GREYSCALE;
@@ -308,31 +310,40 @@ bool Image::read(const std::string& filename)
         }
         else
         {
+            // std::cout << "reading: " << filename << std::endl;
             unsigned char* pxls = stbi_load(filename.c_str(),
                                             &wid,
                                             &hei,
                                             &dep,
                                             3);
+
+            // std::cout << "converting bytes to floats" << std::endl;
             if (pxls)
             {
+                // std::cout << "resizing" << std::endl;
                 resize(wid, hei, dep);
+                // std::cout << "post resizing" << std::endl;
 
                 for (int y = 0; y < h; ++y)
                 {
                     for (int x = 0; x < w; ++x)
                     {
-                        for (int z = 0; z < d; ++z)
+                        for (int z = 0; z < std::min(d, 3); ++z)
                         {
+                            // std::cout << "x: " << x << " y: " << y << " z: " << z << std::endl;
                             byteToVal(pxls[3 * (x + y * w) + z], operator()(x, y, z));
+                            // std::cout << "post: x: " << x << " y: " << y << " z: " << z << std::endl;
                         }
                     }
                 }
 
+                // std::cout << "freeing" << std::endl;
                 stbi_image_free(pxls);
                 return true;
             }
             else
             {
+                // std::cout << "broke" << std::endl;
                 throw std::runtime_error("Could not load LDR image");
             }
         }
@@ -343,6 +354,8 @@ bool Image::read(const std::string& filename)
              << stbi_failure_reason() << std::endl;
         return false;
     }
+
+    return false;
 }
 
 bool Image::write(const std::string& filename)
@@ -836,12 +849,20 @@ Float Image::operator()(int x, int y, int z) const
     return im[(z * h + y) * w + x];
 }
 
-Float Image::operator()(float x, float y, float z) const
+Float Image::operator()(float x, float y, int z) const
 {
     // TODO
     // return im[z * w * h + y * w + x];
     // return im[(z * h + y) * w + x];
-    return 0.0;
+    return im[(z * h + int(y)) * w + int(x)];
+}
+
+Float& Image::operator()(float x, float y, int z)
+{
+    // TODO
+    // return im[z * w * h + y * w + x];
+    // return im[(z * h + y) * w + x];
+    return im[(z * h + int(y)) * w + int(x)];
 }
 
 Float& Image::filter_index(int x, int y, int z)

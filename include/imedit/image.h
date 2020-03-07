@@ -20,7 +20,8 @@
 namespace imedit
 {
 
-typedef double Float;
+// typedef double Float;
+typedef float Float;
 
 struct Pixel
 {
@@ -140,8 +141,8 @@ public:
     Float operator[](int index) const;
     Float& operator()(int x, int y, int z);
     Float operator()(int x, int y, int z) const;
-
-    Float operator()(float x, float y, float z) const;
+    Float operator()(float x, float y, int z) const;
+    Float& operator()(float x, float y, int z);
 
     Float& filter_index(int x, int y, int z);
     Float filter_index(int x, int y, int z) const;
