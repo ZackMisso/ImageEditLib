@@ -108,6 +108,8 @@ public:
 
     Image getChannel(int ch);
 
+    float safeAccess(int j, int i, int k);
+
     void setPixels(Float r, Float b, Float g);
     void setPixels(Pixel p);
     void setPixel(int j, int i, Pixel p);

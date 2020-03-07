@@ -765,4 +765,97 @@ static void hsl_to_rgb(Pixel& pixel)
     pixel.b = new_pix.b;
 }
 
+// TODO: this is very slow
+static void minimize_neighbors(Image& image)
+{
+    bool minimized_any = true;
+
+    while(minimized_any)
+    {
+        minimized_any = false;
+
+        for (int i = image.height()-1; i >= 0; --i)
+        {
+            for (int j = image.width()-1; j >= 0; --j)
+            {
+                float old = image.safeAccess(j, i, 0);
+
+                if (old <= 1.f)
+                {
+                    float min_val = fmin(
+                        fmin(
+                            image.safeAccess(j-1, i, 0),
+                            image.safeAccess(j+1, i, 0)
+                        ),
+                        fmin(
+                            image.safeAccess(j, i-1, 0),
+                            image.safeAccess(j, i+1, 0)
+                        )
+                    );
+
+                    if (min_val < old)
+                    {
+                        image(j, i, 0) = min_val;
+                        image(j, i, 1) = min_val;
+                        image(j, i, 2) = min_val;
+
+                        minimized_any = true;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// this method assumes the input image has already been thresholded
+static Image group_white(const Image& image, int& count)
+{
+    Image grouped = Image(image.width(), image.height(), 3);
+    float max_val = image.width() * image.height() / 20;
+
+    count = 1;
+    float val = float(count) / max_val;
+
+    for (int i = 0; i < image.height(); ++i)
+    {
+        for (int j = 0; j < image.width(); ++j)
+        {
+            if (image(j, i, 0) == 1.f)
+            {
+                float min_val = fmin(grouped.safeAccess(j-1, i, 0),
+                                     grouped.safeAccess(j, i-1, 0));
+
+                if (min_val > 0.1f)
+                {
+                    grouped(j, i, 0) = min_val;
+                    grouped(j, i, 1) = min_val;
+                    grouped(j, i, 2) = min_val;
+                }
+                else
+                {
+                    std::cout << count << std::endl;
+                    grouped(j, i, 0) = val;
+                    grouped(j, i, 1) = val;
+                    grouped(j, i, 2) = val;
+                    count++;
+                    val = float(count) / max_val;
+                }
+            }
+        }
+    }
+
+    // float max_val = image.width() * image.height();
+    for (int i = 0; i < image.size(); ++i)
+        if (grouped[i] < 1e-6)
+            grouped[i] = 2.f;
+
+    minimize_neighbors(grouped);
+
+    for (int i = 0; i < image.size(); ++i)
+        if (grouped[i] == 2.f)
+            grouped[i] = 0.f;
+
+    return grouped;
+}
+
 }
