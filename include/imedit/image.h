@@ -11,32 +11,17 @@
 #include <stdio.h>
 #include <string>
 #include <iostream>
+#include <pixel.h>
 
 #pragma once
-
-// useful functions
-// TODO: rewrite all of this in terms of templates
 
 namespace imedit
 {
 
-typedef double Float;
-
-struct Pixel
-{
-    Pixel() : r(0.f), g(0.f), b(0.f) { }
-    Pixel(Float r, Float g, Float b) : r(r), g(g), b(b) { }
-
-    Float r;
-    Float g;
-    Float b;
-};
-
 // clamps val between min and max
 static inline Float im_clamp(Float val, Float min, Float max)
 {
-    return (val >= min) ?
-           ((val <= max) ? val : max) : min;
+    return (val >= min) ? ((val <= max) ? val : max) : min;
 }
 
 // converts the value to a byte
@@ -61,23 +46,13 @@ static std::string getExtension(const std::string &filename)
 	return "";
 }
 
-enum ImageMode
-{
-    IM_GREYSCALE,
-    IM_COLOR,
-    IM_3D_COLORED_TEXTURE,
-    IM_3D_GRAYSCALE_TEXTURE
-};
-
 class Image
 {
 public:
+    // TODO: remove depth parameter, it is never going to be used
     Image();
-    Image(int w, int h, int d);
-    Image(int w, int h, int d, ImageMode mode);
+    Image(int w, int h);
     Image(const std::string& filename);
-
-    void scale_to_fit(const Image& other);
 
     void clear();
 
@@ -138,12 +113,21 @@ public:
     void operator*=(Float val);
     // component wise division
     void operator/=(Float val);
-    Float& operator[](int index);
-    Float operator[](int index) const;
+
+    // Float& operator[](int index);
+    // Float operator[](int index) const;
+
+    Pixel& operator[](int index);
+    Pixel operator[](int index) const;
+
     Float& operator()(int x, int y, int z);
     Float operator()(int x, int y, int z) const;
-
     Float operator()(float x, float y, float z) const;
+
+    Pixel& operator()(int x, int y);
+    Pixel operator()(int x, int y) const;
+    Pixel& operator()(float x, float y);
+    Pixel operator()(float x, float y) const;
 
     Float& filter_index(int x, int y, int z);
     Float filter_index(int x, int y, int z) const;
@@ -154,10 +138,9 @@ public:
     uint32_t size() const { return w * h * d; }
 
 protected:
-    std::vector<Float> im;
+    std::vector<Pixel> pixels;
 
-    ImageMode mode;
-    int w, h, d;
+    int w, h;
 };
 
 }

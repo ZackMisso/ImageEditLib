@@ -20,101 +20,65 @@ namespace imedit
 
 Image::Image() : w(0), h(0), d(0)
 {
-    mode = IM_COLOR;
     im = std::vector<Float>();
 }
 
-Image::Image(int w, int h, int d) : w(w), h(h), d(d)
+Image::Image(int w, int h) : w(w), h(h)
 {
-    if (d == 1) mode = IM_GREYSCALE;
-    else if (d == 3) mode = IM_COLOR;
-    else if (d % 3 == 0) mode = IM_3D_COLORED_TEXTURE;
-    else mode = IM_3D_GRAYSCALE_TEXTURE;
-
-    im = std::vector<Float>(w * h * d);
-}
-
-Image::Image(int w, int h, int d, ImageMode mode)
-    : w(w), h(h), d(d), mode(mode)
-{
-    im = std::vector<Float>(w * h * d);
+    im = std::vector<Pixel>(w * h);
 }
 
 Image::Image(const std::string& filename)
 {
     read(filename);
-
-    if (d == 1) mode = IM_GREYSCALE;
-    else if (d == 3) mode = IM_COLOR;
-    else if (d % 3 == 0) mode = IM_3D_COLORED_TEXTURE;
-    else mode = IM_3D_GRAYSCALE_TEXTURE;
-}
-
-void Image::scale_to_fit(const Image& other)
-{
-    for (int i = 0; i < h; ++i)
-    {
-        for (int j = 0; j < w; ++j)
-        {
-            // TODO
-        }
-    }
 }
 
 void Image::clear()
 {
-    for (int i = 0; i < size(); ++i)
+    int siz = w*h;
+    for (int i = 0; i < siz; ++i)
     {
-        im[i] = 0.0;
+        im[i] = Pixel(0.f);
     }
 }
 
-double Image::average() const
+Float Image::average() const
 {
-    // use long double for precision
-    long double avg = 0.0;
+    int siz = w*h;
 
-    for (int i = 0; i < size(); ++i)
+    Float avg = 0.f;
+
+    for (int i = 0; i < siz; ++i)
     {
-        avg += im[i];
+        avg += pixels[i].sum();
     }
 
-    avg /= (long double)size();
-
-    return double(avg);
-}
-
-Pixel Image::average_pixel() const
-{
-    Pixel avg;
-    avg.r = 0.0;
-    avg.g = 0.0;
-    avg.b = 0.0;
-
-    for (int i = 0; i < height(); ++i)
-    {
-        for (int j = 0; j < width(); ++j)
-        {
-            avg.r += operator()(j, i, 0);
-            avg.g += operator()(j, i, 1);
-            avg.b += operator()(j, i, 2);
-        }
-    }
-
-    avg.r /= double(size());
-    avg.g /= double(size());
-    avg.b /= double(size());
+    avg /= Float(siz);
 
     return avg;
 }
 
+Pixel Image::average_pixel() const
+{
+    Pixel avg = Pixel();
+    int siz = h*w;
+
+    for (int i = 0; i < siz; ++i)
+    {
+        avg += pixels[i];
+    }
+
+    return avg / Float(siz);
+}
+
 Float Image::max() const
 {
-    Float val = im[0];
+    Float val = pixels[0].r;
+    int siz = h*w;
 
-    for (int i = 1; i < im.size(); ++i)
+    for (int i = 0; i < siz; ++i)
     {
-        if (im[i] > val) val = im[i];
+        val = std::max(val, pixels[i].max());
     }
 
     return val;
@@ -122,11 +86,12 @@ Float Image::max() const
 
 Float Image::min() const
 {
-    Float val = im[0];
+    Float val = pixels[0].r;
+    int siz = h*w;
 
-    for (int i = 1; i < im.size(); ++i)
+    for (int i = 0; i < siz; ++i)
     {
-        if (im[i] < val) val = im[i];
+        val = std::min(val, pixels[i].min());
     }
 
     return val;
@@ -134,20 +99,12 @@ Float Image::min() const
 
 Pixel Image::max_channel() const
 {
-    Pixel max;
+    Pixel max = pixels[0];
+    int siz = h*w;
 
-    max.r = operator()(0, 0, 0);
-    max.g = operator()(0, 0, 1);
-    max.b = operator()(0, 0, 2);
-
-    for (int i = 0; i < height(); ++i)
+    for (int i = 1; i < siz; ++i)
     {
-        for (int j = 0; j < width(); ++j)
-        {
-            if (operator()(j, i, 0) > max.r) max.r = operator()(j, i, 0);
-            if (operator()(j, i, 1) > max.g) max.g = operator()(j, i, 1);
-            if (operator()(j, i, 2) > max.b) max.b = operator()(j, i, 2);
-        }
+        max = Pixel.max(max, pixels[i]);
     }
 
     return max;
@@ -155,20 +112,12 @@ Pixel Image::max_channel() const
 
 Pixel Image::min_channel() const
 {
-    Pixel min;
+    Pixel min = pixels[0];
+    int siz = h*w;
 
-    min.r = operator()(0, 0, 0);
-    min.g = operator()(0, 0, 1);
-    min.b = operator()(0, 0, 2);
-
-    for (int i = 0; i < height(); ++i)
+    for (int i = 1; i < siz; ++i)
     {
-        for (int j = 0; j < width(); ++j)
-        {
-            if (operator()(j, i, 0) < min.r) min.r = operator()(j, i, 0);
-            if (operator()(j, i, 1) < min.g) min.g = operator()(j, i, 1);
-            if (operator()(j, i, 2) < min.b) min.b = operator()(j, i, 2);
-        }
+        min = Pixel.min(max, pixels[i]);
     }
 
     return min;
@@ -196,9 +145,13 @@ void Image::exposure(Float factor)
 void Image::alterGamma(Float oldGamma, Float newGamma)
 {
     Float power = newGamma / oldGamma;
-    for (int i = 0; i < im.size(); ++i)
+    int siz = h*w;
+
+    for (int i = 0; i < siz; ++i)
     {
-        im[i] = pow(im[i], power);
+        pixels[i].r = pow(pixels[i].r, power);
+        pixels[i].g = pow(pixels[i].g, power);
+        pixels[i].b = pow(pixels[i].b, power);
     }
 }
 
@@ -207,8 +160,6 @@ bool Image::read(const std::string& filename)
     int wid;
     int hei;
     int dep;
-
-    // std::cout << "reading" << std::endl;
 
     try
     {
@@ -854,6 +805,34 @@ Float Image::operator()(float x, float y, float z) const
     // return im[z * w * h + y * w + x];
     // return im[(z * h + y) * w + x];
     return 0.0;
+}
+
+Pixel& Image::operator()(int x, int y)
+{
+    // TODO
+
+    return Pixel();
+}
+
+Pixel Image::operator(int x, int y) const
+{
+    // TODO
+
+    return Pixel();
+}
+
+Pixel& operator()(float x, float y)
+{
+    // TODO
+
+    return Pixel();
+}
+
+Pixel operator()(float x, float y) const
+{
+    // TODO
+
+    return Pixel;
 }
 
 Float& Image::filter_index(int x, int y, int z)
