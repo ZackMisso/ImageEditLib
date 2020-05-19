@@ -18,31 +18,33 @@
 namespace imedit
 {
 
-Image::Image() : w(0), h(0), d(0)
+RGBImage::RGBImage() : w(0), h(0)
 {
-    im = std::vector<Float>();
+    pixels = std::vector<Pixel>();
 }
 
-Image::Image(int w, int h) : w(w), h(h)
+RGBImage::RGBImage(int w, int h) : w(w), h(h)
 {
-    im = std::vector<Pixel>(w * h);
+    pixels = std::vector<Pixel>(w * h);
 }
 
-Image::Image(const std::string& filename)
+RGBImage::RGBImage(const std::string& filename)
 {
+    pixels = std::vector<Pixel>();
+
     read(filename);
 }
 
-void Image::clear()
+void RGBImage::clear()
 {
     int siz = w*h;
     for (int i = 0; i < siz; ++i)
     {
-        im[i] = Pixel(0.f);
+        pixels[i] = Pixel(0.f);
     }
 }
 
-Float Image::average() const
+Float RGBImage::average() const
 {
     int siz = w*h;
 
@@ -53,12 +55,12 @@ Float Image::average() const
         avg += pixels[i].sum();
     }
 
-    avg /= Float(siz);
+    avg /= Float(siz*3);
 
     return avg;
 }
 
-Pixel Image::average_pixel() const
+Pixel RGBImage::average_pixel() const
 {
     Pixel avg = Pixel();
     int siz = h*w;
@@ -71,7 +73,7 @@ Pixel Image::average_pixel() const
     return avg / Float(siz);
 }
 
-Float Image::max() const
+Float RGBImage::max() const
 {
     Float val = pixels[0].r;
     int siz = h*w;
@@ -84,7 +86,7 @@ Float Image::max() const
     return val;
 }
 
-Float Image::min() const
+Float RGBImage::min() const
 {
     Float val = pixels[0].r;
     int siz = h*w;
@@ -97,52 +99,52 @@ Float Image::min() const
     return val;
 }
 
-Pixel Image::max_channel() const
+Pixel RGBImage::max_channel() const
 {
     Pixel max = pixels[0];
     int siz = h*w;
 
     for (int i = 1; i < siz; ++i)
     {
-        max = Pixel.max(max, pixels[i]);
+        max = Pixel::max(max, pixels[i]);
     }
 
     return max;
 }
 
-Pixel Image::min_channel() const
+Pixel RGBImage::min_channel() const
 {
     Pixel min = pixels[0];
     int siz = h*w;
 
     for (int i = 1; i < siz; ++i)
     {
-        min = Pixel.min(max, pixels[i]);
+        min = Pixel::min(min, pixels[i]);
     }
 
     return min;
 }
 
-void Image::brighten(Float factor)
+void RGBImage::brighten(Float factor)
 {
     (operator *=)(factor);
 }
 
-void Image::contrast(Float factor, Float midpoint)
+void RGBImage::contrast(Float factor, Float midpoint)
 {
     (operator -=)(midpoint);
     (operator *=)(factor);
     (operator +=)(midpoint);
 }
 
-void Image::exposure(Float factor)
+void RGBImage::exposure(Float factor)
 {
     alterGamma(Float(1.0/2.2), Float(1.0));
     brighten(factor);
     alterGamma(Float(1.0), Float(1.0/2.2));
 }
 
-void Image::alterGamma(Float oldGamma, Float newGamma)
+void RGBImage::alterGamma(Float oldGamma, Float newGamma)
 {
     Float power = newGamma / oldGamma;
     int siz = h*w;
@@ -155,7 +157,7 @@ void Image::alterGamma(Float oldGamma, Float newGamma)
     }
 }
 
-bool Image::read(const std::string& filename)
+bool RGBImage::read(const std::string& filename)
 {
     int wid;
     int hei;
@@ -163,7 +165,6 @@ bool Image::read(const std::string& filename)
 
     try
     {
-        // std::cout << "hi" << std::endl;
         if (getExtension(filename) == "txt")
         {
             std::string line;
@@ -176,13 +177,13 @@ bool Image::read(const std::string& filename)
             std::getline(file, line);
             int dep = std::stoi(line);
 
-            resize(wid, hei, dep);
+            resize(wid, hei);
 
             for (int y = 0; y < h; ++y)
             {
                 for (int x = 0; x < w; ++x)
                 {
-                    for (int z = 0; z < d; ++z)
+                    for (int z = 0; z < 3; ++z)
                     {
                         std::getline(file, line);
                         operator()(x, y, z) = (Float)std::stod(line);
@@ -210,13 +211,13 @@ bool Image::read(const std::string& filename)
             }
             else
             {
-                resize(tmp_w, tmp_h, 3);
+                resize(tmp_w, tmp_h);
 
                 for (int y = 0; y < h; ++y)
                 {
                     for (int x = 0; x < w; ++x)
                     {
-                        for (int z = 0; z < d; ++z)
+                        for (int z = 0; z < 3; ++z)
                         {
                             operator()(x, y, z) = (Float)out[4 * (x + y * w) + z];
                         }
@@ -236,13 +237,13 @@ bool Image::read(const std::string& filename)
                                      3);
             if (pxls)
             {
-                resize(wid, hei, dep);
+                resize(wid, hei);
 
                 for (int y = 0; y < h; ++y)
                 {
                     for (int x = 0; x < w; ++x)
                     {
-                        for (int z = 0; z < d; ++z)
+                        for (int z = 0; z < 3; ++z)
                         {
                             operator()(x, y, z) = (Float)pxls[3 * (x + y * w) + z];
                         }
@@ -264,15 +265,16 @@ bool Image::read(const std::string& filename)
                                             &hei,
                                             &dep,
                                             3);
+
             if (pxls)
             {
-                resize(wid, hei, dep);
+                resize(wid, hei);
 
                 for (int y = 0; y < h; ++y)
                 {
                     for (int x = 0; x < w; ++x)
                     {
-                        for (int z = 0; z < d; ++z)
+                        for (int z = 0; z < 3; ++z)
                         {
                             byteToVal(pxls[3 * (x + y * w) + z], operator()(x, y, z));
                         }
@@ -294,18 +296,19 @@ bool Image::read(const std::string& filename)
              << stbi_failure_reason() << std::endl;
         return false;
     }
+
+    return false;
 }
 
-bool Image::write(const std::string& filename)
+bool RGBImage::write(const std::string& filename)
 {
     if (getExtension(filename) == "txt")
     {
         std::ofstream file(filename);
         file << width() << "\n";
         file << height() << "\n";
-        file << depth() << "\n";
 
-        for (int z = 0; z < d; ++z)
+        for (int z = 0; z < 3; ++z)
         {
             for (int x = 0; x < w; ++x)
             {
@@ -320,12 +323,6 @@ bool Image::write(const std::string& filename)
     }
     else
     {
-        if (d != 1 && d != 3 && d != 4)
-        {
-            std::cout << "Image must have 1, 3, or 4 channels" << std::endl;
-            return false;
-        }
-
         std::string extension = getExtension(filename);
 
         std::transform(extension.begin(),
@@ -342,14 +339,14 @@ bool Image::write(const std::string& filename)
                 {
                     for (int y = 0; y < h; ++y)
                     {
-                        for (int z = 0; z < d; ++z)
+                        for (int z = 0; z < 3; ++z)
                         {
                             pxls[z + 3 * (x + y * w)] = (float)operator()(x, y, z);
                         }
                     }
                 }
 
-                if (!stb::stbi_write_hdr(filename.c_str(), w, h, d, &pxls[0]))
+                if (!stb::stbi_write_hdr(filename.c_str(), w, h, 3, &pxls[0]))
                 {
                     throw std::runtime_error("Could not write HDR image");
                 }
@@ -373,9 +370,9 @@ bool Image::write(const std::string& filename)
                 {
                     for (int j = 0; j < w; ++j)
                     {
-                        images[0][i*w+j] = im[0*(w*h)+i*w+j];
-                        images[1][i*w+j] = im[1*(w*h)+i*w+j];
-                        images[2][i*w+j] = im[2*(w*h)+i*w+j];
+                        images[0][i*w+j] = pixels[i*w+j].r;
+                        images[1][i*w+j] = pixels[i*w+j].g;
+                        images[2][i*w+j] = pixels[i*w+j].b;
                     }
                 }
 
@@ -433,7 +430,7 @@ bool Image::write(const std::string& filename)
                     for (int y = 0; y < h; ++y)
                     {
                         int z;
-                        for (z = 0; z < d; ++z)
+                        for (z = 0; z < 3; ++z)
                         {
                             pxls[z + outC * (x + y * w)] = valToByte(pow(operator()(x, y, z), 1.0/2.2));
                         }
@@ -492,12 +489,12 @@ bool Image::write(const std::string& filename)
     return true;
 }
 
-bool Image::writeChannel(const std::string& filename, int ch)
-{
-    return getChannel(ch).write(filename);
-}
+// bool RGBImage::writeChannel(const std::string& filename, int ch)
+// {
+//     return getChannel(ch).write(filename);
+// }
 
-float Image::safeAccess(int j, int i, int k)
+float RGBImage::safeAccess(int j, int i, int k)
 {
     if (j < 0) j = 0;
     if (j >= w) j = w-1;
@@ -509,43 +506,39 @@ float Image::safeAccess(int j, int i, int k)
     return operator()(j,i,k);
 }
 
-void Image::resize(int cols, int rows, int channels)
+void RGBImage::resize(int cols, int rows)
 {
-    im.resize(cols * rows * channels);
+    pixels.resize(cols * rows);
     // TODO - not completely correct
     w = cols;
     h = rows;
-    d = channels;
-    // std::cout << "w: " << w << " h: " << h << " d: " << d << std::endl;
 }
 
-void Image::setZero()
+void RGBImage::setZero()
 {
-    for (int i = 0; i < im.size(); ++i)
+    for (int i = 0; i < pixels.size(); ++i)
     {
-        im[i] = 0;
+        pixels[i] = Pixel();
     }
 }
 
-Image Image::getChannel(int ch)
+// Image RGBImage::getChannel(int ch)
+// {
+//     Image image = Image(w, h);
+//
+//     for (int i = 0; i < h; ++i)
+//     {
+//         for (int j = 0; j < w; ++j)
+//         {
+//             image(j, h) = operator()(j, h);
+//         }
+//     }
+//
+//     return image;
+// }
+
+void RGBImage::setPixels(Float r, Float g, Float b)
 {
-    Image image = Image(w, h, 1);
-
-    for (int i = 0; i < h; ++i)
-    {
-        for (int j = 0; j < w; ++j)
-        {
-            image(j, h, 0) = operator()(j, h, ch);
-        }
-    }
-
-    return image;
-}
-
-void Image::setPixels(Float r, Float g, Float b)
-{
-    if (d != 3) return;
-
     for (int i = 0; i < h; ++i)
     {
         for (int j = 0; j < w; ++j)
@@ -557,21 +550,21 @@ void Image::setPixels(Float r, Float g, Float b)
     }
 }
 
-void Image::setPixels(Pixel p)
+void RGBImage::setPixels(Pixel p)
 {
     setPixels(p.r, p.g, p.b);
 }
 
-void Image::setPixel(int j, int i, Pixel p)
+void RGBImage::setPixel(int j, int i, Pixel p)
 {
     operator()(j, i, 0) = p.r;
     operator()(j, i, 1) = p.g;
     operator()(j, i, 2) = p.b;
 }
 
-void Image::operator~()
+void RGBImage::operator~()
 {
-    int size = w * h * d;
+    int size = w * h * 3;
 
     for (int i = 0; i < size; ++i)
     {
@@ -579,11 +572,11 @@ void Image::operator~()
     }
 }
 
-Image Image::operator+(const Image& other) const
+RGBImage RGBImage::operator+(const RGBImage& other) const
 {
-    Image image = Image(w, h, d);
+    RGBImage image = Image(w, h);
 
-    int size = w * h * d;
+    int size = w * h * 3;
 
     for (int i = 0; i < size; ++i)
     {
@@ -593,11 +586,11 @@ Image Image::operator+(const Image& other) const
     return image;
 }
 
-Image Image::operator-(const Image& other) const
+RGBImage RGBImage::operator-(const RGBImage& other) const
 {
-    Image image = Image(w, h, d);
+    RGBImage image = RGBImage(w, h);
 
-    int size = w * h * d;
+    int size = w * h * 3;
 
     for (int i = 0; i < size; ++i)
     {
@@ -608,11 +601,11 @@ Image Image::operator-(const Image& other) const
 }
 
 // this is component-wise multiplication
-Image Image::operator*(const Image& other) const
+RGBImage RGBImage::operator*(const RGBImage& other) const
 {
-    Image image = Image(w, h, d);
+    RGBImage image = RGBImage(w, h);
 
-    int size = w * h * d;
+    int size = w * h * 3;
 
     for (int i = 0; i < size; ++i)
     {
@@ -623,11 +616,11 @@ Image Image::operator*(const Image& other) const
 }
 
 // this is component-wise division
-Image Image::operator/(const Image& other) const
+RGBImage RGBImage::operator/(const RGBImage& other) const
 {
-    Image image = Image(w, h, d);
+    RGBImage image = RGBImage(w, h);
 
-    int size = w * h * d;
+    int size = w * h * 3;
 
     for (int i = 0; i < size; ++i)
     {
@@ -637,11 +630,11 @@ Image Image::operator/(const Image& other) const
     return image;
 }
 
-Image Image::operator+(Float val) const
+RGBImage RGBImage::operator+(Float val) const
 {
-    Image image = Image(w, h, d);
+    RGBImage image = RGBImage(w, h);
 
-    int size = w * h * d;
+    int size = w * h * 3;
 
     for (int i = 0; i < size; ++i)
     {
@@ -651,11 +644,11 @@ Image Image::operator+(Float val) const
     return image;
 }
 
-Image Image::operator-(Float val) const
+RGBImage RGBImage::operator-(Float val) const
 {
-    Image image = Image(w, h, d);
+    RGBImage image = RGBImage(w, h);
 
-    int size = w * h * d;
+    int size = w * h * 3;
 
     for (int i = 0; i < size; ++i)
     {
@@ -665,11 +658,11 @@ Image Image::operator-(Float val) const
     return image;
 }
 
-Image Image::operator*(Float val) const
+RGBImage RGBImage::operator*(Float val) const
 {
-    Image image = Image(w, h, d);
+    RGBImage image = RGBImage(w, h);
 
-    int size = w * h * d;
+    int size = w * h * 3;
 
     for (int i = 0; i < size; ++i)
     {
@@ -679,11 +672,11 @@ Image Image::operator*(Float val) const
     return image;
 }
 
-Image Image::operator/(Float val) const
+RGBImage RGBImage::operator/(Float val) const
 {
-    Image image = Image(w, h, d);
+    RGBImage image = RGBImage(w, h);
 
-    int size = w * h * d;
+    int size = w * h * 3;
 
     for (int i = 0; i < size; ++i)
     {
@@ -693,9 +686,9 @@ Image Image::operator/(Float val) const
     return image;
 }
 
-void Image::operator+=(const Image& other)
+void RGBImage::operator+=(const RGBImage& other)
 {
-    int size = w * h * d;
+    int size = w * h * 3;
 
     for (int i = 0; i < size; ++i)
     {
@@ -703,9 +696,9 @@ void Image::operator+=(const Image& other)
     }
 }
 
-void Image::operator-=(const Image& other)
+void RGBImage::operator-=(const RGBImage& other)
 {
-    int size = w * h * d;
+    int size = w * h * 3;
 
     for (int i = 0; i < size; ++i)
     {
@@ -714,9 +707,9 @@ void Image::operator-=(const Image& other)
 }
 
 // component wise multiplication
-void Image::operator*=(const Image& other)
+void RGBImage::operator*=(const RGBImage& other)
 {
-    int size = w * h * d;
+    int size = w * h * 3;
 
     for (int i = 0; i < size; ++i)
     {
@@ -725,9 +718,9 @@ void Image::operator*=(const Image& other)
 }
 
 // component wise division
-void Image::operator/=(const Image& other)
+void RGBImage::operator/=(const RGBImage& other)
 {
-    int size = w * h * d;
+    int size = w * h * 3;
 
     for (int i = 0; i < size; ++i)
     {
@@ -735,9 +728,9 @@ void Image::operator/=(const Image& other)
     }
 }
 
-void Image::operator+=(Float val)
+void RGBImage::operator+=(Float val)
 {
-    int size = w * h * d;
+    int size = w * h * 3;
 
     for (int i = 0; i < size; ++i)
     {
@@ -745,9 +738,9 @@ void Image::operator+=(Float val)
     }
 }
 
-void Image::operator-=(Float val)
+void RGBImage::operator-=(Float val)
 {
-    int size = w * h * d;
+    int size = w * h * 3;
 
     for (int i = 0; i < size; ++i)
     {
@@ -756,9 +749,9 @@ void Image::operator-=(Float val)
 }
 
 // component wise multiplication
-void Image::operator*=(Float val)
+void RGBImage::operator*=(Float val)
 {
-    int size = w * h * d;
+    int size = w * h * 3;
 
     for (int i = 0; i < size; ++i)
     {
@@ -767,9 +760,9 @@ void Image::operator*=(Float val)
 }
 
 // component wise division
-void Image::operator/=(Float val)
+void RGBImage::operator/=(Float val)
 {
-    int size = w * h * d;
+    int size = w * h * 3;
 
     for (int i = 0; i < size; ++i)
     {
@@ -777,77 +770,85 @@ void Image::operator/=(Float val)
     }
 }
 
-Float& Image::operator[](int index)
+Float& RGBImage::operator[](int index)
 {
-    return im[index];
+    int loc = index / 3;
+
+    return pixels[loc].access(index);
 }
 
-Float Image::operator[](int index) const
+Float RGBImage::operator[](int index) const
 {
-    return im[index];
+    int loc = index / 3;
+
+    return pixels[loc].access(index);
 }
 
-Float& Image::operator()(int x, int y, int z)
-{
-    // return im[z * w * h + y * w + x];
-    return im[(z * h + y) * w + x];
-}
-
-Float Image::operator()(int x, int y, int z) const
+Float& RGBImage::operator()(int x, int y, int z)
 {
     // return im[z * w * h + y * w + x];
     return im[(z * h + y) * w + x];
 }
 
-Float Image::operator()(float x, float y, float z) const
+Float RGBImage::operator()(int x, int y, int z) const
+{
+    // return im[z * w * h + y * w + x];
+    return im[(z * h + y) * w + x];
+}
+
+Float RGBImage::operator()(float x, float y, int z) const
 {
     // TODO
     // return im[z * w * h + y * w + x];
     // return im[(z * h + y) * w + x];
-    return 0.0;
+    return im[(z * h + int(y)) * w + int(x)];
 }
 
-Pixel& Image::operator()(int x, int y)
+Float& RGBImage::operator()(float x, float y, int z)
+{
+    // TODO
+    // return im[z * w * h + y * w + x];
+    // return im[(z * h + y) * w + x];
+    return im[(z * h + int(y)) * w + int(x)];
+}
+
+Pixel& RGBImage::operator()(int x, int y)
+{
+    return pixels[y * w + x];
+}
+
+Pixel RGBImage::operator(int x, int y) const
+{
+    return pixels[y * w + x];
+}
+
+Pixel& RGBImage::operator()(float x, float y)
+{
+    // TODO
+
+    return pixels[0];
+}
+
+Pixel RGBImage::operator()(float x, float y) const
 {
     // TODO
 
     return Pixel();
 }
 
-Pixel Image::operator(int x, int y) const
-{
-    // TODO
-
-    return Pixel();
-}
-
-Pixel& operator()(float x, float y)
-{
-    // TODO
-
-    return Pixel();
-}
-
-Pixel operator()(float x, float y) const
-{
-    // TODO
-
-    return Pixel;
-}
-
-Float& Image::filter_index(int x, int y, int z)
+Float& RGBImage::filter_index(int x, int y, int z)
 {
     if (x < 0) x = 0;
     if (x > w-1) x = w-1;
     if (y < 0) y = 0;
     if (y > h-1) y = h-1;
     if (z < 0) z = 0;
-    if (z > d-1) z = d-1;
+    if (z > 2) z = 2;
 
-    return im[(z * h + y) * w + x];
+    return pixels[y * w + x].access(z);
 }
 
-Float Image::filter_index(int x, int y, int z) const
+Float RGBImage::filter_index(int x, int y, int z) const
 {
     if (x < 0) x = 0;
     if (x > w-1) x = w-1;

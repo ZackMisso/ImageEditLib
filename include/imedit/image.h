@@ -18,6 +18,9 @@
 namespace imedit
 {
 
+// typedef double Float;
+typedef float Float;
+
 // clamps val between min and max
 static inline Float im_clamp(Float val, Float min, Float max)
 {
@@ -46,20 +49,17 @@ static std::string getExtension(const std::string &filename)
 	return "";
 }
 
-class Image
+class RGBImage
 {
 public:
     // TODO: remove depth parameter, it is never going to be used
-    Image();
-    Image(int w, int h);
-    Image(const std::string& filename);
+    RGBImage();
+    RGBImage(int w, int h);
+    RGBImage(const std::string& filename);
 
     void clear();
 
-    // TODO: convert this form of averaging to be in-place
-    double average() const;
-
-    // TODO: convert this form of averaging to be in-place
+    Float average() const;
     Pixel average_pixel() const;
 
     Float max() const;
@@ -76,12 +76,12 @@ public:
     // The read and write logic is based off of code written by Wojciech Jarosz
     bool read(const std::string& filename);
     bool write(const std::string& filename);
-    bool writeChannel(const std::string& filename, int ch);
+    // bool writeChannel(const std::string& filename, int ch);
 
-    void resize(int cols, int rows, int channels);
+    void resize(int cols, int rows);
     void setZero();
 
-    Image getChannel(int ch);
+    // Image getChannel(int ch);
 
     float safeAccess(int j, int i, int k);
 
@@ -91,22 +91,22 @@ public:
 
     void operator~();
 
-    Image operator+(const Image& other) const;
-    Image operator-(const Image& other) const;
+    RGBImage operator+(const RGBImage& other) const;
+    RGBImage operator-(const RGBImage& other) const;
     // this is component-wise multiplication
-    Image operator*(const Image& other) const;
+    RGBImage operator*(const RGBImage& other) const;
     // this is component-wise division
-    Image operator/(const Image& other) const;
-    Image operator+(Float val) const;
-    Image operator-(Float val) const;
-    Image operator*(Float val) const;
-    Image operator/(Float val) const;
-    void operator+=(const Image& other);
-    void operator-=(const Image& other);
+    RGBImage operator/(const RGBImage& other) const;
+    RGBImage operator+(Float val) const;
+    RGBImage operator-(Float val) const;
+    RGBImage operator*(Float val) const;
+    RGBImage operator/(Float val) const;
+    void operator+=(const RGBImage& other);
+    void operator-=(const RGBImage& other);
     // component wise multiplication
-    void operator*=(const Image& other);
+    void operator*=(const RGBImage& other);
     // component wise division
-    void operator/=(const Image& other);
+    void operator/=(const RGBImage& other);
     void operator+=(Float val);
     void operator-=(Float val);
     // component wise multiplication
@@ -114,15 +114,16 @@ public:
     // component wise division
     void operator/=(Float val);
 
-    // Float& operator[](int index);
-    // Float operator[](int index) const;
+    Float& operator[](int index);
+    Float operator[](int index) const;
 
-    Pixel& operator[](int index);
-    Pixel operator[](int index) const;
+    // Pixel& operator[](int index);
+    // Pixel operator[](int index) const;
 
     Float& operator()(int x, int y, int z);
     Float operator()(int x, int y, int z) const;
-    Float operator()(float x, float y, float z) const;
+    Float operator()(float x, float y, int z) const;
+    Float& operator()(float x, float y, int z);
 
     Pixel& operator()(int x, int y);
     Pixel operator()(int x, int y) const;
@@ -134,8 +135,7 @@ public:
 
     int width() const { return w; }
     int height() const { return h; }
-    int depth() const { return d; }
-    uint32_t size() const { return w * h * d; }
+    uint32_t size() const { return w * h * 3; }
 
 protected:
     std::vector<Pixel> pixels;

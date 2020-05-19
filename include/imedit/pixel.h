@@ -8,6 +8,7 @@ typedef float Float;
 struct Pixel
 {
     Pixel() : r(0.f), g(0.f), b(0.f) { }
+    Pixel(Float v) : r(v), g(v), b(v) { }
     Pixel(Float r, Float g, Float b) : r(r), g(g), b(b) { }
 
     void convert_from_rgb_to_xyz()
@@ -148,6 +149,25 @@ struct Pixel
         r /= val;
         g /= val;
         b /= val;
+    }
+
+    Float min() const
+    {
+        return std::min(r, std::min(g, b));
+    }
+
+    Float max() const
+    {
+        return std::max(r, std::max(g, b));
+    }
+
+    Float& access(int index) const
+    {
+        if (index % 3 == 0)
+            return r;
+        if (index % 3 == 1)
+            return g;
+        return b;
     }
 
     static Pixel max(const Pixel& one, const Pixel& two)
