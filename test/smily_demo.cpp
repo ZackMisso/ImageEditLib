@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
     for (int k = 0; k < 1; ++k)
     {
         std::cout << "rendering frame: " << k << std::endl;
-        imedit::Image image = imedit::Image(1024, 1024, 3);
+        imedit::Image image = imedit::Image(1024, 1024);
 
         float amp = float(k) / 1000.0 * 0.031;
 

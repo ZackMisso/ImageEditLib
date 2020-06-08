@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <string>
 #include <iostream>
-#include <pixel.h>
+#include "pixel.h"
 
 #pragma once
 
@@ -135,6 +135,7 @@ public:
 
     int width() const { return w; }
     int height() const { return h; }
+    int depth() const { return 3; }
     uint32_t size() const { return w * h * 3; }
 
 protected:
@@ -142,5 +143,8 @@ protected:
 
     int w, h;
 };
+
+// this is a hack, will have to fix later
+#define Image RGBImage
 
 }

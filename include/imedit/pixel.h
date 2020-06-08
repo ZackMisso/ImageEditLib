@@ -161,7 +161,16 @@ struct Pixel
         return std::max(r, std::max(g, b));
     }
 
-    Float& access(int index) const
+    Float& access(int index)
+    {
+        if (index % 3 == 0)
+            return r;
+        if (index % 3 == 1)
+            return g;
+        return b;
+    }
+
+    Float const_access(int index) const
     {
         if (index % 3 == 0)
             return r;

@@ -574,7 +574,7 @@ void RGBImage::operator~()
 
 RGBImage RGBImage::operator+(const RGBImage& other) const
 {
-    RGBImage image = Image(w, h);
+    RGBImage image = RGBImage(w, h);
 
     int size = w * h * 3;
 
@@ -781,35 +781,31 @@ Float RGBImage::operator[](int index) const
 {
     int loc = index / 3;
 
-    return pixels[loc].access(index);
+    return pixels[loc].const_access(index);
 }
 
 Float& RGBImage::operator()(int x, int y, int z)
 {
-    // return im[z * w * h + y * w + x];
-    return im[(z * h + y) * w + x];
+    int index = w * y + x;
+    return pixels[index].access(z);
 }
 
 Float RGBImage::operator()(int x, int y, int z) const
 {
-    // return im[z * w * h + y * w + x];
-    return im[(z * h + y) * w + x];
+    int index = w * y + x;
+    return pixels[index].const_access(z);
 }
 
 Float RGBImage::operator()(float x, float y, int z) const
 {
     // TODO
-    // return im[z * w * h + y * w + x];
-    // return im[(z * h + y) * w + x];
-    return im[(z * h + int(y)) * w + int(x)];
+    return operator()(int(x), int(y), z);
 }
 
 Float& RGBImage::operator()(float x, float y, int z)
 {
     // TODO
-    // return im[z * w * h + y * w + x];
-    // return im[(z * h + y) * w + x];
-    return im[(z * h + int(y)) * w + int(x)];
+    return operator()(int(x), int(y), z);
 }
 
 Pixel& RGBImage::operator()(int x, int y)
@@ -817,7 +813,7 @@ Pixel& RGBImage::operator()(int x, int y)
     return pixels[y * w + x];
 }
 
-Pixel RGBImage::operator(int x, int y) const
+Pixel RGBImage::operator()(int x, int y) const
 {
     return pixels[y * w + x];
 }
@@ -825,14 +821,12 @@ Pixel RGBImage::operator(int x, int y) const
 Pixel& RGBImage::operator()(float x, float y)
 {
     // TODO
-
     return pixels[0];
 }
 
 Pixel RGBImage::operator()(float x, float y) const
 {
     // TODO
-
     return Pixel();
 }
 
@@ -855,9 +849,9 @@ Float RGBImage::filter_index(int x, int y, int z) const
     if (y < 0) y = 0;
     if (y > h-1) y = h-1;
     if (z < 0) z = 0;
-    if (z > d-1) z = d-1;
+    if (z > 2) z = 2;
 
-    return im[(z * h + y) * w + x];
+    return pixels[y * w + x].const_access(z);
 }
 
 }

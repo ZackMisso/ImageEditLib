@@ -244,7 +244,7 @@ static void im_abs(Image& image)
 // TODO: why is this a pointer???
 static Image* lerp(Float t, const Image& one, const Image& two)
 {
-    Image* img = new Image(one.width(), one.height(), one.depth());
+    Image* img = new Image(one.width(), one.height());
 
     *img = one * (1.0 - t) + two * t;
 
@@ -417,7 +417,7 @@ static void histogram_grayscale(const Image& image,
 
 static Image edge_image(const Image& image)
 {
-    Image edge = Image(image.width(), image.height(), 3);
+    Image edge = Image(image.width(), image.height());
 
     for (int i = 1; i < edge.height()-1; ++i)
     {
@@ -810,7 +810,7 @@ static void minimize_neighbors(Image& image)
 // this method assumes the input image has already been thresholded
 static Image group_white(const Image& image, int& count)
 {
-    Image grouped = Image(image.width(), image.height(), 3);
+    Image grouped = Image(image.width(), image.height());
     float max_val = image.width() * image.height() / 20;
 
     count = 1;

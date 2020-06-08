@@ -492,7 +492,7 @@ static void noise_image_xy(Image& image,
 
 static Image mirror_along_x_axis(const Image& image, int location)
 {
-    Image ret = Image(image.width(), image.height(), image.depth());
+    Image ret = Image(image.width(), image.height());
 
     for (int i = 0; i < image.height(); ++i)
     {
@@ -511,7 +511,7 @@ static Image mirror_along_x_axis(const Image& image, int location)
 
 static Image mirror_along_y_axis(const Image& image, int location)
 {
-    Image ret = Image(image.width(), image.height(), image.depth());
+    Image ret = Image(image.width(), image.height());
 
     for (int i = 0; i < image.height(); ++i)
     {
