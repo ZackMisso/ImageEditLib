@@ -21,6 +21,7 @@ void get_bounding_box(const imedit::Image& mask,
                     min_y = i;
                     max_x = j;
                     max_y = i;
+                    found_first = true;
                 }
                 else
                 {
