@@ -8,16 +8,27 @@ void get_bounding_box(const imedit::Image& mask,
                       int& max_x,
                       int& max_y)
 {
+    bool found_first = false;
     for (int i = 0; i < mask.height(); i++)
     {
         for (int j = 0; j < mask.width(); ++j)
         {
             if (mask(j, i).r > 1e-4)
             {
-                min_x = std::min(min_x, j);
-                min_y = std::min(min_y, i);
-                max_x = std::max(max_x, j);
-                max_y = std::max(max_y, i);
+                if (!found_first)
+                {
+                    min_x = j;
+                    min_y = i;
+                    max_x = j;
+                    max_y = i;
+                }
+                else
+                {
+                    min_x = std::min(min_x, j);
+                    min_y = std::min(min_y, i);
+                    max_x = std::max(max_x, j);
+                    max_y = std::max(max_y, i);
+                }
             }
         }
     }
