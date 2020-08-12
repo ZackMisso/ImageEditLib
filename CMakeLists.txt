@@ -18,7 +18,9 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "^(GNU|Clang|Intel)$")
   CHECK_CXX_COMPILER_FLAG("-std=c++14" HAS_CPP14_FLAG)
   CHECK_CXX_COMPILER_FLAG("-std=c++11" HAS_CPP11_FLAG)
 
-  if (HAS_CPP14_FLAG)
+  if (HAS_CPP17_FLAG)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+  elseif (HAS_CPP14_FLAG)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
   elseif (HAS_CPP11_FLAG)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
@@ -227,6 +229,74 @@ set(bbox_gen_srcs
     test/bbox_gen.cpp
 )
 
+set(bbox_gen_w_composite_srcs
+    ext/stb/stb_image_write.h
+    ext/stb/stb_image.h
+
+    ext/pcg/pcg32.h
+
+    ext/tinyexr/tinyexr.h
+
+    include/imedit/image.h
+    include/imedit/procedural.h
+    include/imedit/filter.h
+
+    src/image.cpp
+
+    test/bbox_gen_with_composite.cpp
+)
+
+set(reformat_srcs
+    ext/stb/stb_image_write.h
+    ext/stb/stb_image.h
+
+    ext/pcg/pcg32.h
+
+    ext/tinyexr/tinyexr.h
+
+    include/imedit/image.h
+    include/imedit/procedural.h
+    include/imedit/filter.h
+
+    src/image.cpp
+
+    test/reformat.cpp
+)
+
+set(heatmap_srcs
+    ext/stb/stb_image_write.h
+    ext/stb/stb_image.h
+
+    ext/pcg/pcg32.h
+
+    ext/tinyexr/tinyexr.h
+
+    include/imedit/image.h
+    include/imedit/procedural.h
+    include/imedit/filter.h
+
+    src/image.cpp
+
+    test/heatmap.cpp
+)
+
+set(heatmap_fc_srcs
+    ext/stb/stb_image_write.h
+    ext/stb/stb_image.h
+
+    ext/pcg/pcg32.h
+
+    ext/tinyexr/tinyexr.h
+
+    include/imedit/image.h
+    include/imedit/procedural.h
+    include/imedit/filter.h
+
+    src/image.cpp
+
+    test/heatmap_fc.cpp
+)
+
 # add_executable(imedit ${imedit_srcs})
 # add_executable(texture_gen ${texture_gen_srcs})
 # add_executable(move_demo ${move_demo_srcs})
@@ -237,6 +307,10 @@ set(bbox_gen_srcs
 # add_executable(wavy_stuff ${wavy_stuff_srcs})
 # add_executable(smiley_demo ${smiley_demo_srcs})
 add_executable(bbox_gen ${bbox_gen_srcs})
+add_executable(reformat ${reformat_srcs})
+add_executable(bbox_gen_w_comp ${bbox_gen_w_composite_srcs})
+add_executable(heatmap ${heatmap_srcs})
+add_executable(heatmap_fc ${heatmap_fc_srcs})
 
 # target_link_libraries(imedit ${PYTHON_LIBRARIES})
 # target_link_libraries(texture_gen ${PYTHON_LIBRARIES})
@@ -247,6 +321,10 @@ add_executable(bbox_gen ${bbox_gen_srcs})
 # target_link_libraries(noise_sandbox ${PYTHON_LIBRARIES})
 # target_link_libraries(smiley_demo ${PYTHON_LIBRARIES})
 target_link_libraries(bbox_gen ${PYTHON_LIBRARIES})
+target_link_libraries(reformat ${PYTHON_LIBRARIES})
+target_link_libraries(bbox_gen_w_comp ${PYTHON_LIBRARIES})
+target_link_libraries(heatmap ${PYTHON_LIBRARIES})
+target_link_libraries(heatmap_fc ${PYTHON_LIBRARIES})
 
 set(CompilerFlags
       CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE

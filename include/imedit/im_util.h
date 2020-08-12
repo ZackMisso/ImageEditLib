@@ -280,7 +280,7 @@ static void false_color_proxies_bins(const Image& other,
                                      Float max,
                                      std::pair<Float, Float> range = std::pair<Float, Float>(0.0, 1.0))
 {
-    assert(bins.size() > 1);
+    // assert(bins.size() > 1);
 
     Float step = Float(1.0) / Float(bins.size() - 1);
 
@@ -398,7 +398,7 @@ static void histogram_grayscale(const Image& image,
                                 Float min = 0.0,
                                 Float max = 1.0)
 {
-    assert(hist.size() != 0);
+    // assert(hist.size() != 0);
 
     for (int i = 0; i < image.height(); ++i)
     {

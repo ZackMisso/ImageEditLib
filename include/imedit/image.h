@@ -49,6 +49,7 @@ static std::string getExtension(const std::string &filename)
 	return "";
 }
 
+// TODO: figure out a nicer way of incorporating an alpha mask
 class RGBImage
 {
 public:
@@ -75,6 +76,7 @@ public:
 
     // The read and write logic is based off of code written by Wojciech Jarosz
     bool read(const std::string& filename);
+    bool read_with_mask(const std::string& filename);
     bool write(const std::string& filename);
     // bool writeChannel(const std::string& filename, int ch);
 
@@ -130,6 +132,8 @@ public:
     Pixel& operator()(float x, float y);
     Pixel operator()(float x, float y) const;
 
+    Float mask_val(int x, int y) const;
+
     Float& filter_index(int x, int y, int z);
     Float filter_index(int x, int y, int z) const;
 
@@ -140,8 +144,10 @@ public:
 
 protected:
     std::vector<Pixel> pixels;
+    std::vector<Float> mask;
 
     int w, h;
+    bool has_mask;
 };
 
 // this is a hack, will have to fix later

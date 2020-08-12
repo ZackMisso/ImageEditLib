@@ -21,16 +21,19 @@ namespace imedit
 RGBImage::RGBImage() : w(0), h(0)
 {
     pixels = std::vector<Pixel>();
+    mask = std::vector<Float>();
 }
 
 RGBImage::RGBImage(int w, int h) : w(w), h(h)
 {
     pixels = std::vector<Pixel>(w * h);
+    mask = std::vector<Float>();
 }
 
 RGBImage::RGBImage(const std::string& filename)
 {
     pixels = std::vector<Pixel>();
+    mask = std::vector<Float>();
 
     read(filename);
 }
@@ -221,6 +224,152 @@ bool RGBImage::read(const std::string& filename)
                         {
                             operator()(x, y, z) = (Float)out[4 * (x + y * w) + z];
                         }
+                    }
+                }
+
+                free(out);
+                return true;
+            }
+        }
+        else if (stbi_is_hdr(filename.c_str()))
+        {
+            float* pxls = stbi_loadf(filename.c_str(),
+                                     &wid,
+                                     &hei,
+                                     &dep,
+                                     3);
+            if (pxls)
+            {
+                resize(wid, hei);
+
+                for (int y = 0; y < h; ++y)
+                {
+                    for (int x = 0; x < w; ++x)
+                    {
+                        for (int z = 0; z < 3; ++z)
+                        {
+                            operator()(x, y, z) = (Float)pxls[3 * (x + y * w) + z];
+                        }
+                    }
+                }
+
+                stbi_image_free(pxls);
+                return true;
+            }
+            else
+            {
+                throw std::runtime_error("Could not load HDR image");
+            }
+        }
+        else
+        {
+            unsigned char* pxls = stbi_load(filename.c_str(),
+                                            &wid,
+                                            &hei,
+                                            &dep,
+                                            3);
+
+            if (pxls)
+            {
+                resize(wid, hei);
+
+                for (int y = 0; y < h; ++y)
+                {
+                    for (int x = 0; x < w; ++x)
+                    {
+                        for (int z = 0; z < 3; ++z)
+                        {
+                            byteToVal(pxls[3 * (x + y * w) + z], operator()(x, y, z));
+                        }
+                    }
+                }
+
+                stbi_image_free(pxls);
+                return true;
+            }
+            else
+            {
+                throw std::runtime_error("Could not load LDR image");
+            }
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Error reading Image for file: \"" << filename << "\":\n\t"
+             << stbi_failure_reason() << std::endl;
+        return false;
+    }
+
+    return false;
+}
+
+bool RGBImage::read_with_mask(const std::string& filename)
+{
+    int wid;
+    int hei;
+    int dep;
+
+    try
+    {
+        if (getExtension(filename) == "txt")
+        {
+            std::string line;
+            std::ifstream file(filename);
+
+            std::getline(file, line);
+            int wid = std::stoi(line);
+            std::getline(file, line);
+            int hei = std::stoi(line);
+            std::getline(file, line);
+            int dep = std::stoi(line);
+
+            resize(wid, hei);
+
+            for (int y = 0; y < h; ++y)
+            {
+                for (int x = 0; x < w; ++x)
+                {
+                    for (int z = 0; z < 3; ++z)
+                    {
+                        std::getline(file, line);
+                        operator()(x, y, z) = (Float)std::stod(line);
+                    }
+                }
+            }
+
+            return true;
+        }
+        else if (getExtension(filename) == "exr")
+        {
+            float* out;
+            int tmp_w;
+            int tmp_h;
+            const char* err = nullptr;
+
+            int ret = LoadEXR(&out, &tmp_w, &tmp_h, filename.c_str(), &err);
+            if (ret != TINYEXR_SUCCESS)
+            {
+                if (err)
+                {
+                    std::cout << err << std::endl;
+                    FreeEXRErrorMessage(err);
+                }
+            }
+            else
+            {
+                resize(tmp_w, tmp_h);
+                mask = std::vector<Float>(w * h);
+
+                for (int y = 0; y < h; ++y)
+                {
+                    for (int x = 0; x < w; ++x)
+                    {
+                        for (int z = 0; z < 3; ++z)
+                        {
+                            operator()(x, y, z) = (Float)out[4 * (x + y * w) + z];
+                        }
+                        int index = y * w + x;
+                        mask[index] = (Float)out[4 * (x + y * w) + 3];
                     }
                 }
 
@@ -828,6 +977,11 @@ Pixel RGBImage::operator()(float x, float y) const
 {
     // TODO
     return Pixel();
+}
+
+Float RGBImage::mask_val(int x, int y) const
+{
+    return mask[y * w + x];
 }
 
 Float& RGBImage::filter_index(int x, int y, int z)
