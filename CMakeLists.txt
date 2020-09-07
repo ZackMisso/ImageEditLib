@@ -227,6 +227,40 @@ set(bbox_gen_srcs
     test/bbox_gen.cpp
 )
 
+set(hetero_2_srcs
+    ext/stb/stb_image_write.h
+    ext/stb/stb_image.h
+
+    ext/pcg/pcg32.h
+
+    ext/tinyexr/tinyexr.h
+
+    include/imedit/image.h
+    include/imedit/procedural.h
+    include/imedit/filter.h
+
+    src/image.cpp
+
+    test/hetero_2_vid.cpp
+)
+
+set(hsl_tests_src
+    ext/stb/stb_image_write.h
+    ext/stb/stb_image.h
+
+    ext/pcg/pcg32.h
+
+    ext/tinyexr/tinyexr.h
+
+    include/imedit/image.h
+    include/imedit/procedural.h
+    include/imedit/filter.h
+
+    src/image.cpp
+
+    test/hsl_conversion_tests.cpp
+)
+
 # add_executable(imedit ${imedit_srcs})
 # add_executable(texture_gen ${texture_gen_srcs})
 # add_executable(move_demo ${move_demo_srcs})
@@ -237,6 +271,8 @@ set(bbox_gen_srcs
 # add_executable(wavy_stuff ${wavy_stuff_srcs})
 # add_executable(smiley_demo ${smiley_demo_srcs})
 add_executable(bbox_gen ${bbox_gen_srcs})
+add_executable(hetero_2 ${hetero_2_srcs})
+add_executable(hsl_tests ${hsl_tests_src})
 
 # target_link_libraries(imedit ${PYTHON_LIBRARIES})
 # target_link_libraries(texture_gen ${PYTHON_LIBRARIES})
@@ -247,6 +283,8 @@ add_executable(bbox_gen ${bbox_gen_srcs})
 # target_link_libraries(noise_sandbox ${PYTHON_LIBRARIES})
 # target_link_libraries(smiley_demo ${PYTHON_LIBRARIES})
 target_link_libraries(bbox_gen ${PYTHON_LIBRARIES})
+target_link_libraries(hetero_2 ${PYTHON_LIBRARIES})
+target_link_libraries(hsl_tests ${PYTHON_LIBRARIES})
 
 set(CompilerFlags
       CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE

@@ -668,101 +668,53 @@ static double mean_absolute_relative_difference(const Image& one, const Image& t
 
 static void hsl_to_rgb(Pixel& pixel)
 {
-    // h=r; s=g; l=b
-    Pixel new_pix;
+    // hue is expected to be in the [0.0-1.0] range
+    Float hue = pixel.r * 360.0;
+    Float sat = pixel.g;
+    Float lum = pixel.b;
 
-    if (pixel.g == 0.0)
-    {
-        pixel.r = pixel.b;
-        pixel.g = pixel.b;
-        return;
-    }
+    Float c = (1.0 - std::abs(2.0 * lum - 1.0)) * sat;
+    Float x = c * (1.0 - std::abs(std::fmod((hue / 60.0), 2.0) - 1.0));
+    Float m = lum - c / 2.0;
 
-    double tmp_1 = 0.0;
-    if (pixel.b < 0.5)
-    {
-        tmp_1 = pixel.b * (1.0 + pixel.g);
-    }
-    else
-    {
-        tmp_1 = pixel.b + pixel.g - (pixel.b * pixel.g);
-    }
+    Float rp = 0.0;
+    Float gp = 0.0;
+    Float bp = 0.0;
 
-    double tmp_2 = 2.0 * pixel.b - tmp_1;
-
-    double tmp_R = pixel.r + 0.3333;
-    double tmp_G = pixel.r;
-    double tmp_B = pixel.r - 0.3333;
-
-    // convert the red channel
-    if (tmp_R > 1.0 or tmp_R < 0.0)
+    if (hue >= 0.0 && hue < 60.0)
     {
-        new_pix.r = 0.0;
+        rp = c;
+        gp = x;
     }
-    else if (6.0 * tmp_R < 1.0)
+    else if (hue >= 60.0 && hue < 120.0)
     {
-        new_pix.r = (tmp_2 + (tmp_1 - tmp_2) * 6.0 * tmp_R);
+        rp = x;
+        gp = c;
     }
-    else if (2.0 * tmp_R < 1.0)
+    else if (hue >= 120.0 && hue < 180.0)
     {
-        new_pix.r = tmp_1;
+        gp = c;
+        bp = x;
     }
-    else if (3.0 * tmp_R < 2.0)
+    else if (hue >= 180.0 && hue < 240.0)
     {
-        new_pix.r = tmp_2 + (tmp_1 - tmp_2) * (0.667 - tmp_R) * 6.0;
+        gp = x;
+        bp = c;
     }
-    else
+    else if (hue >= 240.0 && hue < 300.0)
     {
-        new_pix.r = tmp_2;
+        bp = c;
+        rp = x;
+    }
+    else if (hue >= 300.0 && hue < 360.0)
+    {
+        bp = x;
+        rp = c;
     }
 
-    // convert the green channel
-    if (tmp_G > 1.0 or tmp_G < 0.0)
-    {
-        new_pix.g = 0.0;
-    }
-    else if (6.0 * tmp_G < 1.0)
-    {
-        new_pix.g = tmp_2 + (tmp_1 - tmp_2) * 6.0 * tmp_G;
-    }
-    else if (2.0 * tmp_G < 1.0)
-    {
-        new_pix.g = tmp_1;
-    }
-    else if (3.0 * tmp_G < 2.0)
-    {
-        new_pix.g = tmp_2 + (tmp_1 - tmp_2) * (0.667 - tmp_G) * 6.0;
-    }
-    else
-    {
-        new_pix.g = tmp_2;
-    }
-
-    // convert the blue channel
-    if (tmp_B >= 1.0 or tmp_B <= 0.0)
-    {
-        new_pix.b = 0.0;
-    }
-    else if (6.0 * tmp_B < 1.0)
-    {
-        new_pix.b = tmp_2 + (tmp_1 - tmp_2) * 6.0 * tmp_B;
-    }
-    else if (2.0 * tmp_B < 1.0)
-    {
-        new_pix.b = tmp_1;
-    }
-    else if (3.0 * tmp_B < 2.0)
-    {
-        new_pix.b = tmp_2 + (tmp_1 - tmp_2) * (0.667 - tmp_B) * 6.0;
-    }
-    else
-    {
-        new_pix.b = tmp_2;
-    }
-
-    pixel.r = new_pix.r;
-    pixel.g = new_pix.g;
-    pixel.b = new_pix.b;
+    pixel.r = rp + m;
+    pixel.g = gp + m;
+    pixel.b = bp + m;
 }
 
 // TODO: this is very slow

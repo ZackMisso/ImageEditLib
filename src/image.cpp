@@ -410,6 +410,8 @@ bool RGBImage::write(const std::string& filename)
                     return ret;
                 }
 
+                // std::cout << "succeeded: " << filename << std::endl;
+
                 free(header.channels);
                 free(header.pixel_types);
                 free(header.requested_pixel_types);
