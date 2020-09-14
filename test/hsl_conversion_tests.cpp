@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
             imedit::Pixel hsl = imedit::Pixel(hue, sat, 0.5);
             if (i == 0)
                 write_pix(hsl);
-            imedit::hsl_to_rgb_2(hsl);
+            imedit::hsl_to_rgb(hsl);
             if (i == 0)
             {
                 std::cout << " -> ";
@@ -37,8 +37,8 @@ int main(int argc, char* argv[])
     imedit::Pixel test_1 = imedit::Pixel(59.0 / 360.0, 1.0, 0.5);
     imedit::Pixel test_2 = imedit::Pixel(61.0 / 360.0, 1.0, 0.5);
 
-    imedit::hsl_to_rgb_2(test_1);
-    imedit::hsl_to_rgb_2(test_2);
+    imedit::hsl_to_rgb(test_1);
+    imedit::hsl_to_rgb(test_2);
 
     std::cout << "test:" << std::endl;
     write_pix(test_1);
