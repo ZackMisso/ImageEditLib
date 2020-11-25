@@ -149,35 +149,35 @@ void sequence_split_frames()
     modifications.push_back(std::pair<int, int>(900, 48));
     modifications.push_back(std::pair<int, int>(971, 72));
 
-    // do_sequence("/Users/corneria/Documents/Videos/shulks_workshop/sequence_one/",
-    //             "one_",
-    //             modifications,
-    //             1, 370);
-    //
-    // do_sequence("/Users/corneria/Documents/Videos/shulks_workshop/sequence_two/",
-    //             "two_",
-    //             modifications,
-    //             371, 416);
-    //
-    // do_sequence("/Users/corneria/Documents/Videos/shulks_workshop/sequence_three/",
-    //             "three_",
-    //             modifications,
-    //             417, 433);
-    //
-    // do_sequence("/Users/corneria/Documents/Videos/shulks_workshop/sequence_four/",
-    //             "four_",
-    //             modifications,
-    //             434, 452);
-    //
-    // do_sequence("/Users/corneria/Documents/Videos/shulks_workshop/sequence_five/",
-    //             "five_",
-    //             modifications,
-    //             452, 524);
-    //
-    // do_sequence("/Users/corneria/Documents/Videos/shulks_workshop/sequence_six/",
-    //             "six_",
-    //             modifications,
-    //             525, 680);
+    do_sequence("/Users/corneria/Documents/Videos/shulks_workshop/sequence_one/",
+                "one_",
+                modifications,
+                1, 370);
+
+    do_sequence("/Users/corneria/Documents/Videos/shulks_workshop/sequence_two/",
+                "two_",
+                modifications,
+                371, 416);
+
+    do_sequence("/Users/corneria/Documents/Videos/shulks_workshop/sequence_three/",
+                "three_",
+                modifications,
+                417, 433);
+
+    do_sequence("/Users/corneria/Documents/Videos/shulks_workshop/sequence_four/",
+                "four_",
+                modifications,
+                434, 452);
+
+    do_sequence("/Users/corneria/Documents/Videos/shulks_workshop/sequence_five/",
+                "five_",
+                modifications,
+                452, 524);
+
+    do_sequence("/Users/corneria/Documents/Videos/shulks_workshop/sequence_six/",
+                "six_",
+                modifications,
+                525, 680);
 
     do_sequence("/Users/corneria/Documents/Videos/shulks_workshop/sequence_seven/",
                 "seven_",
@@ -187,7 +187,7 @@ void sequence_split_frames()
     do_sequence("/Users/corneria/Documents/Videos/shulks_workshop/sequence_eight/",
                 "eight_",
                 modifications,
-                839, 900);
+                838, 900);
 
     do_sequence("/Users/corneria/Documents/Videos/shulks_workshop/sequence_nine/",
                 "nine_",

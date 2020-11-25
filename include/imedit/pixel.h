@@ -151,6 +151,13 @@ struct Pixel
         b /= val;
     }
 
+    bool operator!=(const Pixel& other)
+    {
+        return r != other.r &&
+               g != other.g &&
+               b != other.b;
+    }
+
     Float min() const
     {
         return std::min(r, std::min(g, b));
