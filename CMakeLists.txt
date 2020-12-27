@@ -329,6 +329,23 @@ set(stoy_buffer_srcs
     misc/shader_toy_buffer_setup.cpp
 )
 
+set(frame_miss_srcs
+    ext/stb/stb_image_write.h
+    ext/stb/stb_image.h
+
+    ext/pcg/pcg32.h
+
+    ext/tinyexr/tinyexr.h
+
+    include/imedit/image.h
+    include/imedit/procedural.h
+    include/imedit/filter.h
+
+    src/image.cpp
+
+    misc/frame_missing_counter.cpp
+)
+
 # add_executable(imedit ${imedit_srcs})
 # add_executable(texture_gen ${texture_gen_srcs})
 # add_executable(move_demo ${move_demo_srcs})
@@ -345,6 +362,7 @@ add_executable(mandlebrot ${mandlebrot_srcs})
 add_executable(spinny ${spinny_srcs})
 add_executable(xeno_anim_prep ${xeno_srcs})
 add_executable(stoy_buffer ${stoy_buffer_srcs})
+add_executable(frame_miss ${frame_miss_srcs})
 
 # target_link_libraries(imedit ${PYTHON_LIBRARIES})
 # target_link_libraries(texture_gen ${PYTHON_LIBRARIES})
@@ -361,6 +379,7 @@ target_link_libraries(mandlebrot ${PYTHON_LIBRARIES})
 target_link_libraries(spinny ${PYTHON_LIBRARIES})
 target_link_libraries(xeno_anim_prep ${PYTHON_LIBRARIES})
 target_link_libraries(stoy_buffer ${PYTHON_LIBRARIES})
+target_link_libraries(frame_miss ${PYTHON_LIBRARIES})
 
 set(CompilerFlags
       CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE

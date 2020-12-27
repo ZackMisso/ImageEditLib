@@ -694,6 +694,26 @@ void test_exr()
 
 int main()
 {
+    // the path through life is a fun one - freddy in water
+    // sphinx
+    // the path through life is full of adventure - zhara looking out to sea
+    // anubis
+    // the path through life is a merry one - julius with ines as kids
+    // sphinx
+    // the path through life is full of longing - allwin holding his fathers sythe
+    // stag
+    // the path through life is a hard one - rev homeless
+    // snake
+    // the path through life is filled with folly - the falchion blade passing hands
+    // dragon
+    // the path through life is a trecherous one - shanks surrounded by dark tenrils
+    // anubis
+    // the path through life is litered with mistakes - four skulls on the ground
+    // bat
+    // the path through life.... is fated in death
+    // eye
+
+    // the path through
     srand(0x31245A);
     // srand(0x891);
 
