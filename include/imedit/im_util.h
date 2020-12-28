@@ -128,35 +128,6 @@ static void remap_avg(Image& image, Float new_avg)
     }
 }
 
-// static void color_map_image(Image& image,
-//                      const std::vector<Color3>& colors,
-//                      const std::vector<Float>& stops)
-// {
-//     assert(colors.size() == stops.size());
-//
-//     for (int i = 0; i < image.height(); ++i)
-//     {
-//         for (int j = 0; j < image.width(); ++j)
-//         {
-//             T val = T(j) / T(image.width()-1);
-//
-//             for (int k = 0; k < stops.size(); ++k)
-//             {
-//                 if (stops[k] >= val)
-//                 {
-//                     Float t = (val - stops[k-1]) / (stops[k] - stops[k - 1]);
-//
-//                     image(j, i, 0) = (1.0 - t) * colors[k-1].r + t * colors[k].r;
-//                     image(j, i, 1) = (1.0 - t) * colors[k-1].g + t * colors[k].g;
-//                     image(j, i, 2) = (1.0 - t) * colors[k-1].b + t * colors[k].b;
-//
-//                     break;
-//                 }
-//             }
-//         }
-//     }
-// }
-
 // TODO: create tone map functionality
 
 static void im_sin(Image& image)
@@ -297,60 +268,6 @@ static void false_color_proxies_bins(const Image& other,
     }
 }
 
-// // Note: this only applies a uniform color scaling
-// template <typename T>
-// void falseColor(const std::vector<T>& proxies,
-//                 const std::vector<Color3<T> >& colors,
-//                 std::vector<Color3<T> >& proxy_colors,
-//                 bool isConstant)
-// {
-//     // proxies are stored in [0,1]
-//     assert(colors.size() > 1);
-//
-//     double step = 1.0 / double(colors.size() - 1);
-//
-//     for (int i = 0; i < proxies.size(); ++i)
-//     {
-//         T val = proxies[i] / step;
-//         int index = std::floor(val);
-//         T partial = val - T(index);
-//
-//         if (index < 0)
-//         {
-//             proxy_colors.push_back(colors[0]);
-//             continue;
-//         }
-//         else if (index > colors.size()-2)
-//         {
-//             proxy_colors.push_back(colors[colors.size()-1]);
-//             continue;
-//         }
-//
-//         if (isConstant)
-//         {
-//             if (partial > 0.5)
-//             {
-//                 proxy_colors.push_back(colors[index + 1]);
-//             }
-//             else
-//             {
-//                 proxy_colors.push_back(colors[index]);
-//             }
-//         }
-//         else
-//         {
-//             Color3<T> tmp_color = Color3<T>
-//             (
-//                 (1.0 - partial) * colors[index].r + partial * colors[index + 1].r,
-//                 (1.0 - partial) * colors[index].g + partial * colors[index + 1].g,
-//                 (1.0 - partial) * colors[index].b + partial * colors[index + 1].b
-//             );
-//
-//             proxy_colors.push_back(tmp_color);
-//         }
-//     }
-// }
-
 // Note: this only applies a uniform color scaling
 static void falseColorProxy(const Image& other,
                             Image& image,
@@ -435,158 +352,6 @@ static Image edge_image(const Image& image)
     return edge;
 }
 
-// // a false color scheme with arbitrary locations for all color stops
-// template <typename T>
-// void falseColor(const Image<T>& other,
-//                 Image<T>& image,
-//                 const std::vector<T>& stops,
-//                 const std::vector<Color3<T> >& colors,
-//                 T min,
-//                 T max,
-//                 bool isConstant)
-// {
-//     if (isConstant) std::cout << "ERROR: IS CONSTANT NOT SUPPORTED YET" << std::endl;
-//
-//     assert(colors.size() == stops.size());
-//
-//     Image<T> proxies = other;
-//
-//     falseColorProxy(other,
-//                     proxies,
-//                     min,
-//                     max);
-//
-//     for (int i = 0; i < proxies.height(); ++i)
-//     {
-//         for (int j = 0; j < proxies.width(); ++j)
-//         {
-//             T proxy = proxies(j, i, 0);
-//
-//             int k = 0;
-//             for (; k < stops.size(); ++k)
-//             {
-//                 if (proxy < stops[k]) break;
-//             }
-//
-//             if (k == 0)
-//             {
-//                 image(j, i, 0) = colors[0].r;
-//                 image(j, i, 1) = colors[0].g;
-//                 image(j, i, 2) = colors[0].b;
-//             }
-//             else if (k == stops.size())
-//             {
-//                 image(j, i, 0) = colors[colors.size() - 1].r;
-//                 image(j, i, 1) = colors[colors.size() - 1].g;
-//                 image(j, i, 2) = colors[colors.size() - 1].b;
-//             }
-//             else
-//             {
-//                 T up = stops[k];
-//                 T down = stops[k - 1];
-//
-//                 T t = (proxy - down) / (up - down);
-//
-//                 image(j, i, 0) = (1.0 - t) * colors[k - 1].r +
-//                                  t * colors[k].r;
-//                 image(j, i, 1) = (1.0 - t) * colors[k - 1].g +
-//                                  t * colors[k].g;
-//                 image(j, i, 2) = (1.0 - t) * colors[k - 1].b +
-//                                  t * colors[k].b;
-//             }
-//         }
-//     }
-// }
-//
-// // Note: this only applies a uniform color scaling
-// template <typename T>
-// void falseColor(const Image<T>& other,
-//                 Image<T>& image,
-//                 const std::vector<Color3<T> >& colors,
-//                 T min,
-//                 T max,
-//                 bool isConstant,
-//                 std::pair<T, T> range = std::pair<T, T>(0.0, 1.0))
-// {
-//     double step = 1.0 / double(colors.size() - 1);
-//
-//     // std::cout << "Min: " << min << std::endl;
-//     // std::cout << "Max: " << max << std::endl;
-//     //
-//     // std::cout << "LogMin: " << -std::log(min + 0.00000001) << std::endl;
-//     // std::cout << "LogMax: " << -std::log(max + 0.00000001) << std::endl;
-//     //
-//     // std::cout << "Range first: " << range.first << std::endl;
-//     // std::cout << "Range second: " << range.second << std::endl;
-//
-//     for (int i = 0; i < other.height(); ++i)
-//     {
-//         for (int j = 0; j < other.width(); ++j)
-//         {
-//             // other is assumed to be black and white so o[0] == o[1] == o[2]
-//             T val = other(j, i, 0);
-//
-//             // T logmin = -std::log(min + 0.0000000001);
-//             // T logmax = -std::log(max + 0.0000000001);
-//             // T logval = -std::log(val + 0.0000000001);
-//
-//             T logmin = -std::log(min + 0.0000000001);
-//             T logmax = -std::log(max + 0.0000000001);
-//             T logval = -std::log(val + 0.0000000001);
-//
-//             T partial = (logval - logmin) / (logmax - logmin);
-//
-//             // T partial = (val - min) / (max - min);
-//
-//             if (partial < range.first)
-//             {
-//                 image(j, i, 0) = colors[0].r;
-//                 image(j, i, 1) = colors[0].g;
-//                 image(j, i, 2) = colors[0].b;
-//             }
-//             else if (partial > range.second)
-//             {
-//                 image(j, i, 0) = colors[colors.size() - 1].r;
-//                 image(j, i, 1) = colors[colors.size() - 1].g;
-//                 image(j, i, 2) = colors[colors.size() - 1].b;
-//             }
-//             else
-//             {
-//                 double test_val = (((partial - range.first) / (range.second - range.first)) / step);
-//                 int index = std::floor(test_val);
-//
-//                 if (isConstant)
-//                 {
-//                     if (double(test_val) - double(index) > 0.5)
-//                     {
-//                         image(j, i, 0) = colors[index].r;
-//                         image(j, i, 1) = colors[index].g;
-//                         image(j, i, 2) = colors[index].b;
-//                     }
-//                     else
-//                     {
-//                         image(j, i, 0) = colors[index + 1].r;
-//                         image(j, i, 1) = colors[index + 1].g;
-//                         image(j, i, 2) = colors[index + 1].b;
-//                     }
-//                 }
-//                 else
-//                 {
-//                     double proxy = double(test_val) - double(index);
-//                     // if (proxy < 0.0) std::cout << "Uh Oh" << std::endl;
-//
-//                     image(j, i, 0) = (1.0 - proxy) * colors[index].r +
-//                                     proxy * colors[index + 1].r;
-//                                     image(j, i, 1) = (1.0 - proxy) * colors[index].g +
-//                                     proxy * colors[index + 1].g;
-//                                     image(j, i, 2) = (1.0 - proxy) * colors[index].b +
-//                                     proxy * colors[index + 1].b;
-//                 }
-//             }
-//         }
-//     }
-// }
-
 static Image* low_avg_comparison(const std::vector<Image*>& images)
 {
     double lowest = images[0]->average();
@@ -623,17 +388,7 @@ static double mean_sqr_error(const Image& one, const Image& two)
 
 static double root_mean_sqr_error(const Image& one, const Image& two)
 {
-    double err = 0.0;
-    double size_term = 1.0 / one.size();
-
-    for (int i = 0; i < one.size(); ++i)
-    {
-        err += (one[i] - two[i]) * (one[i] - two[i]);
-    }
-
-    err *= size_term;
-
-    return sqrt(err);
+    return sqrt(mean_sqr_error(one, two));
 }
 
 static double mean_absolute_difference(const Image& one, const Image& two)
