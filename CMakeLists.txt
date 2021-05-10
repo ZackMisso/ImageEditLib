@@ -363,6 +363,91 @@ set(pawn_fd_srcs
     research/pawn_fd.cpp
 )
 
+set(veach_srcs
+    ext/stb/stb_image_write.h
+    ext/stb/stb_image.h
+
+    ext/pcg/pcg32.h
+
+    ext/tinyexr/tinyexr.h
+
+    include/imedit/image.h
+    include/imedit/procedural.h
+    include/imedit/filter.h
+
+    src/image.cpp
+
+    research/veach.cpp
+)
+
+set(caustic_srcs
+    ext/stb/stb_image_write.h
+    ext/stb/stb_image.h
+
+    ext/pcg/pcg32.h
+
+    ext/tinyexr/tinyexr.h
+
+    include/imedit/image.h
+    include/imedit/procedural.h
+    include/imedit/filter.h
+
+    src/image.cpp
+
+    research/caustic.cpp
+)
+
+set(caustic_unb_srcs
+    ext/stb/stb_image_write.h
+    ext/stb/stb_image.h
+
+    ext/pcg/pcg32.h
+
+    ext/tinyexr/tinyexr.h
+
+    include/imedit/image.h
+    include/imedit/procedural.h
+    include/imedit/filter.h
+
+    src/image.cpp
+
+    research/caustic_unb.cpp
+)
+
+set(shader_srcs
+    ext/stb/stb_image_write.h
+    ext/stb/stb_image.h
+
+    ext/pcg/pcg32.h
+
+    ext/tinyexr/tinyexr.h
+
+    include/imedit/image.h
+    include/imedit/procedural.h
+    include/imedit/filter.h
+
+    src/image.cpp
+
+    research/shader.cpp
+)
+
+set(shader_unb_srcs
+    ext/stb/stb_image_write.h
+    ext/stb/stb_image.h
+
+    ext/pcg/pcg32.h
+
+    ext/tinyexr/tinyexr.h
+
+    include/imedit/image.h
+    include/imedit/procedural.h
+    include/imedit/filter.h
+
+    src/image.cpp
+
+    research/shader_unb.cpp
+)
+
 # add_executable(imedit ${imedit_srcs})
 # add_executable(texture_gen ${texture_gen_srcs})
 # add_executable(move_demo ${move_demo_srcs})
@@ -381,6 +466,11 @@ add_executable(xeno_anim_prep ${xeno_srcs})
 add_executable(stoy_buffer ${stoy_buffer_srcs})
 add_executable(frame_miss ${frame_miss_srcs})
 add_executable(pawn_fd ${pawn_fd_srcs})
+add_executable(veach ${veach_srcs})
+add_executable(caustic ${caustic_srcs})
+add_executable(caustic_unb ${caustic_unb_srcs})
+add_executable(shader ${shader_srcs})
+add_executable(shader_unb ${shader_unb_srcs})
 
 # target_link_libraries(imedit ${PYTHON_LIBRARIES})
 # target_link_libraries(texture_gen ${PYTHON_LIBRARIES})
@@ -390,14 +480,15 @@ add_executable(pawn_fd ${pawn_fd_srcs})
 # target_link_libraries(color_maps ${PYTHON_LIBRARIES})
 # target_link_libraries(noise_sandbox ${PYTHON_LIBRARIES})
 # target_link_libraries(smiley_demo ${PYTHON_LIBRARIES})
-target_link_libraries(bbox_gen ${PYTHON_LIBRARIES})
-target_link_libraries(hetero_2 ${PYTHON_LIBRARIES})
-target_link_libraries(hsl_tests ${PYTHON_LIBRARIES})
-target_link_libraries(mandlebrot ${PYTHON_LIBRARIES})
-target_link_libraries(spinny ${PYTHON_LIBRARIES})
-target_link_libraries(xeno_anim_prep ${PYTHON_LIBRARIES})
-target_link_libraries(stoy_buffer ${PYTHON_LIBRARIES})
-target_link_libraries(frame_miss ${PYTHON_LIBRARIES})
+# target_link_libraries(bbox_gen ${PYTHON_LIBRARIES})
+# target_link_libraries(hetero_2 ${PYTHON_LIBRARIES})
+# target_link_libraries(hsl_tests ${PYTHON_LIBRARIES})
+# target_link_libraries(mandlebrot ${PYTHON_LIBRARIES})
+# target_link_libraries(spinny ${PYTHON_LIBRARIES})
+# target_link_libraries(xeno_anim_prep ${PYTHON_LIBRARIES})
+# target_link_libraries(stoy_buffer ${PYTHON_LIBRARIES})
+# target_link_libraries(frame_miss ${PYTHON_LIBRARIES})
+# target_link_libraries(veach ${PYTHON_LIBRARIES})
 
 set(CompilerFlags
       CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE

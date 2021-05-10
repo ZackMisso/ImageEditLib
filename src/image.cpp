@@ -31,6 +31,7 @@ RGBImage::RGBImage(int w, int h) : w(w), h(h)
 RGBImage::RGBImage(const std::string& filename)
 {
     pixels = std::vector<Pixel>();
+    w = 0; h = 0;
 
     read(filename);
 }
@@ -596,6 +597,7 @@ RGBImage RGBImage::operator-(const RGBImage& other) const
 
     for (int i = 0; i < size; ++i)
     {
+        // std::cout << i << std::endl;
         image[i] = operator[](i) - other[i];
     }
 
