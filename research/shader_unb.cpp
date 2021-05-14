@@ -35,6 +35,11 @@ int main()
             notes >> hp1;
             notes >> pmf;
 
+            std::cout << " hp1: " << hp1;
+            std::cout << " pmf: " << pmf << std::endl;
+
+            if (hp1 < 0.0001) throw std::exception();
+
             imedit::Image scene = imedit::Image(path + "scene_" + std::to_string(i) + ".exr");
             // std::cout << "what " << scene.width() << std::endl;
             imedit::Image basescene = imedit::Image(path + "base_scene_" + std::to_string(i) + ".exr");
@@ -52,7 +57,7 @@ int main()
             imedit::Image dif = (hp1scene - scene) / hp1 - (hscene - scene) / h;
             imedit::Image eval = chg + dif / pmf;
 
-            fd_image = fd_image + ((hscene - scene) - fd_image) * (1.0 / double(count+1));
+            fd_image = fd_image + (eval - fd_image) * (1.0 / double(count+1));
             count++;
         } catch(std::exception e) { std::cout << " iter failed"; }
         std::cout << std::endl;
@@ -61,5 +66,5 @@ int main()
     // fd_image.write(name + "_non_normed.exr");
 
     std::cout << "UNB COUNT: " << count << std::endl;
-    fd_image.write(name + ".exr");
+    fd_image.write(name + "_test_fuck_me.exr");
 }

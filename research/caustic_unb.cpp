@@ -21,14 +21,14 @@ void combine()
 
 int main()
 {
-    std::string path = "/Users/corneria/Desktop/results/paper/caustic_unb/images/";
-    std::string note_path = "/Users/corneria/Desktop/results/paper/caustic_unb/notes/";
+    std::string path = "/Users/corneria/Desktop/cluster_caustic_unb/images/";
+    std::string note_path = "/Users/corneria/Desktop/cluster_caustic_unb/notes/";
 
     imedit::Image fd_image = imedit::Image(1024, 1024);
 
-    combine();
-
-    return 0;
+    // combine();
+    //
+    // return 0;
 
     // a list of failures which have failed due to timing out.
     std::vector<int> failures = std::vector<int>();
@@ -60,7 +60,7 @@ int main()
     // failures.push_back(3573);
     // failures.push_back(3931);
 
-    int iters = 1024;
+    int iters = 2048;
     int count = 0;
 
     for (int i = 0; i < iters; ++i)
@@ -117,9 +117,11 @@ int main()
 
             imedit::Image chg = (basescene - scene) / base_h;
             // std::cout << "quiff: " << h << " as: " << hp1 << std::endl;
-            imedit::Image dif = (hp1scene - scene);// / hp1;// - (hscene - scene) / h;
+            imedit::Image dif = (hp1scene - scene) / hp1 - (hscene - scene) / h;
             // std::cout << "dif: " << pmf << std::endl;
-            imedit::Image eval = chg + dif / pmf;
+            imedit::Image eval = dif;
+
+            eval.write("ind/"+std::to_string(i) + "_" + std::to_string(int(n))+ ".exr");
 
             // std::cout << "quack" << std::endl;
 
@@ -140,7 +142,6 @@ int main()
     }
 
     std::cout << "FINAL COUNT: " << count << std::endl;
-    std::cout << "THIS IS 1" << std::endl;
 
-    fd_image.write("caustic_unb_1.exr");
+    fd_image.write("caustic_unb_fuck.exr");
 }
