@@ -5,7 +5,7 @@
 
 int main()
 {
-    std::string path = "/Users/corneria/Desktop/cluster_veach_path/images/";
+    std::string path = "/Users/corneria/Desktop/cluster_veach_path_7/images/";
 
     imedit::Image image = imedit::Image(512, 512);
 
@@ -31,5 +31,5 @@ int main()
     }
 
     // fd_image.write("non_normed_fd.exr");
-    image.write("veach_5_path.exr");
+    image.write("veach_7_path.exr");
 }

@@ -482,6 +482,23 @@ set(disco_srcs
     research/disco.cpp
 )
 
+set(caustic_unb_2_srcs
+    ext/stb/stb_image_write.h
+    ext/stb/stb_image.h
+
+    ext/pcg/pcg32.h
+
+    ext/tinyexr/tinyexr.h
+
+    include/imedit/image.h
+    include/imedit/procedural.h
+    include/imedit/filter.h
+
+    src/image.cpp
+
+    research/caustic_unb2.cpp
+)
+
 set(debiasing_figs_srcs
     ext/stb/stb_image_write.h
     ext/stb/stb_image.h
@@ -497,6 +514,23 @@ set(debiasing_figs_srcs
     src/image.cpp
 
     research/debiasing_figs.cpp
+)
+
+set(consistent_srcs
+    ext/stb/stb_image_write.h
+    ext/stb/stb_image.h
+
+    ext/pcg/pcg32.h
+
+    ext/tinyexr/tinyexr.h
+
+    include/imedit/image.h
+    include/imedit/procedural.h
+    include/imedit/filter.h
+
+    src/image.cpp
+
+    research/consistent.cpp
 )
 
 # add_executable(imedit ${imedit_srcs})
@@ -524,7 +558,9 @@ add_executable(shader ${shader_srcs})
 add_executable(shader_unb ${shader_unb_srcs})
 add_executable(veach_fd ${veach_fd_srcs})
 add_executable(disco ${disco_srcs})
+add_executable(caustic_unb_2 ${caustic_unb_2_srcs})
 add_executable(debiasing_figs ${debiasing_figs_srcs})
+add_executable(consistent ${consistent_srcs})
 
 # target_link_libraries(imedit ${PYTHON_LIBRARIES})
 # target_link_libraries(texture_gen ${PYTHON_LIBRARIES})
