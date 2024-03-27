@@ -171,12 +171,12 @@ bool RGBImage::read(const std::string& filename)
             std::string line;
             std::ifstream file(filename);
 
+            // std::cout << "HELLO" << std::endl;
+
             std::getline(file, line);
             int wid = std::stoi(line);
             std::getline(file, line);
             int hei = std::stoi(line);
-            std::getline(file, line);
-            int dep = std::stoi(line);
 
             resize(wid, hei);
 
@@ -221,6 +221,8 @@ bool RGBImage::read(const std::string& filename)
                         for (int z = 0; z < 3; ++z)
                         {
                             operator()(x, y, z) = (Float)out[4 * (x + y * w) + z];
+                            // if (operator()(x, y, z) < 0.0) std::cout << "SUCCESS" << std::endl;
+                            // std::cout << "failure" << std::endl;
                         }
                     }
                 }

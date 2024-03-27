@@ -346,7 +346,7 @@ set(frame_miss_srcs
     misc/frame_missing_counter.cpp
 )
 
-set(pawn_fd_srcs
+set(var_rr_srcs
     ext/stb/stb_image_write.h
     ext/stb/stb_image.h
 
@@ -360,10 +360,10 @@ set(pawn_fd_srcs
 
     src/image.cpp
 
-    research/pawn_fd.cpp
+    bias/variance_rr.cpp
 )
 
-set(veach_srcs
+set(pw_mse_srcs
     ext/stb/stb_image_write.h
     ext/stb/stb_image.h
 
@@ -377,10 +377,10 @@ set(veach_srcs
 
     src/image.cpp
 
-    research/veach.cpp
+    bias/pixel_wise_mse.cpp
 )
 
-set(caustic_srcs
+set(svar_srcs
     ext/stb/stb_image_write.h
     ext/stb/stb_image.h
 
@@ -394,10 +394,10 @@ set(caustic_srcs
 
     src/image.cpp
 
-    research/caustic.cpp
+    bias/smoke_scene_convergence.cpp
 )
 
-set(caustic_unb_srcs
+set(scene_conv_srcs
     ext/stb/stb_image_write.h
     ext/stb/stb_image.h
 
@@ -411,10 +411,10 @@ set(caustic_unb_srcs
 
     src/image.cpp
 
-    research/caustic_unb.cpp
+    bias/scene_convergence.cpp
 )
 
-set(shader_srcs
+set(multscat_srcs
     ext/stb/stb_image_write.h
     ext/stb/stb_image.h
 
@@ -428,75 +428,7 @@ set(shader_srcs
 
     src/image.cpp
 
-    research/shader.cpp
-)
-
-set(shader_unb_srcs
-    ext/stb/stb_image_write.h
-    ext/stb/stb_image.h
-
-    ext/pcg/pcg32.h
-
-    ext/tinyexr/tinyexr.h
-
-    include/imedit/image.h
-    include/imedit/procedural.h
-    include/imedit/filter.h
-
-    src/image.cpp
-
-    research/shader_unb.cpp
-)
-
-set(veach_fd_srcs
-    ext/stb/stb_image_write.h
-    ext/stb/stb_image.h
-
-    ext/pcg/pcg32.h
-
-    ext/tinyexr/tinyexr.h
-
-    include/imedit/image.h
-    include/imedit/procedural.h
-    include/imedit/filter.h
-
-    src/image.cpp
-
-    research/veach_fd.cpp
-)
-
-set(disco_srcs
-    ext/stb/stb_image_write.h
-    ext/stb/stb_image.h
-
-    ext/pcg/pcg32.h
-
-    ext/tinyexr/tinyexr.h
-
-    include/imedit/image.h
-    include/imedit/procedural.h
-    include/imedit/filter.h
-
-    src/image.cpp
-
-    research/disco.cpp
-)
-
-set(debiasing_figs_srcs
-    ext/stb/stb_image_write.h
-    ext/stb/stb_image.h
-
-    ext/pcg/pcg32.h
-
-    ext/tinyexr/tinyexr.h
-
-    include/imedit/image.h
-    include/imedit/procedural.h
-    include/imedit/filter.h
-
-    src/image.cpp
-
-    research/debiasing_figs.cpp
+    bias/multscat_mse.cpp
 )
 
 # add_executable(imedit ${imedit_srcs})
@@ -516,15 +448,11 @@ add_executable(spinny ${spinny_srcs})
 add_executable(xeno_anim_prep ${xeno_srcs})
 add_executable(stoy_buffer ${stoy_buffer_srcs})
 add_executable(frame_miss ${frame_miss_srcs})
-add_executable(pawn_fd ${pawn_fd_srcs})
-add_executable(veach ${veach_srcs})
-add_executable(caustic ${caustic_srcs})
-add_executable(caustic_unb ${caustic_unb_srcs})
-add_executable(shader ${shader_srcs})
-add_executable(shader_unb ${shader_unb_srcs})
-add_executable(veach_fd ${veach_fd_srcs})
-add_executable(disco ${disco_srcs})
-add_executable(debiasing_figs ${debiasing_figs_srcs})
+add_executable(var_rr ${var_rr_srcs})
+add_executable(pw_mse ${pw_mse_srcs})
+add_executable(svar ${svar_srcs})
+add_executable(scene_conv ${scene_conv_srcs})
+add_executable(multscat ${multscat_srcs})
 
 # target_link_libraries(imedit ${PYTHON_LIBRARIES})
 # target_link_libraries(texture_gen ${PYTHON_LIBRARIES})
@@ -542,7 +470,9 @@ add_executable(debiasing_figs ${debiasing_figs_srcs})
 # target_link_libraries(xeno_anim_prep ${PYTHON_LIBRARIES})
 # target_link_libraries(stoy_buffer ${PYTHON_LIBRARIES})
 # target_link_libraries(frame_miss ${PYTHON_LIBRARIES})
-# target_link_libraries(veach ${PYTHON_LIBRARIES})
+# target_link_libraries(var_rr ${PYTHON_LIBRARIES})
+# target_link_libraries(pw_mse ${PYTHON_LIBRARIES})
+# target_link_libraries(svar ${PYTHON_LIBRARIES})
 
 set(CompilerFlags
       CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
