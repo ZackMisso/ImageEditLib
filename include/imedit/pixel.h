@@ -198,6 +198,34 @@ namespace imedit
             return b;
         }
 
+        Pixel positives() const
+        {
+            Pixel pix = Pixel(0.0, 0.0, 0.0);
+
+            if (r >= 0.0)
+                pix.r = r;
+            if (g >= 0.0)
+                pix.g = g;
+            if (b >= 0.0)
+                pix.b = b;
+
+            return pix;
+        }
+
+        Pixel negatives() const
+        {
+            Pixel pix = Pixel(0.0, 0.0, 0.0);
+
+            if (r <= 0.0)
+                pix.r = -r;
+            if (g <= 0.0)
+                pix.g = -g;
+            if (b <= 0.0)
+                pix.b = -b;
+
+            return pix;
+        }
+
         static Pixel max(const Pixel &one, const Pixel &two)
         {
             Pixel val;
