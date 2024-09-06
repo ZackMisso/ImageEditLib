@@ -533,6 +533,23 @@ set(consistent_srcs
     research/consistent.cpp
 )
 
+set(color_picker_srcs
+    ext/stb/stb_image_write.h
+    ext/stb/stb_image.h
+
+    ext/pcg/pcg32.h
+
+    ext/tinyexr/tinyexr.h
+
+    include/imedit/image.h
+    include/imedit/procedural.h
+    include/imedit/filter.h
+
+    src/image.cpp
+
+    misc/color_picker.cpp
+)
+
 # add_executable(imedit ${imedit_srcs})
 # add_executable(texture_gen ${texture_gen_srcs})
 # add_executable(move_demo ${move_demo_srcs})
@@ -542,25 +559,29 @@ set(consistent_srcs
 # add_executable(noise_sandbox ${noise_sandbox_srcs})
 # add_executable(wavy_stuff ${wavy_stuff_srcs})
 # add_executable(smiley_demo ${smiley_demo_srcs})
-add_executable(bbox_gen ${bbox_gen_srcs})
-add_executable(hetero_2 ${hetero_2_srcs})
-add_executable(hsl_tests ${hsl_tests_src})
-add_executable(mandlebrot ${mandlebrot_srcs})
-add_executable(spinny ${spinny_srcs})
-add_executable(xeno_anim_prep ${xeno_srcs})
-add_executable(stoy_buffer ${stoy_buffer_srcs})
-add_executable(frame_miss ${frame_miss_srcs})
 # add_executable(pawn_fd ${pawn_fd_srcs})
 # add_executable(veach ${veach_srcs})
 # add_executable(caustic ${caustic_srcs})
 # add_executable(caustic_unb ${caustic_unb_srcs})
 # add_executable(shader ${shader_srcs})
-add_executable(shader_unb ${shader_unb_srcs})
-add_executable(veach_fd ${veach_fd_srcs})
-add_executable(disco ${disco_srcs})
-add_executable(caustic_unb_2 ${caustic_unb_2_srcs})
-add_executable(debiasing_figs ${debiasing_figs_srcs})
-add_executable(consistent ${consistent_srcs})
+
+# uncomment / fix these
+# add_executable(bbox_gen ${bbox_gen_srcs})
+# add_executable(hetero_2 ${hetero_2_srcs})
+# add_executable(hsl_tests ${hsl_tests_src})
+# add_executable(mandlebrot ${mandlebrot_srcs})
+# add_executable(spinny ${spinny_srcs})
+# add_executable(xeno_anim_prep ${xeno_srcs})
+# add_executable(stoy_buffer ${stoy_buffer_srcs})
+# add_executable(frame_miss ${frame_miss_srcs})
+# add_executable(shader_unb ${shader_unb_srcs})
+# add_executable(veach_fd ${veach_fd_srcs})
+# add_executable(disco ${disco_srcs})
+# add_executable(caustic_unb_2 ${caustic_unb_2_srcs})
+# add_executable(debiasing_figs ${debiasing_figs_srcs})
+# add_executable(consistent ${consistent_srcs})
+
+add_executable(color_picker ${color_picker_srcs})
 
 # target_link_libraries(imedit ${PYTHON_LIBRARIES})
 # target_link_libraries(texture_gen ${PYTHON_LIBRARIES})

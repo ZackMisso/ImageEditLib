@@ -4,15 +4,16 @@
 
 namespace imedit
 {
-    // THIS IS GROSS
-    typedef float Float;
-    // typedef double Float;
+    // // THIS IS GROSS
+    // typedef float Float;
+    // // typedef double Float;
 
+    template <typename T>
     struct Pixel
     {
         Pixel() : r(0.f), g(0.f), b(0.f) {}
-        Pixel(Float v) : r(v), g(v), b(v) {}
-        Pixel(Float r, Float g, Float b) : r(r), g(g), b(b) {}
+        Pixel(T v) : r(v), g(v), b(v) {}
+        Pixel(T r, T g, T b) : r(r), g(g), b(b) {}
 
         void convert_from_rgb_to_xyz()
         {
@@ -36,152 +37,152 @@ namespace imedit
 
         void clamp_non_negative()
         {
-            if (r < 0.0)
-                r = 0.0;
-            if (g < 0.0)
-                g = 0.0;
-            if (b < 0.0)
-                b = 0.0;
+            if (r < (T)0.0)
+                r = (T)0.0;
+            if (g < (T)0.0)
+                g = (T)0.0;
+            if (b < (T)0.0)
+                b = (T)0.0;
         }
 
         // TODO: maybe extend my vector implementation instead of rewriting
         //       all of this?
 
-        Float sum() const
+        T sum() const
         {
             return r + g + b;
         }
 
-        Pixel operator+(const Pixel &other) const
+        Pixel<T> operator+(const Pixel<T> &other) const
         {
             return Pixel(r + other.r,
                          g + other.g,
                          b + other.b);
         }
 
-        Pixel operator-(const Pixel &other) const
+        Pixel<T> operator-(const Pixel<T> &other) const
         {
             return Pixel(r - other.r,
                          g - other.g,
                          b - other.b);
         }
 
-        Pixel operator*(const Pixel &other) const
+        Pixel<T> operator*(const Pixel<T> &other) const
         {
-            return Pixel(r * other.r,
-                         g * other.g,
-                         b * other.b);
+            return Pixel<T>(r * other.r,
+                            g * other.g,
+                            b * other.b);
         }
 
-        Pixel operator/(const Pixel &other) const
+        Pixel<T> operator/(const Pixel<T> &other) const
         {
-            return Pixel(r / other.r,
-                         g / other.g,
-                         b / other.b);
+            return Pixel<T>(r / other.r,
+                            g / other.g,
+                            b / other.b);
         }
 
-        Pixel operator+(Float val) const
+        Pixel<T> operator+(T val) const
         {
-            return Pixel(r + val,
-                         g + val,
-                         b + val);
+            return Pixel<T>(r + val,
+                            g + val,
+                            b + val);
         }
 
-        Pixel operator-(Float val) const
+        Pixel<T> operator-(T val) const
         {
-            return Pixel(r - val,
-                         g - val,
-                         b - val);
+            return Pixel<T>(r - val,
+                            g - val,
+                            b - val);
         }
 
-        Pixel operator*(Float val) const
+        Pixel<T> operator*(T val) const
         {
-            return Pixel(r * val,
-                         g * val,
-                         b * val);
+            return Pixel<T>(r * val,
+                            g * val,
+                            b * val);
         }
 
-        Pixel operator/(Float val) const
+        Pixel<T> operator/(T val) const
         {
-            return Pixel(r / val,
-                         g / val,
-                         b / val);
+            return Pixel<T>(r / val,
+                            g / val,
+                            b / val);
         }
 
-        void operator+=(const Pixel &other)
+        void operator+=(const Pixel<T> &other)
         {
             r += other.r;
             g += other.g;
             b += other.b;
         }
 
-        void operator-=(const Pixel &other)
+        void operator-=(const Pixel<T> &other)
         {
             r -= other.r;
             g -= other.g;
             b -= other.b;
         }
 
-        void operator*=(const Pixel &other)
+        void operator*=(const Pixel<T> &other)
         {
             r *= other.r;
             g *= other.g;
             b *= other.b;
         }
 
-        void operator/=(const Pixel &other)
+        void operator/=(const Pixel<T> &other)
         {
             r /= other.r;
             g /= other.g;
             b /= other.b;
         }
 
-        void operator+=(Float val)
+        void operator+=(T val)
         {
             r += val;
             g += val;
             b += val;
         }
 
-        void operator-=(Float val)
+        void operator-=(T val)
         {
             r -= val;
             g -= val;
             b -= val;
         }
 
-        void operator*=(Float val)
+        void operator*=(T val)
         {
             r *= val;
             g *= val;
             b *= val;
         }
 
-        void operator/=(Float val)
+        void operator/=(T val)
         {
             r /= val;
             g /= val;
             b /= val;
         }
 
-        bool operator!=(const Pixel &other)
+        bool operator!=(const Pixel<T> &other)
         {
             return r != other.r &&
                    g != other.g &&
                    b != other.b;
         }
 
-        Float min() const
+        T min() const
         {
             return std::min(r, std::min(g, b));
         }
 
-        Float max() const
+        T max() const
         {
             return std::max(r, std::max(g, b));
         }
 
-        Float &access(int index)
+        T &access(int index)
         {
             if (index % 3 == 0)
                 return r;
@@ -190,7 +191,7 @@ namespace imedit
             return b;
         }
 
-        Float const_access(int index) const
+        T const_access(int index) const
         {
             if (index % 3 == 0)
                 return r;
@@ -199,37 +200,37 @@ namespace imedit
             return b;
         }
 
-        Pixel positives() const
+        Pixel<T> positives() const
         {
-            Pixel pix = Pixel(0.0, 0.0, 0.0);
+            Pixel<T> pix = Pixel(0, 0, 0);
 
-            if (r >= 0.0)
+            if (r >= 0)
                 pix.r = r;
-            if (g >= 0.0)
+            if (g >= 0)
                 pix.g = g;
-            if (b >= 0.0)
+            if (b >= 0)
                 pix.b = b;
 
             return pix;
         }
 
-        Pixel negatives() const
+        Pixel<T> negatives() const
         {
-            Pixel pix = Pixel(0.0, 0.0, 0.0);
+            Pixel<T> pix = Pixel(0, 0, 0);
 
-            if (r <= 0.0)
+            if (r <= 0)
                 pix.r = -r;
-            if (g <= 0.0)
+            if (g <= 0)
                 pix.g = -g;
-            if (b <= 0.0)
+            if (b <= 0)
                 pix.b = -b;
 
             return pix;
         }
 
-        static Pixel max(const Pixel &one, const Pixel &two)
+        static Pixel<T> max(const Pixel<T> &one, const Pixel<T> &two)
         {
-            Pixel val;
+            Pixel<T> val;
 
             val.r = std::max(one.r, two.r);
             val.g = std::max(one.g, two.g);
@@ -238,9 +239,9 @@ namespace imedit
             return val;
         }
 
-        static Pixel min(const Pixel &one, const Pixel &two)
+        static Pixel<T> min(const Pixel<T> &one, const Pixel<T> &two)
         {
-            Pixel val;
+            Pixel<T> val;
 
             val.r = std::min(one.r, two.r);
             val.g = std::min(one.g, two.g);
@@ -249,9 +250,9 @@ namespace imedit
             return val;
         }
 
-        static Pixel abs(const Pixel &one)
+        static Pixel<T> abs(const Pixel<T> &one)
         {
-            Pixel val;
+            Pixel<T> val;
 
             val.r = std::fabs(double(one.r));
             val.g = std::fabs(double(one.g));
@@ -260,9 +261,9 @@ namespace imedit
             return val;
         }
 
-        Float r;
-        Float g;
-        Float b;
+        T r;
+        T g;
+        T b;
     };
 
 }
