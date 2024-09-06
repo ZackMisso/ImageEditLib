@@ -28,11 +28,26 @@ namespace imedit
     }
 
     // converts the value to a byte
+    // static unsigned char valToByte(Float val)
+    // {
+    //     Float min = 0;
+    //     Float max = 1;
+    //     return int(255.0 * im_clamp(val, min, max));
+    // }
+
+    inline Float GammaCorrect(Float value)
+    {
+        if (value <= 0.0031308f)
+            return 12.92f * value;
+        return 1.055f * std::pow(value, (Float)(1.f / 2.4f)) - 0.055f;
+    }
+
+    // taken from PBRTv3
     static unsigned char valToByte(Float val)
     {
-        Float min = 0;
-        Float max = 1;
-        return int(255.0 * im_clamp(val, min, max));
+        Float min = 0.0;
+        Float max = 255.0;
+        return int(im_clamp((Float)255.0 * GammaCorrect(val) + (Float)0.5, min, max));
     }
 
     // converts the byte to a value
@@ -127,13 +142,13 @@ namespace imedit
 
         Float &operator()(int x, int y, int z);
         Float operator()(int x, int y, int z) const;
-        Float operator()(float x, float y, int z) const;
-        Float &operator()(float x, float y, int z);
+        Float operator()(Float x, Float y, int z) const;
+        Float &operator()(Float x, Float y, int z);
 
         Pixel &operator()(int x, int y);
         Pixel operator()(int x, int y) const;
-        Pixel &operator()(float x, float y);
-        Pixel operator()(float x, float y) const;
+        Pixel &operator()(Float x, Float y);
+        Pixel operator()(Float x, Float y) const;
 
         Float &filter_index(int x, int y, int z);
         Float filter_index(int x, int y, int z) const;

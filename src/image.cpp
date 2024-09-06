@@ -278,10 +278,10 @@ namespace imedit
                             for (int z = 0; z < 3; ++z)
                             {
                                 // change all of this back!
-                                if (pxls[4 * (x + y * w) + 3] != 0.0)
-                                    byteToVal(pxls[4 * (x + y * w) + z], operator()(x, y, z));
-                                else
-                                    byteToVal(0.0, operator()(x, y, z));
+                                // if (pxls[4 * (x + y * w) + 3] != 0.0)
+                                byteToVal(pxls[3 * (x + y * w) + z], operator()(x, y, z));
+                                // else
+                                //     byteToVal(0.0, operator()(x, y, z));
                             }
                         }
                     }
@@ -442,12 +442,14 @@ namespace imedit
                             int z;
                             for (z = 0; z < 3; ++z)
                             {
-                                pxls[z + outC * (x + y * w)] = valToByte(pow(operator()(x, y, z), 1.0));
-                                // pxls[z + outC * (x + y * w)] = valToByte(operator()(x, y, z));
+                                // 2.2 does not exactly match .exr for low pixel values... fix later
+                                // pxls[z + outC * (x + y * w)] = valToByte(pow(operator()(x, y, z), 1.0 / 2.2));
+                                pxls[z + outC * (x + y * w)] = valToByte(operator()(x, y, z));
                             }
                             for (; z < 3; ++z)
                             {
-                                pxls[z + outC * (x + y * w)] = valToByte(pow(operator()(x, y, 0), 1.0));
+                                // pxls[z + outC * (x + y * w)] = valToByte(pow(operator()(x, y, 0), 1.0 / 2.2));
+                                pxls[z + outC * (x + y * w)] = valToByte(operator()(x, y, z));
                             }
                         }
                     }
@@ -813,13 +815,13 @@ namespace imedit
         return pixels[index].const_access(z);
     }
 
-    Float RGBImage::operator()(float x, float y, int z) const
+    Float RGBImage::operator()(Float x, Float y, int z) const
     {
         // TODO
         return operator()(int(x), int(y), z);
     }
 
-    Float &RGBImage::operator()(float x, float y, int z)
+    Float &RGBImage::operator()(Float x, Float y, int z)
     {
         // TODO
         return operator()(int(x), int(y), z);
@@ -835,13 +837,13 @@ namespace imedit
         return pixels[y * w + x];
     }
 
-    Pixel &RGBImage::operator()(float x, float y)
+    Pixel &RGBImage::operator()(Float x, Float y)
     {
         // TODO
         return pixels[0];
     }
 
-    Pixel RGBImage::operator()(float x, float y) const
+    Pixel RGBImage::operator()(Float x, Float y) const
     {
         // TODO
         return Pixel();

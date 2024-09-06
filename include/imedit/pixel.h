@@ -4,8 +4,9 @@
 
 namespace imedit
 {
-
+    // THIS IS GROSS
     typedef float Float;
+    // typedef double Float;
 
     struct Pixel
     {
