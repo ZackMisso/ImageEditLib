@@ -1,6 +1,6 @@
 /*
     ImageEditLib was developed by Zack Misso
-    <zackary.t.misso.gr@dartmouth.edu>
+    <zack441@mac.com>
 
     All code here is free to use as long as
     proper credit is given to the author
@@ -18,7 +18,8 @@
 namespace imedit
 {
 
-    static void clamp_im(Image &image)
+    template <typename T>
+    static void clamp_im(RGBImage<T> &image)
     {
         for (int i = 0; i < image.size(); ++i)
         {
@@ -29,7 +30,8 @@ namespace imedit
         }
     }
 
-    static void clamp_im(Image &image, Float min, Float max)
+    template <typename T>
+    static void clamp_im(RGBImage<T> &image, T min, T max)
     {
         for (int i = 0; i < image.size(); ++i)
         {
@@ -40,10 +42,11 @@ namespace imedit
         }
     }
 
-    static void apply_mask(Image &image,
-                           const Image &mask,
-                           Float threshold = 0.f,
-                           Float scale = 0.f)
+    template <typename T>
+    static void apply_mask(RGBImage<T> &image,
+                           const RGBImage<T> &mask,
+                           T threshold = 0.f,
+                           T scale = 0.f)
     {
         for (int i = 0; i < image.size(); ++i)
         {
@@ -58,7 +61,8 @@ namespace imedit
         }
     }
 
-    static Float clamp(Float val)
+    template <typename T>
+    static T clamp(T val)
     {
         if (val < 0.0)
             return 0.0;
@@ -67,7 +71,8 @@ namespace imedit
         return val;
     }
 
-    static Float clamp(Float val, Float min, Float max)
+    template <typename T>
+    static T clamp(T val, T min, T max)
     {
         if (val < min)
             return min;
@@ -76,10 +81,11 @@ namespace imedit
         return val;
     }
 
-    static void remap_range_lin(Image &image)
+    template <typename T>
+    static void remap_range_lin(RGBImage<T> &image)
     {
-        Float min = image.min();
-        Float max = image.max();
+        T min = image.min();
+        T max = image.max();
 
         for (int i = 0; i < image.size(); ++i)
         {
@@ -87,7 +93,8 @@ namespace imedit
         }
     }
 
-    static void exp_im(Image &image, Float period)
+    template <typename T>
+    static void exp_im(RGBImage<T> &image, T period)
     {
         for (int i = 0; i < image.size(); ++i)
         {
@@ -95,7 +102,8 @@ namespace imedit
         }
     }
 
-    static void pow_im(Image &image, Float exponent)
+    template <typename T>
+    static void pow_im(RGBImage<T> &image, T exponent)
     {
         for (int i = 0; i < image.size(); ++i)
         {
@@ -103,15 +111,16 @@ namespace imedit
         }
     }
 
-    static void remap_range_lin(std::vector<Image> &images)
+    template <typename T>
+    static void remap_range_lin(VEC(RGBImage<T>) & images)
     {
-        Float min = images[0].min();
-        Float max = images[0].max();
+        T min = images[0].min();
+        T max = images[0].max();
 
         for (int i = 1; i < images.size(); ++i)
         {
-            Float tmp_min = images[i].min();
-            Float tmp_max = images[i].max();
+            T tmp_min = images[i].min();
+            T tmp_max = images[i].max();
 
             if (min > tmp_min)
                 min = tmp_min;
@@ -128,9 +137,11 @@ namespace imedit
         }
     }
 
-    static void remap_avg(Image &image, Float new_avg)
+    // continue from here
+    template <typename T>
+    static void remap_avg(RGBImage<T> &image, T new_avg)
     {
-        Float avg = image.average();
+        T avg = image.average();
 
         for (int i = 0; i < image.size(); ++i)
         {
@@ -138,19 +149,20 @@ namespace imedit
         }
     }
 
-    static void color_map_image(Image &image,
-                                const std::vector<Pixel> &colors)
+    template <typename T>
+    static void color_map_image(RGBImage<T> &image,
+                                const VEC(Pixel<T>) & colors)
     {
         int len = colors.size() - 1;
-        double step = 1.0 / double(len);
+        T step = 1.0 / T(len);
 
         for (int i = 0; i < image.height(); ++i)
         {
             for (int j = 0; j < image.width(); ++j)
             {
-                double val = double(j) / double(image.width() - 1) / step;
+                T val = T(j) / T(image.width() - 1) / step;
                 int index = int(val);
-                double partial = val - (double)index;
+                T partial = val - (T)index;
 
                 image(j, i, 0) = (1.0 - partial) * colors[index].r + partial * colors[index + 1].r;
                 image(j, i, 1) = (1.0 - partial) * colors[index].g + partial * colors[index + 1].g;
@@ -159,23 +171,24 @@ namespace imedit
         }
     }
 
-    static void color_map_ticks(std::vector<double> &ticks,
-                                const std::vector<double> &stops,
+    template <typename T>
+    static void color_map_ticks(std::vector<T> &ticks,
+                                const std::vector<T> &stops,
                                 int num_ticks)
     {
-        double tick_step = 1.0 / double(num_ticks - 1);
+        T tick_step = 1.0 / T(num_ticks - 1);
 
         ticks.push_back(0.0);
 
         for (int i = 1; i < num_ticks - 1; ++i)
         {
-            double tick_loc = tick_step * i;
+            T tick_loc = tick_step * i;
 
-            double stop_loc = (stops.size() - 1) * tick_loc;
+            T stop_loc = (stops.size() - 1) * tick_loc;
             int stop_index = int(stop_loc);
-            double stop_partial = stop_loc - (double)(stop_index);
+            T stop_partial = stop_loc - (T)(stop_index);
 
-            double tick_val = (1.0 - stop_partial) * double(stops[stop_index]) + (stop_partial) * double(stops[stop_index + 1]);
+            T tick_val = (1.0 - stop_partial) * T(stops[stop_index]) + (stop_partial) * double(stops[stop_index + 1]);
 
             ticks.push_back(tick_val);
         }
@@ -185,7 +198,8 @@ namespace imedit
 
     // TODO: create tone map functionality
 
-    static void im_sin(Image &image)
+    template <typename T>
+    static void im_sin(RGBImage<T> &image)
     {
         for (int i = 0; i < image.size(); ++i)
         {
@@ -193,7 +207,8 @@ namespace imedit
         }
     }
 
-    static void im_cos(Image &image)
+    template <typename T>
+    static void im_cos(RGBImage<T> &image)
     {
         for (int i = 0; i < image.size(); ++i)
         {
@@ -201,15 +216,17 @@ namespace imedit
         }
     }
 
-    static void one_minus(Image &image)
+    template <typename T>
+    static void one_minus(RGBImage<T> &image)
     {
         for (int i = 0; i < image.size(); ++i)
         {
-            image[i] = (Float)1.0 - image[i];
+            image[i] = (T)1.0 - image[i];
         }
     }
 
-    static void thresh_min(Image &image, Float threshold)
+    template <typename T>
+    static void thresh_min(RGBImage<T> &image, T threshold)
     {
         for (int i = 0; i < image.size(); ++i)
         {
@@ -218,7 +235,8 @@ namespace imedit
         }
     }
 
-    static void thresh_min_zero(Image &image, Float threshold)
+    template <typename T>
+    static void thresh_min_zero(RGBImage<T> &image, T threshold)
     {
         for (int i = 0; i < image.size(); ++i)
         {
@@ -227,7 +245,8 @@ namespace imedit
         }
     }
 
-    static void thresh_min_image(Image &image, Float threshold)
+    template <typename T>
+    static void thresh_min_image(RGBImage<T> &image, T threshold)
     {
         for (int i = 0; i < image.size(); ++i)
         {
@@ -238,7 +257,8 @@ namespace imedit
         }
     }
 
-    static void thresh_max(Image &image, Float threshold)
+    template <typename T>
+    static void thresh_max(RGBImage<T> &image, T threshold)
     {
         for (int i = 0; i < image.size(); ++i)
         {
@@ -247,7 +267,8 @@ namespace imedit
         }
     }
 
-    static void thresh_max_zero(Image &image, Float threshold)
+    template <typename T>
+    static void thresh_max_zero(RGBImage<T> &image, T threshold)
     {
         for (int i = 0; i < image.size(); ++i)
         {
@@ -256,7 +277,8 @@ namespace imedit
         }
     }
 
-    static void thresh_max_image(Image &image, Float threshold)
+    template <typename T>
+    static void thresh_max_image(RGBImage<T> &image, T threshold)
     {
         for (int i = 0; i < image.size(); ++i)
         {
@@ -267,7 +289,8 @@ namespace imedit
         }
     }
 
-    static void im_abs(Image &image)
+    template <typename T>
+    static void im_abs(RGBImage<T> &image)
     {
         for (int i = 0; i < image.size(); ++i)
         {
@@ -277,30 +300,32 @@ namespace imedit
     }
 
     // TODO: why is this a pointer???
-    static Image *lerp(Float t, const Image &one, const Image &two)
+    template <typename T>
+    static RGBImage<T> *lerp(T t, const RGBImage<T> &one, const RGBImage<T> &two)
     {
-        Image *img = new Image(one.width(), one.height());
+        RGBImage<T> *img = new RGBImage<T>(one.width(), one.height());
 
         *img = one * (1.0 - t) + two * t;
 
         return img;
     }
 
-    static void false_color_proxies(const Image &other,
-                                    std::vector<Float> &proxies,
-                                    Float min,
-                                    Float max)
+    template <typename T>
+    static void false_color_proxies(const RGBImage<T> &other,
+                                    std::vector<T> &proxies,
+                                    T min,
+                                    T max)
     {
-        Float logmin = -std::log(min + 0.0000000001);
-        Float logmax = -std::log(max + 0.0000000001);
+        T logmin = -std::log(min + 0.0000000001);
+        T logmax = -std::log(max + 0.0000000001);
 
         for (int i = 0; i < other.height(); ++i)
         {
             for (int j = 0; j < other.width(); ++j)
             {
-                Float val = other(j, i, 0);
+                T val = other(j, i, 0);
 
-                Float logval = -std::log(val + 0.0000000001);
+                T logval = -std::log(val + 0.0000000001);
 
                 proxies.push_back((logval - logmin) / (logmax - logmin));
             }
@@ -309,17 +334,18 @@ namespace imedit
 
     // it is assumed the bins have already been given a size
     // and that size is larger than 1
-    static void false_color_proxies_bins(const Image &other,
+    template <typename T>
+    static void false_color_proxies_bins(const RGBImage<T> &other,
                                          std::vector<int> &bins,
-                                         Float min,
-                                         Float max,
-                                         std::pair<Float, Float> range = std::pair<Float, Float>(0.0, 1.0))
+                                         T min,
+                                         T max,
+                                         std::pair<T, T> range = std::pair<T, T>(0.0, 1.0))
     {
         assert(bins.size() > 1);
 
-        Float step = Float(1.0) / Float(bins.size() - 1);
+        T step = T(1.0) / T(bins.size() - 1);
 
-        std::vector<Float> proxies = std::vector<Float>();
+        std::vector<T> proxies = std::vector<T>();
 
         false_color_proxies(other,
                             proxies,
@@ -387,26 +413,27 @@ namespace imedit
     // }
 
     // Note: this only applies a uniform color scaling
-    static void falseColorProxy(const Image &other,
-                                Image &image,
-                                Float min,
-                                Float max,
-                                std::pair<Float, Float> range = std::pair<Float, Float>(0.0, 1.0))
+    template <typename T>
+    static void falseColorProxy(const RGBImage<T> &other,
+                                RGBImage<T> &image,
+                                T min,
+                                T max,
+                                std::pair<T, T> range = std::pair<T, T>(0.0, 1.0))
     {
         for (int i = 0; i < other.height(); ++i)
         {
             for (int j = 0; j < other.width(); ++j)
             {
                 // other is assumed to be black and white so o[0] == o[1] == o[2]
-                Float val = other(j, i, 0);
+                T val = other(j, i, 0);
 
-                Float logmin = -std::log(min + 0.0000000001);
-                Float logmax = -std::log(max + 0.0000000001);
-                Float logval = -std::log(val + 0.0000000001);
+                T logmin = -std::log(min + 0.0000000001);
+                T logmax = -std::log(max + 0.0000000001);
+                T logval = -std::log(val + 0.0000000001);
 
-                Float partial = (logval - logmin) / (logmax - logmin);
+                T partial = (logval - logmin) / (logmax - logmin);
 
-                Float proxy = partial;
+                T proxy = partial;
 
                 if (partial < range.first)
                 {
@@ -428,10 +455,11 @@ namespace imedit
         }
     }
 
-    static void histogram_grayscale(const Image &image,
+    template <typename T>
+    static void histogram_grayscale(const RGBImage<T> &image,
                                     std::vector<int> &hist,
-                                    Float min = 0.0,
-                                    Float max = 1.0)
+                                    T min = 0.0,
+                                    T max = 1.0)
     {
         assert(hist.size() != 0);
 
@@ -439,7 +467,7 @@ namespace imedit
         {
             for (int j = 0; j < image.width(); ++j)
             {
-                Float val = (image(j, i, 0) / (max - min)) * hist.size();
+                T val = (image(j, i, 0) / (max - min)) * hist.size();
 
                 int index = std::floor(val);
 
@@ -453,9 +481,10 @@ namespace imedit
         }
     }
 
-    static Image edge_image(const Image &image)
+    template <typename T>
+    static RGBImage<T> edge_image(const RGBImage<T> &image)
     {
-        Image edge = Image(image.width(), image.height());
+        RGBImage<T> edge = RGBImage<T>(image.width(), image.height());
 
         for (int i = 1; i < edge.height() - 1; ++i)
         {
@@ -628,14 +657,15 @@ namespace imedit
     //     }
     // }
 
-    static Image *low_avg_comparison(const std::vector<Image *> &images)
+    template <typename T>
+    static RGBImage<T> *low_avg_comparison(const std::vector<RGBImage<T> *> &images)
     {
-        double lowest = images[0]->average();
-        Image *least_avg_image = images[0];
+        T lowest = images[0]->average();
+        RGBImage<T> *least_avg_image = images[0];
 
         for (int i = 1; i < images.size(); ++i)
         {
-            double avg = images[i]->average();
+            T avg = images[i]->average();
 
             if (avg < lowest)
             {
@@ -647,10 +677,11 @@ namespace imedit
         return least_avg_image;
     }
 
-    static double mean_sqr_error(const Image &one, const Image &two)
+    template <typename T>
+    static T mean_sqr_error(const RGBImage<T> &one, const RGBImage<T> &two)
     {
-        double err = 0.0;
-        double size_term = 1.0 / one.size();
+        T err = 0.0;
+        T size_term = 1.0 / one.size();
 
         for (int i = 0; i < one.size(); ++i)
         {
@@ -662,9 +693,10 @@ namespace imedit
         return err;
     }
 
-    static double sqr_error(const Image &one, const Image &two)
+    template <typename T>
+    static T sqr_error(const RGBImage<T> &one, const RGBImage<T> &two)
     {
-        double err = 0.0;
+        T err = 0.0;
 
         for (int i = 0; i < one.size(); ++i)
         {
@@ -674,9 +706,10 @@ namespace imedit
         return err;
     }
 
-    static double error(const Image &one, const Image &two)
+    template <typename T>
+    static T error(const RGBImage<T> &one, const RGBImage<T> &two)
     {
-        double err = 0.0;
+        T err = 0.0;
 
         for (int i = 0; i < one.size(); ++i)
         {
@@ -686,10 +719,11 @@ namespace imedit
         return err;
     }
 
-    static double root_mean_sqr_error(const Image &one, const Image &two)
+    template <typename T>
+    static T root_mean_sqr_error(const RGBImage<T> &one, const RGBImage<T> &two)
     {
-        double err = 0.0;
-        double size_term = 1.0 / one.size();
+        T err = 0.0;
+        T size_term = 1.0 / one.size();
 
         for (int i = 0; i < one.size(); ++i)
         {
@@ -701,10 +735,11 @@ namespace imedit
         return sqrt(err);
     }
 
-    static double mean_absolute_difference(const Image &one, const Image &two)
+    template <typename T>
+    static T mean_absolute_difference(const RGBImage<T> &one, const RGBImage<T> &two)
     {
-        double err = 0.0;
-        double size_term = 1.0 / one.size();
+        T err = 0.0;
+        T size_term = 1.0 / one.size();
 
         for (int i = 0; i < one.size(); ++i)
         {
@@ -716,10 +751,11 @@ namespace imedit
         return err;
     }
 
-    static double mean_absolute_relative_difference(const Image &one, const Image &two)
+    template <typename T>
+    static double mean_absolute_relative_difference(const RGBImage<T> &one, const RGBImage<T> &two)
     {
-        double err = 0.0;
-        double size_term = 1.0 / one.size();
+        T err = 0.0;
+        T size_term = 1.0 / (T)one.size();
 
         for (int i = 0; i < one.size(); ++i)
         {
@@ -731,20 +767,22 @@ namespace imedit
         return err;
     }
 
-    static void hsl_to_rgb(Pixel &pixel)
+    // this is wrong
+    template <typename T>
+    static void hsl_to_rgb(Pixel<T> &pixel)
     {
         // hue is expected to be in the [0.0-1.0] range
-        Float hue = pixel.r * 360.0;
-        Float sat = pixel.g;
-        Float lum = pixel.b;
+        T hue = pixel.r * 360.0;
+        T sat = pixel.g;
+        T lum = pixel.b;
 
-        Float c = (1.0 - std::abs(2.0 * lum - 1.0)) * sat;
-        Float x = c * (1.0 - std::abs(std::fmod((hue / 60.0), 2.0) - 1.0));
-        Float m = lum - c / 2.0;
+        T c = (1.0 - std::abs(2.0 * lum - 1.0)) * sat;
+        T x = c * (1.0 - std::abs(std::fmod((hue / 60.0), 2.0) - 1.0));
+        T m = lum - c / 2.0;
 
-        Float rp = 0.0;
-        Float gp = 0.0;
-        Float bp = 0.0;
+        T rp = 0.0;
+        T gp = 0.0;
+        T bp = 0.0;
 
         if (hue >= 0.0 && hue < 60.0)
         {
@@ -783,7 +821,8 @@ namespace imedit
     }
 
     // TODO: this is very slow
-    static void minimize_neighbors(Image &image)
+    template <typename T>
+    static void minimize_neighbors(RGBImage<T> &image)
     {
         bool minimized_any = true;
 
@@ -795,11 +834,11 @@ namespace imedit
             {
                 for (int j = image.width() - 1; j >= 0; --j)
                 {
-                    float old = image.safeAccess(j, i, 0);
+                    T old = image.safeAccess(j, i, 0);
 
                     if (old <= 1.f)
                     {
-                        float min_val = fmin(
+                        T min_val = fmin(
                             fmin(
                                 image.safeAccess(j - 1, i, 0),
                                 image.safeAccess(j + 1, i, 0)),
@@ -822,13 +861,14 @@ namespace imedit
     }
 
     // this method assumes the input image has already been thresholded
-    static Image group_white(const Image &image, int &count)
+    template <typename T>
+    static RGBImage<T> group_white(const RGBImage<T> &image, int &count)
     {
-        Image grouped = Image(image.width(), image.height());
-        float max_val = image.width() * image.height() / 20;
+        RGBImage<T> grouped = RGBImage<T>(image.width(), image.height());
+        T max_val = image.width() * image.height() / 20;
 
         count = 1;
-        float val = float(count) / max_val;
+        T val = T(count) / max_val;
 
         for (int i = 0; i < image.height(); ++i)
         {
@@ -836,8 +876,8 @@ namespace imedit
             {
                 if (image(j, i, 0) == 1.f)
                 {
-                    float min_val = fmin(grouped.safeAccess(j - 1, i, 0),
-                                         grouped.safeAccess(j, i - 1, 0));
+                    T min_val = fmin(grouped.safeAccess(j - 1, i, 0),
+                                     grouped.safeAccess(j, i - 1, 0));
 
                     if (min_val > 0.1f)
                     {
@@ -852,13 +892,13 @@ namespace imedit
                         grouped(j, i, 1) = val;
                         grouped(j, i, 2) = val;
                         count++;
-                        val = float(count) / max_val;
+                        val = T(count) / max_val;
                     }
                 }
             }
         }
 
-        // float max_val = image.width() * image.height();
+        // T max_val = image.width() * image.height();
         for (int i = 0; i < image.size(); ++i)
             if (grouped[i] < 1e-6)
                 grouped[i] = 2.f;
@@ -872,30 +912,32 @@ namespace imedit
         return grouped;
     }
 
-    static void negpos_from_gray(Image &image)
+    template <typename T>
+    static void negpos_from_gray(RGBImage<T> &image)
     {
         for (int i = 0; i < image.height(); ++i)
         {
             for (int j = 0; j < image.width(); ++j)
             {
                 if (image(j, i).r > 0.0)
-                    image(j, i) = imedit::Pixel(image(j, i).r, 0.0, 0.0);
+                    image(j, i) = Pixel<T>(image(j, i).r, 0.0, 0.0);
                 else
-                    image(j, i) = imedit::Pixel(0.0, 0.0, -image(j, i).r);
+                    image(j, i) = Pixel<T>(0.0, 0.0, -image(j, i).r);
             }
         }
     }
 
     // returns an image mult times larger
-    static Image mult_size(const Image &base, int mult)
+    template <typename T>
+    static RGBImage<T> mult_size(const RGBImage<T> &base, int mult)
     {
-        Image image = Image(base.width() * mult, base.height() * mult);
+        RGBImage<T> image = RGBImage<T>(base.width() * mult, base.height() * mult);
 
         for (int i = 0; i < base.height(); ++i)
         {
             for (int j = 0; j < base.height(); ++j)
             {
-                Pixel val = base(j, i);
+                Pixel<T> val = base(j, i);
                 int jj = mult * j;
                 int ii = mult * i;
 
@@ -913,21 +955,22 @@ namespace imedit
     }
 
     // returns an image mult times larger
-    static Image resize_image(const Image &base, int width, int height)
+    template <typename T>
+    static RGBImage<T> resize_image(const RGBImage<T> &base, int width, int height)
     {
-        Image image = Image(width, height);
-        double w_factor = double(base.width()) / double(width);
-        double h_factor = double(base.height()) / double(height);
+        RGBImage<T> image = RGBImage<T>(width, height);
+        T w_factor = T(base.width()) / T(width);
+        T h_factor = T(base.height()) / T(height);
 
         for (int i = 0; i < image.height(); ++i)
         {
             for (int j = 0; j < image.height(); ++j)
             {
-                Pixel val = Pixel(0.0);
-                double min_j = double(j) * w_factor;
-                double max_j = double(j + 1) * w_factor;
-                double min_i = double(i) * h_factor;
-                double max_i = double(i + 1) * h_factor;
+                Pixel<T> val = Pixel<T>(0.0);
+                T min_j = T(j) * w_factor;
+                T max_j = T(j + 1) * w_factor;
+                T min_i = T(i) * h_factor;
+                T max_i = T(i + 1) * h_factor;
                 int cnt = 0;
 
                 for (int ii = std::floor(min_i); ii < std::ceil(max_i); ++ii)
@@ -947,9 +990,10 @@ namespace imedit
         return image;
     }
 
-    static Image double_sized_image(const Image &input)
+    template <typename T>
+    static RGBImage<T> double_sized_image(const RGBImage<T> &input)
     {
-        Image output = Image(input.width() * 2, input.height() * 2);
+        RGBImage<T> output = RGBImage<T>(input.width() * 2, input.height() * 2);
 
         for (int i = 0; i < output.height(); ++i)
         {
