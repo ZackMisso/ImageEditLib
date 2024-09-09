@@ -820,6 +820,59 @@ namespace imedit
         pixel.b = bp + m;
     }
 
+    // in the process of fixing
+    template <typename T>
+    static void hsl_to_rgb_2(Pixel<T> &pixel)
+    {
+        // hue is expected to be in the [0.0-1.0] range
+        T hue = pixel.r * 360.0;
+        T sat = pixel.g;
+        T lum = pixel.b;
+
+        T c = (1.0 - std::abs(2.0 * lum - 1.0)) * sat;
+        T x = c * (1.0 - std::abs(std::fmod((hue / 60.0), 2.0) - 1.0));
+        T m = lum - c / 2.0;
+
+        T rp = 0.0;
+        T gp = 0.0;
+        T bp = 0.0;
+
+        if (hue >= 0.0 && hue < 60.0)
+        {
+            rp = c;
+            gp = x;
+        }
+        else if (hue >= 60.0 && hue < 120.0)
+        {
+            rp = x;
+            gp = c;
+        }
+        else if (hue >= 120.0 && hue < 180.0)
+        {
+            gp = c;
+            bp = x;
+        }
+        else if (hue >= 180.0 && hue < 240.0)
+        {
+            gp = x;
+            bp = c;
+        }
+        else if (hue >= 240.0 && hue < 300.0)
+        {
+            bp = c;
+            rp = x;
+        }
+        else if (hue >= 300.0 && hue < 360.0)
+        {
+            bp = x;
+            rp = c;
+        }
+
+        pixel.r = rp + m;
+        pixel.g = gp + m;
+        pixel.b = bp + m;
+    }
+
     // TODO: this is very slow
     template <typename T>
     static void minimize_neighbors(RGBImage<T> &image)

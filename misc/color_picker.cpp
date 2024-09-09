@@ -4,8 +4,10 @@
 #include <pcg32.h>
 #include "imedit/image.h"
 #include "imedit/im_util.h"
+#include "imedit/procedural.h"
 // #include "imedit/procedural.h"
-// #include "imedit/im_color_maps.h"
+#include "imedit/im_color_maps.h"
+#include "imedit/filter.h"
 
 #define Imaged imedit::RGBImage<double>
 #define Pixd imedit::Pixel<double>
@@ -127,7 +129,7 @@ void hue_box_visualization(float hue)
             pix.r = hue;
             pix.g = float(j) / float(image.width()) + rng.nextFloat() / float(image.width());
             pix.b = float(i) / float(image.height()) + rng.nextFloat() / float(image.height());
-            imedit::hsl_to_rgb(pix);
+            imedit::hsl_to_rgb_2(pix);
 
             image(j, i) += pix / float(image_samples);
         }
@@ -170,7 +172,7 @@ void hue_circle_visualization(float hue)
 void lum_circle_visualization(float lum)
 {
     float min_hue = 0.f;
-    float max_hue = 359.f;
+    float max_hue = 1.f;
     float min_sat = 0.f;
     float max_sat = 1.f;
 
@@ -182,7 +184,7 @@ void sat_circle_visualization(float sat)
     float min_lum = 0.f;
     float max_lum = 1.f;
     float min_hue = 0.f;
-    float max_hue = 359.f;
+    float max_hue = 1.f;
 
     // TODO
 }
