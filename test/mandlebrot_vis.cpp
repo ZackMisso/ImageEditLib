@@ -6,6 +6,9 @@
 #include "imedit/im_color_maps.h"
 #include "pcg/pcg32.h"
 
+#define Image imedit::RGBImage<double>
+#define Pix imedit::Pixel<double>
+
 struct Complex2f
 {
 public:
@@ -103,7 +106,7 @@ int main(int argc, char* argv[])
     {
         pcg32 rng(k * 0x1ac4, k + 0xca23);
 
-        imedit::Image image = imedit::Image(x_res, y_res);
+        Image image = Image(x_res, y_res);
         std::cout << "creating frame: " << k << std::endl;
 
         // double max_values[3];
@@ -118,7 +121,7 @@ int main(int argc, char* argv[])
 
         int pixel_samples = 128;
 
-        std::vector<imedit::Pixel> colors = std::vector<imedit::Pixel>();
+        std::vector<Pix> colors = std::vector<Pix>();
         imedit::color_map_inferno(colors);
 
         for (int i = 0; i < y_res; ++i)
@@ -353,8 +356,8 @@ int main(int argc, char* argv[])
         snprintf(str, 5, "%04d", k);
         std::string name = "mandlebrot_vis/mandlebrot_" + std::string(str);
 
-        image.write(name + ".exr");
-        image.write(name + ".png");
+        imedit::write_image(name + ".exr", image);
+        imedit::write_image(name + ".png", image);
     }
 
     system(publish_command.c_str());

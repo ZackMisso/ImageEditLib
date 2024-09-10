@@ -2,7 +2,9 @@
 #include <imedit/image.h>
 #include <fstream>
 
-void get_bounding_box(const imedit::Image& mask,
+#define Image imedit::RGBImage<double>
+
+void get_bounding_box(const Image& mask,
                       int& min_x,
                       int& min_y,
                       int& max_x,
@@ -40,8 +42,8 @@ int main(int argc, char* argv[])
     std::string path = std::string(argv[1]);
     std::string name = std::string(argv[2]);
 
-    imedit::Image img = imedit::Image(path + "img_" + name + ".exr");
-    imedit::Image mask = imedit::Image(path + "mask_" + name + ".exr");
+    Image img = Image(path + "img_" + name + ".exr");
+    Image mask = Image(path + "mask_" + name + ".exr");
 
     int min_x, min_y, max_x, max_y;
     get_bounding_box(mask, min_x, min_y, max_x, max_y);
@@ -54,6 +56,6 @@ int main(int argc, char* argv[])
     file << max_y << std::endl;
     file.close();
 
-    img.write(path + "img_" + name + ".png");
-    mask.write(path + "mask_" + name + ".png");
+    imedit::write_image(path + "img_" + name + ".png", img);
+    imedit::write_image(path + "mask_" + name + ".png", mask);
 }

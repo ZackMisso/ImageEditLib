@@ -3,7 +3,9 @@
 #include <fstream>
 #include <sstream>
 
-void combine(imedit::Image& render, imedit::Image& ui, imedit::Image& results)
+#define Image imedit::RGBImage<double>
+
+void combine(Image& render, Image& ui, Image& results)
 {
     for (int i = 0; i < render.height(); ++i)
     {
@@ -55,13 +57,13 @@ int main()
         std::string index = zero_pad(i);
         std::string actual_str = zero_pad(actual_index);
 
-        imedit::Image render = imedit::Image(render_path + index + ".exr");
-        imedit::Image ui = imedit::Image(ui_path + index + ".png");
+        Image render = Image(render_path + index + ".exr");
+        Image ui = Image(ui_path + index + ".png");
 
-        imedit::Image results = imedit::Image(render.width() + ui.width(), render.height());
+        Image results = Image(render.width() + ui.width(), render.height());
         combine(render, ui, results);
 
-        results.write(final_path + actual_str + ".exr");
+        imedit::write_image(final_path + actual_str + ".exr", results);
         actual_index++;
     }
 
@@ -72,13 +74,13 @@ int main()
         std::string index = zero_pad(i);
         std::string actual_str = zero_pad(actual_index);
 
-        imedit::Image render = imedit::Image(render_path + index + ".exr");
-        imedit::Image ui = imedit::Image(ui_path + index + ".png");
+        Image render = Image(render_path + index + ".exr");
+        Image ui = Image(ui_path + index + ".png");
 
-        imedit::Image results = imedit::Image(render.width() + ui.width(), render.height());
+        Image results = Image(render.width() + ui.width(), render.height());
         combine(render, ui, results);
 
-        results.write(final_path + actual_str + ".exr");
+        imedit::write_image(final_path + actual_str + ".exr", results);
         actual_index++;
     }
 }

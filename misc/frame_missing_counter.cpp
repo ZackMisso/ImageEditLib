@@ -7,6 +7,9 @@
 #include "imedit/procedural.h"
 #include "imedit/im_color_maps.h"
 
+#define Image imedit::RGBImage<double>
+#define Pix imedit::Pixel<double>
+
 int main(int argc, char* argv[])
 {
     int start_frame = 0;
@@ -19,8 +22,8 @@ int main(int argc, char* argv[])
         char str[5];
         snprintf(str, 5, "%04d", i);
         std::string frame = std::string(str);
-        imedit::Image image;
-        bool success = image.read(prefix + frame + ".exr");
+        Image image;
+        bool success = imedit::read_image(prefix + frame + ".exr", image);
         if (!success) std::cout << frame << std::endl;
     }
     

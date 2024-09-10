@@ -6,6 +6,9 @@
 #include "imedit/procedural.h"
 #include "imedit/im_color_maps.h"
 
+#define Image imedit::RGBImage<double>
+#define Pix imedit::Pixel<double>
+
 void non_slowed_down_frames()
 {
     std::vector<std::pair<int, int> > modifications = std::vector<std::pair<int, int> >();

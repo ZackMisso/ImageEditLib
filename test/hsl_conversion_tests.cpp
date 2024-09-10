@@ -3,14 +3,17 @@
 #include "imedit/image.h"
 #include "imedit/im_util.h"
 
-void write_pix(imedit::Pixel pix)
+#define Image imedit::RGBImage<double>
+#define Pix imedit::Pixel<double>
+
+void write_pix(Pix pix)
 {
     std::cout << "(" << pix.r << ", " << pix.g << ", " << pix.b << ")";
 }
 
 int main(int argc, char* argv[])
 {
-    imedit::Image image = imedit::Image(1024, 1024);
+    Image image = Image(1024, 1024);
 
     for (int i = 0; i < 1024; ++i)
     {
@@ -19,7 +22,7 @@ int main(int argc, char* argv[])
             float sat = 1.0 - float(i) / 1024.0;
             float hue = float(j) / 1024.0;
 
-            imedit::Pixel hsl = imedit::Pixel(hue, sat, 0.5);
+            Pix hsl = Pix(hue, sat, 0.5);
             if (i == 0)
                 write_pix(hsl);
             imedit::hsl_to_rgb(hsl);
@@ -34,8 +37,8 @@ int main(int argc, char* argv[])
         }
     }
 
-    imedit::Pixel test_1 = imedit::Pixel(59.0 / 360.0, 1.0, 0.5);
-    imedit::Pixel test_2 = imedit::Pixel(61.0 / 360.0, 1.0, 0.5);
+    Pix test_1 = Pix(59.0 / 360.0, 1.0, 0.5);
+    Pix test_2 = Pix(61.0 / 360.0, 1.0, 0.5);
 
     imedit::hsl_to_rgb(test_1);
     imedit::hsl_to_rgb(test_2);
@@ -45,7 +48,7 @@ int main(int argc, char* argv[])
     std::cout << std::endl;
     write_pix(test_2);
 
-    image.write("hsl_mapping.exr");
+    imedit::write_image("hsl_mapping.exr", image);
 
     return 0;
 }

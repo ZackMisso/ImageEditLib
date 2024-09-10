@@ -8,6 +8,9 @@
 
 #define PI 3.1415269
 
+#define Image imedit::RGBImage<double>
+#define Pix imedit::Pixel<double>
+
 struct Circle
 {
     Circle()
@@ -143,7 +146,7 @@ struct DrawEvent
 
     virtual void evaluate(float x,
                           float y,
-                          imedit::Pixel& pixel,
+                          Pix& pixel,
                           int frame) const = 0;
 
     int start_frame;
@@ -153,10 +156,10 @@ struct DrawEvent
 struct DrawFullCircle : public DrawEvent
 {
     DrawFullCircle(Circle& circle,
-                   imedit::Pixel color)
+                   Pix color)
         : DrawEvent(), circle(circle), color(color) { }
     DrawFullCircle(Circle& circle,
-                   imedit::Pixel color,
+                   Pix color,
                    int start_frame,
                    int end_frame)
         : DrawEvent(start_frame, end_frame),
@@ -165,21 +168,21 @@ struct DrawFullCircle : public DrawEvent
 
     virtual void evaluate(float x,
                           float y,
-                          imedit::Pixel& pixel,
+                          Pix& pixel,
                           int frame) const
     {
         if (circle.evaluate(x, y) > 0.f) pixel = color;
     }
 
     Circle circle;
-    imedit::Pixel color;
+    Pix color;
 };
 
 struct DrawCircleFromAngleOutwards : public DrawEvent
 {
     DrawCircleFromAngleOutwards(Circle& circle,
                                 float angle,
-                                imedit::Pixel color,
+                                Pix color,
                                 int start_frame,
                                 int end_frame)
         : DrawEvent(start_frame, end_frame),
@@ -189,7 +192,7 @@ struct DrawCircleFromAngleOutwards : public DrawEvent
 
     virtual void evaluate(float x,
                           float y,
-                          imedit::Pixel& pixel,
+                          Pix& pixel,
                           int frame) const
     {
         if (circle.evaluate(x, y) > 0.f)
@@ -203,17 +206,17 @@ struct DrawCircleFromAngleOutwards : public DrawEvent
     }
 
     Circle circle;
-    imedit::Pixel color;
+    Pix color;
     float angle;
 };
 
 struct DrawFullLine : public DrawEvent
 {
     DrawFullLine(Line& line,
-                 imedit::Pixel color)
+                 Pix color)
         : DrawEvent(), line(line), color(color) { }
     DrawFullLine(Line& line,
-                 imedit::Pixel color,
+                 Pix color,
                  int start_frame,
                  int end_frame)
         : DrawEvent(start_frame, end_frame),
@@ -222,23 +225,23 @@ struct DrawFullLine : public DrawEvent
 
     virtual void evaluate(float x,
                           float y,
-                          imedit::Pixel& pixel,
+                          Pix& pixel,
                           int frame) const
     {
         if (line.evaluate(x, y) > 0.f) pixel = color;
     }
 
     Line line;
-    imedit::Pixel color;
+    Pix color;
 };
 
 struct DrawLineFromStartToFinish : public DrawEvent
 {
     DrawLineFromStartToFinish(Line& line,
-                              imedit::Pixel color)
+                              Pix color)
         : DrawEvent(), line(line), color(color) { }
     DrawLineFromStartToFinish(Line& line,
-                              imedit::Pixel color,
+                              Pix color,
                               int start_frame,
                               int end_frame)
         : DrawEvent(start_frame, end_frame),
@@ -247,7 +250,7 @@ struct DrawLineFromStartToFinish : public DrawEvent
 
     virtual void evaluate(float x,
                           float y,
-                          imedit::Pixel& pixel,
+                          Pix& pixel,
                           int frame) const
     {
         float proxy = float(frame - start_frame) / float(end_frame - start_frame);
@@ -271,13 +274,13 @@ struct DrawLineFromStartToFinish : public DrawEvent
     }
 
     Line line;
-    imedit::Pixel color;
+    Pix color;
 };
 
 // TODO: this is basically a shader, I should just implement this in shader toy
 void evaluate_pixel(float x,
                     float y,
-                    imedit::Pixel& pixel,
+                    Pix& pixel,
                     std::vector<DrawEvent*>& events,
                     int frame)
 {
@@ -300,13 +303,13 @@ int main(int argc, char* argv[])
     std::string publish_command = "ffmpeg -r 24 -f image2 -i spinny_vis/spinny_%04d.png -vcodec mpeg4 -vb 20M -minrate 20M -maxrate 30M spinny_vis/spinny.mp4";;
     system("mkdir spinny_vis");
 
-    imedit::Image image = imedit::Image(x_res, y_res);
+    Image image = Image(x_res, y_res);
     Circle circle = Circle(0.5, 0.5, 0.40, 0.41);
     Line line = Line(0.0, 0.405, 0.0, -0.405, 0.005);
 
     std::vector<DrawEvent*> events = std::vector<DrawEvent*>();
-    events.push_back(new DrawCircleFromAngleOutwards(circle, PI / 4.0, imedit::Pixel(1.f, 0.f, 0.f), 0, 100));
-    events.push_back(new DrawLineFromStartToFinish(line, imedit::Pixel(0.f, 1.f, 0.f), 100, 200));
+    events.push_back(new DrawCircleFromAngleOutwards(circle, PI / 4.0, Pix(1.f, 0.f, 0.f), 0, 100));
+    events.push_back(new DrawLineFromStartToFinish(line, Pix(0.f, 1.f, 0.f), 100, 200));
 
     int start_frame = 0;
     int end_frame = 200;
@@ -314,14 +317,14 @@ int main(int argc, char* argv[])
     for (int frame = start_frame; frame < end_frame; frame++)
     {
         std::cout << "Rendering frame: " << frame << std::endl;
-        imedit::Image image = imedit::Image(x_res, y_res);
+        Image image = Image(x_res, y_res);
         for (int i = 0; i < y_res; ++i)
         {
             for(int j = 0; j < x_res; ++j)
             {
                 for (int k = 0; k < samples; ++k)
                 {
-                    imedit::Pixel pixel = imedit::Pixel(0.f);
+                    Pix pixel = Pix(0.f);
                     evaluate_pixel(float(j) / float(x_res),
                                    float(i) / float(y_res),
                                    pixel,
@@ -335,8 +338,8 @@ int main(int argc, char* argv[])
         char str[5];
         snprintf(str, 5, "%04d", frame);
         std::string name = "spinny_vis/spinny_" + std::string(str);
-        image.write(name + ".exr");
-        image.write(name + ".png");
+        imedit::write_image(name + ".exr", image);
+        imedit::write_image(name + ".png", image);
     }
 
     system(publish_command.c_str());

@@ -21,7 +21,7 @@
 namespace imedit
 {
     // The read and write logic is based off of code written by Wojciech Jarosz
-    bool image_read(const std::string &filename, RGBImage<float> &image)
+    bool read_image(const std::string &filename, RGBImage<float> &image)
     {
         int wid;
         int hei;
@@ -167,7 +167,7 @@ namespace imedit
         return false;
     }
 
-    bool image_write(const std::string &filename, RGBImage<float> &image)
+    bool write_image(const std::string &filename, RGBImage<float> &image)
     {
         if (getExtension(filename) == "txt")
         {
@@ -363,7 +363,7 @@ namespace imedit
         return true;
     }
 
-    bool image_read(const std::string &filename, RGBImage<double> &image)
+    bool read_image(const std::string &filename, RGBImage<double> &image)
     {
         int wid;
         int hei;
@@ -504,7 +504,7 @@ namespace imedit
         return false;
     }
 
-    bool image_write(const std::string &filename, RGBImage<double> &image)
+    bool write_image(const std::string &filename, RGBImage<double> &image)
     {
         if (getExtension(filename) == "txt")
         {

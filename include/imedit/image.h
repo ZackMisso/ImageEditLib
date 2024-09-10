@@ -170,7 +170,7 @@ namespace imedit
         w = 0;
         h = 0;
 
-        image_read(filename, *this);
+        read_image(filename, *this);
     }
 
     template <typename T>
@@ -739,9 +739,9 @@ namespace imedit
         return pixels[y * w + x];
     }
 
-    bool image_read(const std::string &filename, RGBImage<float> &image);
-    bool image_write(const std::string &filename, RGBImage<float> &image);
+    bool read_image(const std::string &filename, RGBImage<float> &image);
+    bool write_image(const std::string &filename, RGBImage<float> &image);
 
-    bool image_read(const std::string &filename, RGBImage<double> &image);
-    bool image_write(const std::string &filename, RGBImage<double> &image);
+    bool read_image(const std::string &filename, RGBImage<double> &image);
+    bool write_image(const std::string &filename, RGBImage<double> &image);
 }

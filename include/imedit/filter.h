@@ -5,8 +5,8 @@
 
 namespace imedit
 {
-
-    void sharpen3x3(const Image &old, Image &image)
+    template <typename T>
+    void sharpen3x3(const RGBImage<T> &old, RGBImage<T> &image)
     {
         // filter is of the form:
         // 0  -1  0
@@ -19,13 +19,13 @@ namespace imedit
             {
                 for (int j = 1; j < image.width() - 1; ++j)
                 {
-                    Float up_val = old.filter_index(j, i - 1, k);
-                    Float down_val = old.filter_index(j, i + 1, k);
-                    Float right_val = old.filter_index(j - 1, i, k);
-                    Float left_val = old.filter_index(j + 1, i, k);
-                    Float val = old.filter_index(j, i, k);
+                    T up_val = old.filter_index(j, i - 1, k);
+                    T down_val = old.filter_index(j, i + 1, k);
+                    T right_val = old.filter_index(j - 1, i, k);
+                    T left_val = old.filter_index(j + 1, i, k);
+                    T val = old.filter_index(j, i, k);
 
-                    Float new_val = -1.0 * (up_val + down_val + right_val + left_val) +
+                    T new_val = -1.0 * (up_val + down_val + right_val + left_val) +
                                     4.0 * val;
 
                     image(j, i, k) = new_val;
@@ -34,7 +34,8 @@ namespace imedit
         }
     }
 
-    void xgrad3x1(const Image &old, Image &image)
+    template <typename T>
+    void xgrad3x1(const RGBImage<T> &old, RGBImage<T> &image)
     {
         // filter is of the form:
         // -1  0  1
@@ -45,10 +46,10 @@ namespace imedit
             {
                 for (int j = 0; j < image.width(); ++j)
                 {
-                    Float right_val = old.filter_index(j + 1, i, k);
-                    Float left_val = old.filter_index(j - 1, i, k);
+                    T right_val = old.filter_index(j + 1, i, k);
+                    T left_val = old.filter_index(j - 1, i, k);
 
-                    Float new_val = -1.0 * left_val + right_val;
+                    T new_val = -1.0 * left_val + right_val;
 
                     image(j, i, k) = new_val;
                 }
@@ -56,7 +57,8 @@ namespace imedit
         }
     }
 
-    void ygrad1x3(const Image &old, Image &image)
+    template <typename T>
+    void ygrad1x3(const RGBImage<T> &old, RGBImage<T> &image)
     {
         // filter is of the form:
         // [-1  0  1]^T
@@ -67,10 +69,10 @@ namespace imedit
             {
                 for (int j = 0; j < image.width(); ++j)
                 {
-                    Float up_val = old.filter_index(j, i - 1, k);
-                    Float down_val = old.filter_index(j, i + 1, k);
+                    T up_val = old.filter_index(j, i - 1, k);
+                    T down_val = old.filter_index(j, i + 1, k);
 
-                    Float new_val = -1.0 * up_val + down_val;
+                    T new_val = -1.0 * up_val + down_val;
 
                     image(j, i, k) = new_val;
                 }

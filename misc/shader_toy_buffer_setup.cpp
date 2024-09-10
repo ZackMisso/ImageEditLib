@@ -7,6 +7,9 @@
 #include "imedit/procedural.h"
 #include "imedit/im_color_maps.h"
 
+#define Image imedit::RGBImage<double>
+#define Pix imedit::Pixel<double>
+
 int main(int argc, char* argv[])
 {
     std::ofstream image_code;
@@ -16,7 +19,7 @@ int main(int argc, char* argv[])
     {
         std::string image_path = "/Users/corneria/Documents/Art/sonic_run/run_" + std::to_string(k) + ".png";
 
-        imedit::Image image = imedit::Image(image_path);
+        Image image = Image(image_path);
 
         image_code << "vec3 image_" << k << "(vec2 uv, float time)" << std::endl;
         image_code << "{" << std::endl;
@@ -29,9 +32,9 @@ int main(int argc, char* argv[])
         {
             for (int j = 0; j < image.height(); j++)
             {
-                imedit::Pixel pix = image(j, i);
+                Pix pix = image(j, i);
 
-                if (pix != imedit::Pixel(1.f))
+                if (pix != Pix(1.f))
                 {
                     image_code << "    color += chk(pixel_index, ivec2(" << j << ", " << i << ")) * (vec3(" << pix.r << ", " << pix.g << ", " << pix.b << "));" << std::endl;
                 }

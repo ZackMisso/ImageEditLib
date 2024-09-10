@@ -5,6 +5,7 @@
 #include "imedit/image.h"
 #include "imedit/im_util.h"
 #include "imedit/procedural.h"
+#include "imedit/noise.h"
 // #include "imedit/procedural.h"
 #include "imedit/im_color_maps.h"
 #include "imedit/filter.h"
@@ -35,28 +36,28 @@ void consistency_unit_test_float()
         }
     }
 
-    imedit::image_write(path + "test.exr", test);
-    imedit::image_write(path + "test.png", test);
+    imedit::write_image(path + "test.exr", test);
+    imedit::write_image(path + "test.png", test);
 
     Imagef test_2 = Imagef(path + "test.exr");
 
-    imedit::image_write(path + "test_two.exr", test_2);
-    imedit::image_write(path + "test_two.png", test_2);
+    imedit::write_image(path + "test_two.exr", test_2);
+    imedit::write_image(path + "test_two.png", test_2);
 
     Imagef test_3 = Imagef(path + "test.png");
 
-    imedit::image_write(path + "test_three.exr", test_3);
-    imedit::image_write(path + "test_three.png", test_3);
+    imedit::write_image(path + "test_three.exr", test_3);
+    imedit::write_image(path + "test_three.png", test_3);
 
     // consistency test
     Imagef consist_test = test;
     for (int i = 0; i < 16; ++i)
     {
         // good enough
-        imedit::image_write(path + "consist_" + std::to_string(i) + ".exr", consist_test);
-        imedit::image_write(path + "consist_" + std::to_string(i) + ".png", consist_test);
+        imedit::write_image(path + "consist_" + std::to_string(i) + ".exr", consist_test);
+        imedit::write_image(path + "consist_" + std::to_string(i) + ".png", consist_test);
 
-        imedit::image_read(path + "consist_" + std::to_string(i) + ".png", consist_test);
+        imedit::read_image(path + "consist_" + std::to_string(i) + ".png", consist_test);
     }
 }
 
@@ -80,28 +81,28 @@ void consistency_unit_test_double()
         }
     }
 
-    imedit::image_write(path + "test.exr", test);
-    imedit::image_write(path + "test.png", test);
+    imedit::write_image(path + "test.exr", test);
+    imedit::write_image(path + "test.png", test);
 
     Imaged test_2 = Imaged(path + "test.exr");
 
-    imedit::image_write(path + "test_two.exr", test_2);
-    imedit::image_write(path + "test_two.png", test_2);
+    imedit::write_image(path + "test_two.exr", test_2);
+    imedit::write_image(path + "test_two.png", test_2);
 
     Imaged test_3 = Imaged(path + "test.png");
 
-    imedit::image_write(path + "test_three.exr", test_3);
-    imedit::image_write(path + "test_three.png", test_3);
+    imedit::write_image(path + "test_three.exr", test_3);
+    imedit::write_image(path + "test_three.png", test_3);
 
     // consistency test
     Imaged consist_test = test;
     for (int i = 0; i < 16; ++i)
     {
         // good enough
-        imedit::image_write(path + "consist_" + std::to_string(i) + ".exr", consist_test);
-        imedit::image_write(path + "consist_" + std::to_string(i) + ".png", consist_test);
+        imedit::write_image(path + "consist_" + std::to_string(i) + ".exr", consist_test);
+        imedit::write_image(path + "consist_" + std::to_string(i) + ".png", consist_test);
 
-        imedit::image_read(path + "consist_" + std::to_string(i) + ".png", consist_test);
+        imedit::read_image(path + "consist_" + std::to_string(i) + ".png", consist_test);
     }
 }
 
@@ -135,8 +136,8 @@ void hue_box_visualization(float hue)
         }
     }
 
-    imedit::image_write(path + "hue_box.exr", image);
-    imedit::image_write(path + "hue_box.png", image);
+    imedit::write_image(path + "hue_box.exr", image);
+    imedit::write_image(path + "hue_box.png", image);
 }
 
 void lum_box_visualization(float lum)
