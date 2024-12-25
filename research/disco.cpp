@@ -3,13 +3,16 @@
 #include <fstream>
 #include <sstream>
 
+#define Image imedit::RGBImage<double>
+#define Pix imedit::Pixel<double>
+
 int main()
 {
     // std::string path = "/Users/corneria/Desktop/disco_ball/images/";
     std::string path = "/Users/corneria/Desktop/cluster_shader/images/";
 
-    imedit::Image image = imedit::Image(540, 540);
-    imedit::Image image_2 = imedit::Image(540, 540);
+    Image image = Image(540, 540);
+    Image image_2 = Image(540, 540);
 
     int iters = 4096;
     int count = 0;
@@ -22,7 +25,7 @@ int main()
         try
         {
             // imedit::Image scene = imedit::Image(path + "res_" + std::to_string(i) + ".exr");
-            imedit::Image scene = imedit::Image(path + "scene_" + std::to_string(i) + ".exr");
+            Image scene = Image(path + "scene_" + std::to_string(i) + ".exr");
 
             if (scene.width() != 540) throw new std::exception();
 
@@ -36,12 +39,12 @@ int main()
         while (tmp > 1)
         {
             if (i == tmp)
-                image.write("shader_"+std::to_string(i)+".exr");
+                imedit::write_image("shader_"+std::to_string(i)+".exr", image);
             tmp /= 2;
         }
     }
 
     // image_2 /=
 
-    image.write("woohoo.exr");
+    imedit::write_image("woohoo.exr", image);
 }

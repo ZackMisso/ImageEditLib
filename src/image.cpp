@@ -141,7 +141,7 @@ namespace imedit
                             {
                                 // change all of this back!
                                 // if (pxls[4 * (x + y * w) + 3] != 0.0)
-                                byteToVal(pxls[4 * (x + y * image.width()) + z], image(x, y, z));
+                                linearRGB_to_sRGB(pxls[4 * (x + y * image.width()) + z], image(x, y, z));
                                 // else
                                 //     byteToVal(0.0, operator()(x, y, z));
                             }
@@ -305,12 +305,12 @@ namespace imedit
                             {
                                 // 2.2 does not exactly match .exr for low pixel values... fix later
                                 // pxls[z + outC * (x + y * w)] = valToByte(pow(operator()(x, y, z), 1.0 / 2.2));
-                                pxls[z + outC * (x + y * image.width())] = valToByte(image(x, y, z));
+                                pxls[z + outC * (x + y * image.width())] = sRGB_to_linearRGB(image(x, y, z));
                             }
                             for (; z < 3; ++z)
                             {
                                 // pxls[z + outC * (x + y * w)] = valToByte(pow(operator()(x, y, 0), 1.0 / 2.2));
-                                pxls[z + outC * (x + y * image.width())] = valToByte(image(x, y, z));
+                                pxls[z + outC * (x + y * image.width())] = sRGB_to_linearRGB(image(x, y, z));
                             }
                         }
                     }
@@ -480,7 +480,7 @@ namespace imedit
                         {
                             for (int z = 0; z < 3; ++z)
                             {
-                                byteToVal(pxls[4 * (x + y * image.width()) + z], image(x, y, z));
+                                linearRGB_to_sRGB(pxls[4 * (x + y * image.width()) + z], image(x, y, z));
                             }
                         }
                     }
@@ -639,11 +639,11 @@ namespace imedit
                             int z;
                             for (z = 0; z < 3; ++z)
                             {
-                                pxls[z + outC * (x + y * image.width())] = valToByte(image(x, y, z));
+                                pxls[z + outC * (x + y * image.width())] = sRGB_to_linearRGB(image(x, y, z));
                             }
                             for (; z < 3; ++z)
                             {
-                                pxls[z + outC * (x + y * image.width())] = valToByte(image(x, y, z));
+                                pxls[z + outC * (x + y * image.width())] = sRGB_to_linearRGB(image(x, y, z));
                             }
                         }
                     }

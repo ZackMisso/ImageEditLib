@@ -4,7 +4,10 @@
 #include <fstream>
 #include <sstream>
 
-void create_fd_image(const imedit::Image& fd, imedit::Image& image)
+#define Image imedit::RGBImage<double>
+#define Pix imedit::Pixel<double>
+
+void create_fd_image(const Image& fd, Image& image)
 {
     for (int i = 0; i < image.height(); ++i)
     {
@@ -30,33 +33,33 @@ void create_didactic_figs()
 
     system("mkdir debiasing_figs_images/didactic/");
 
-    imedit::Image gt = imedit::Image(path + "gt.exr");
-    imedit::Image bounce_1 = imedit::Image(path + "bounce_1.exr");
-    imedit::Image bounce_2 = imedit::Image(path + "bounce_2.exr");
-    imedit::Image bounce_3 = imedit::Image(path + "bounce_3.exr");
-    imedit::Image bounce_4 = imedit::Image(path + "bounce_4.exr");
-    imedit::Image bounce_5 = imedit::Image(path + "bounce_5.exr");
-    imedit::Image bounce_6 = imedit::Image(path + "bounce_6.exr");
-    imedit::Image bounce_7 = imedit::Image(path + "bounce_7.exr");
+    Image gt = Image(path + "gt.exr");
+    Image bounce_1 = Image(path + "bounce_1.exr");
+    Image bounce_2 = Image(path + "bounce_2.exr");
+    Image bounce_3 = Image(path + "bounce_3.exr");
+    Image bounce_4 = Image(path + "bounce_4.exr");
+    Image bounce_5 = Image(path + "bounce_5.exr");
+    Image bounce_6 = Image(path + "bounce_6.exr");
+    Image bounce_7 = Image(path + "bounce_7.exr");
 
-    imedit::Image delta_1 = bounce_1;
-    imedit::Image delta_2 = bounce_2 - bounce_1;
-    imedit::Image delta_3 = bounce_3 - bounce_2;
-    imedit::Image delta_4 = bounce_4 - bounce_3;
-    imedit::Image delta_5 = bounce_5 - bounce_4;
-    imedit::Image delta_6 = bounce_6 - bounce_5;
-    imedit::Image delta_7 = bounce_7 - bounce_6;
+    Image delta_1 = bounce_1;
+    Image delta_2 = bounce_2 - bounce_1;
+    Image delta_3 = bounce_3 - bounce_2;
+    Image delta_4 = bounce_4 - bounce_3;
+    Image delta_5 = bounce_5 - bounce_4;
+    Image delta_6 = bounce_6 - bounce_5;
+    Image delta_7 = bounce_7 - bounce_6;
 
     // TODO: do more manipulations if necessary
 
-    gt.write("debiasing_figs_images/didactic/gt.png");
-    delta_1.write("debiasing_figs_images/didactic/delta_1.png");
-    delta_2.write("debiasing_figs_images/didactic/delta_2.png");
-    delta_3.write("debiasing_figs_images/didactic/delta_3.png");
-    delta_4.write("debiasing_figs_images/didactic/delta_4.png");
-    delta_5.write("debiasing_figs_images/didactic/delta_5.png");
-    delta_6.write("debiasing_figs_images/didactic/delta_6.png");
-    delta_7.write("debiasing_figs_images/didactic/delta_7.png");
+    imedit::write_image("debiasing_figs_images/didactic/gt.png", gt);
+    imedit::write_image("debiasing_figs_images/didactic/delta_1.png", delta_1);
+    imedit::write_image("debiasing_figs_images/didactic/delta_2.png", delta_2);
+    imedit::write_image("debiasing_figs_images/didactic/delta_3.png", delta_3);
+    imedit::write_image("debiasing_figs_images/didactic/delta_4.png", delta_4);
+    imedit::write_image("debiasing_figs_images/didactic/delta_5.png", delta_5);
+    imedit::write_image("debiasing_figs_images/didactic/delta_6.png", delta_6);
+    imedit::write_image("debiasing_figs_images/didactic/delta_7.png", delta_7);
 }
 
 void create_smoke_figure()
@@ -65,22 +68,22 @@ void create_smoke_figure()
 
     system("mkdir debiasing_figs_images/smoke/");
 
-    imedit::Image c3_gt = imedit::Image(path + "c3_gt.exr");
-    imedit::Image c8_gt = imedit::Image(path + "c8_gt.exr");
-    imedit::Image c3_rat = imedit::Image(path + "c3_rat.exr");
-    imedit::Image c3_tay = imedit::Image(path + "c3_tay.exr");
-    imedit::Image c8_rat = imedit::Image(path + "c8_rat.exr");
-    imedit::Image c8_tay = imedit::Image(path + "c8_tay.exr");
+    Image c3_gt = Image(path + "c3_gt.exr");
+    Image c8_gt = Image(path + "c8_gt.exr");
+    Image c3_rat = Image(path + "c3_rat.exr");
+    Image c3_tay = Image(path + "c3_tay.exr");
+    Image c8_rat = Image(path + "c8_rat.exr");
+    Image c8_tay = Image(path + "c8_tay.exr");
 
     int width_cut = 9*8;
     int height_cut = 11*8;
 
-    imedit::Image c3_gt_crop = imedit::Image(c3_gt.width() - width_cut, c3_gt.height() - height_cut);
-    imedit::Image c3_rat_crop = imedit::Image(c3_rat.width() - width_cut, c3_rat.height() - height_cut);
-    imedit::Image c3_tay_crop = imedit::Image(c3_tay.width() - width_cut, c3_tay.height() - height_cut);
-    imedit::Image c8_gt_crop = imedit::Image(c8_gt.width() - width_cut, c8_gt.height() - height_cut);
-    imedit::Image c8_rat_crop = imedit::Image(c8_rat.width() - width_cut, c8_rat.height() - height_cut);
-    imedit::Image c8_tay_crop = imedit::Image(c8_tay.width() - width_cut, c8_tay.height() - height_cut);
+    Image c3_gt_crop = Image(c3_gt.width() - width_cut, c3_gt.height() - height_cut);
+    Image c3_rat_crop = Image(c3_rat.width() - width_cut, c3_rat.height() - height_cut);
+    Image c3_tay_crop = Image(c3_tay.width() - width_cut, c3_tay.height() - height_cut);
+    Image c8_gt_crop = Image(c8_gt.width() - width_cut, c8_gt.height() - height_cut);
+    Image c8_rat_crop = Image(c8_rat.width() - width_cut, c8_rat.height() - height_cut);
+    Image c8_tay_crop = Image(c8_tay.width() - width_cut, c8_tay.height() - height_cut);
 
     int x_off = width_cut / 2;
     int y_off = height_cut / 2;
@@ -115,20 +118,20 @@ void create_smoke_figure()
         }
     }
 
-    c3_gt_crop.write("debiasing_figs_images/smoke/c3_gt.png");
-    c3_rat_crop.write("debiasing_figs_images/smoke/c3_rat.png");
-    c3_tay_crop.write("debiasing_figs_images/smoke/c3_tay.png");
+    imedit::write_image("debiasing_figs_images/smoke/c3_gt.png", c3_gt_crop);
+    imedit::write_image("debiasing_figs_images/smoke/c3_rat.png", c3_rat_crop);
+    imedit::write_image("debiasing_figs_images/smoke/c3_tay.png", c3_tay_crop);
 
-    c8_gt_crop.write("debiasing_figs_images/smoke/c8_gt.png");
-    c8_rat_crop.write("debiasing_figs_images/smoke/c8_rat.png");
-    c8_tay_crop.write("debiasing_figs_images/smoke/c8_tay.png");
+    imedit::write_image("debiasing_figs_images/smoke/c8_gt.png", c8_gt_crop);
+    imedit::write_image("debiasing_figs_images/smoke/c8_rat.png", c8_rat_crop);
+    imedit::write_image("debiasing_figs_images/smoke/c8_tay.png", c8_tay_crop);
 
-    imedit::Image c3_rat_inset = imedit::Image(c3_gt_crop.width() / 10 * 1, c3_gt_crop.height() / 10 * 1);
-    imedit::Image c3_tay_inset = imedit::Image(c3_gt_crop.width() / 10 * 1, c3_gt_crop.height() / 10 * 1);
-    imedit::Image c3_gt_inset = imedit::Image(c3_gt_crop.width() / 10 * 1, c3_gt_crop.height() / 10 * 1);
-    imedit::Image c8_rat_inset = imedit::Image(c3_gt_crop.width() / 10 * 1, c3_gt_crop.height() / 10 * 1);
-    imedit::Image c8_gt_inset = imedit::Image(c3_gt_crop.width() / 10 * 1, c3_gt_crop.height() / 10 * 1);
-    imedit::Image c8_tay_inset = imedit::Image(c3_gt_crop.width() / 10 * 1, c3_gt_crop.height() / 10 * 1);
+    Image c3_rat_inset = Image(c3_gt_crop.width() / 10 * 1, c3_gt_crop.height() / 10 * 1);
+    Image c3_tay_inset = Image(c3_gt_crop.width() / 10 * 1, c3_gt_crop.height() / 10 * 1);
+    Image c3_gt_inset = Image(c3_gt_crop.width() / 10 * 1, c3_gt_crop.height() / 10 * 1);
+    Image c8_rat_inset = Image(c3_gt_crop.width() / 10 * 1, c3_gt_crop.height() / 10 * 1);
+    Image c8_gt_inset = Image(c3_gt_crop.width() / 10 * 1, c3_gt_crop.height() / 10 * 1);
+    Image c8_tay_inset = Image(c3_gt_crop.width() / 10 * 1, c3_gt_crop.height() / 10 * 1);
 
     int c3_j_off = double(c3_gt_crop.width()) * 0.40;
     int c3_i_off = double(c3_gt_crop.height()) * 0.30;
@@ -187,10 +190,10 @@ void create_smoke_figure()
     // c8_rat_inset.exposure(5.0);
     // c8_tay_inset.exposure(5.0);
 
-    c3_rat_inset.write("debiasing_figs_images/smoke/c3_rat_inset.png");
-    c3_tay_inset.write("debiasing_figs_images/smoke/c3_tay_inset.png");
-    c8_rat_inset.write("debiasing_figs_images/smoke/c8_rat_inset.png");
-    c8_tay_inset.write("debiasing_figs_images/smoke/c8_tay_inset.png");
+    imedit::write_image("debiasing_figs_images/smoke/c3_rat_inset.png", c3_rat_inset);
+    imedit::write_image("debiasing_figs_images/smoke/c3_tay_inset.png", c3_tay_inset);
+    imedit::write_image("debiasing_figs_images/smoke/c8_rat_inset.png", c3_tay_inset);
+    imedit::write_image("debiasing_figs_images/smoke/c8_tay_inset.png", c3_tay_inset);
 }
 
 void create_cloud_figure()
@@ -199,32 +202,32 @@ void create_cloud_figure()
 
     system("mkdir debiasing_figs_images/cloud/");
 
-    imedit::Image exp_anal = imedit::Image(path + "exp_anal.exr");
-    imedit::Image c_1_b_0_25_anal = imedit::Image(path + "c_1_0_b_0_25_anal.exr");
-    imedit::Image c_2_b_0_5_anal = imedit::Image(path + "c_2_0_b_0_5_anal.exr");
-    imedit::Image c_1_5_b_0_75_anal = imedit::Image(path + "c_1_5_b_0_75_anal.exr");
-    imedit::Image exp_deb = imedit::Image(path + "exp_deb.exr");
-    imedit::Image c_1_b_0_25_deb = imedit::Image(path + "c_1_0_b_0_25_deb.exr");
-    imedit::Image c_2_b_0_5_deb = imedit::Image(path + "c_2_0_b_0_5_deb.exr");
-    imedit::Image c_1_5_b_0_75_deb = imedit::Image(path + "c_1_5_b_0_75_deb.exr");
+    Image exp_anal = Image(path + "exp_anal.exr");
+    Image c_1_b_0_25_anal = Image(path + "c_1_0_b_0_25_anal.exr");
+    Image c_2_b_0_5_anal = Image(path + "c_2_0_b_0_5_anal.exr");
+    Image c_1_5_b_0_75_anal = Image(path + "c_1_5_b_0_75_anal.exr");
+    Image exp_deb = Image(path + "exp_deb.exr");
+    Image c_1_b_0_25_deb = Image(path + "c_1_0_b_0_25_deb.exr");
+    Image c_2_b_0_5_deb = Image(path + "c_2_0_b_0_5_deb.exr");
+    Image c_1_5_b_0_75_deb = Image(path + "c_1_5_b_0_75_deb.exr");
 
     // TODO: make smaller... maybe
 
-    exp_anal.write("debiasing_figs_images/cloud/exp_anal.png");
-    c_1_b_0_25_anal.write("debiasing_figs_images/cloud/c_1_0_b_0_25_anal.png");
-    c_2_b_0_5_anal.write("debiasing_figs_images/cloud/c_2_0_b_0_5_anal.png");
-    c_1_5_b_0_75_anal.write("debiasing_figs_images/cloud/c_1_5_b_0_75_anal.png");
-    exp_deb.write("debiasing_figs_images/cloud/exp_deb.png");
-    c_1_b_0_25_deb.write("debiasing_figs_images/cloud/c_1_0_b_0_25_deb.png");
-    c_2_b_0_5_deb.write("debiasing_figs_images/cloud/c_2_0_b_0_5_deb.png");
-    c_1_5_b_0_75_deb.write("debiasing_figs_images/cloud/c_1_5_b_0_75_deb.png");
+    imedit::write_image("debiasing_figs_images/cloud/exp_anal.png", exp_anal);
+    imedit::write_image("debiasing_figs_images/cloud/c_1_0_b_0_25_anal.png", c_1_b_0_25_anal);
+    imedit::write_image("debiasing_figs_images/cloud/c_2_0_b_0_5_anal.png", c_2_b_0_5_anal);
+    imedit::write_image("debiasing_figs_images/cloud/c_1_5_b_0_75_anal.png", c_1_5_b_0_75_anal);
+    imedit::write_image("debiasing_figs_images/cloud/exp_deb.png", exp_deb);
+    imedit::write_image("debiasing_figs_images/cloud/c_1_0_b_0_25_deb.png", c_1_b_0_25_deb);
+    imedit::write_image("debiasing_figs_images/cloud/c_2_0_b_0_5_deb.png", c_2_b_0_5_deb);
+    imedit::write_image("debiasing_figs_images/cloud/c_1_5_b_0_75_deb.png", c_1_5_b_0_75_deb);
 }
 
 void do_crop(
-    const imedit::Image& one,
-    const imedit::Image& two,
-    imedit::Image& crop_one,
-    imedit::Image& crop_two
+    const Image& one,
+    const Image& two,
+    Image& crop_one,
+    Image& crop_two
 )
 {
     int i_start = 0;
@@ -268,28 +271,28 @@ void create_cloud_2_figure()
 
     system("mkdir debiasing_figs_images/cloud_2/");
 
-    imedit::Image exp_anal = imedit::Image(path + "exp_anal.exr");
-    imedit::Image c_1_b_0_25_anal = imedit::Image(path + "c_1_0_b_0_25_anal.exr");
-    imedit::Image c_2_b_0_5_anal = imedit::Image(path + "c_2_0_b_0_5_anal.exr");
-    imedit::Image c_1_5_b_0_75_anal = imedit::Image(path + "c_1_5_b_0_75_anal.exr");
-    imedit::Image exp_deb = imedit::Image(path + "exp_deb.exr");
-    imedit::Image c_1_b_0_25_deb = imedit::Image(path + "c_1_0_b_0_25_deb.exr");
-    imedit::Image c_2_b_0_5_deb = imedit::Image(path + "c_2_0_b_0_5_deb.exr");
-    imedit::Image c_1_5_b_0_75_deb = imedit::Image(path + "c_1_5_b_0_75_deb.exr");
+    Image exp_anal = Image(path + "exp_anal.exr");
+    Image c_1_b_0_25_anal = Image(path + "c_1_0_b_0_25_anal.exr");
+    Image c_2_b_0_5_anal = Image(path + "c_2_0_b_0_5_anal.exr");
+    Image c_1_5_b_0_75_anal = Image(path + "c_1_5_b_0_75_anal.exr");
+    Image exp_deb = Image(path + "exp_deb.exr");
+    Image c_1_b_0_25_deb = Image(path + "c_1_0_b_0_25_deb.exr");
+    Image c_2_b_0_5_deb = Image(path + "c_2_0_b_0_5_deb.exr");
+    Image c_1_5_b_0_75_deb = Image(path + "c_1_5_b_0_75_deb.exr");
 
-    imedit::Image ray_1 = imedit::Image(path + "ray_1.exr");
-    imedit::Image ray_2 = imedit::Image(path + "ray_2.exr");
-    imedit::Image ray_3 = imedit::Image(path + "ray_3_1.exr");
-    imedit::Image ray_4 = imedit::Image(path + "ray_4.exr");
+    Image ray_1 = Image(path + "ray_1.exr");
+    Image ray_2 = Image(path + "ray_2.exr");
+    Image ray_3 = Image(path + "ray_3_1.exr");
+    Image ray_4 = Image(path + "ray_4.exr");
 
-    imedit::Image crop_1_deb = imedit::Image(40, 40);
-    imedit::Image crop_2_deb = imedit::Image(30, 30);
-    imedit::Image crop_3_deb = imedit::Image(30, 30);
-    imedit::Image crop_4_deb = imedit::Image(30, 30);
-    imedit::Image crop_1_ray = imedit::Image(40, 40);
-    imedit::Image crop_2_ray = imedit::Image(30, 30);
-    imedit::Image crop_3_ray = imedit::Image(30, 30);
-    imedit::Image crop_4_ray = imedit::Image(30, 30);
+    Image crop_1_deb = Image(40, 40);
+    Image crop_2_deb = Image(30, 30);
+    Image crop_3_deb = Image(30, 30);
+    Image crop_4_deb = Image(30, 30);
+    Image crop_1_ray = Image(40, 40);
+    Image crop_2_ray = Image(30, 30);
+    Image crop_3_ray = Image(30, 30);
+    Image crop_4_ray = Image(30, 30);
 
     do_crop(exp_deb, ray_1, crop_1_deb, crop_1_ray);
     do_crop(c_1_b_0_25_deb, ray_2, crop_2_deb, crop_2_ray);
@@ -303,14 +306,14 @@ void create_cloud_2_figure()
     int new_width = exp_anal.width() - 70 - 90;
     int new_height = exp_anal.height() - 95 - 145;
 
-    imedit::Image mod_exp_anal = imedit::Image(new_width, new_height);
-    imedit::Image mod_c_1_b_0_25_anal = imedit::Image(new_width, new_height);
-    imedit::Image mod_c_2_b_0_5_anal = imedit::Image(new_width, new_height);
-    imedit::Image mod_c_1_5_b_0_75_anal = imedit::Image(new_width, new_height);
-    imedit::Image mod_exp_deb = imedit::Image(new_width, new_height);
-    imedit::Image mod_c_1_b_0_25_deb = imedit::Image(new_width, new_height);
-    imedit::Image mod_c_2_b_0_5_deb = imedit::Image(new_width, new_height);
-    imedit::Image mod_c_1_5_b_0_75_deb = imedit::Image(new_width, new_height);
+    Image mod_exp_anal = Image(new_width, new_height);
+    Image mod_c_1_b_0_25_anal = Image(new_width, new_height);
+    Image mod_c_2_b_0_5_anal = Image(new_width, new_height);
+    Image mod_c_1_5_b_0_75_anal = Image(new_width, new_height);
+    Image mod_exp_deb = Image(new_width, new_height);
+    Image mod_c_1_b_0_25_deb = Image(new_width, new_height);
+    Image mod_c_2_b_0_5_deb = Image(new_width, new_height);
+    Image mod_c_1_5_b_0_75_deb = Image(new_width, new_height);
 
     for (int i = 0; i < new_height; ++i)
     {
@@ -359,7 +362,7 @@ void create_cloud_2_figure()
     int wid = mod_exp_deb.width();
     int hei = mod_exp_deb.height();
 
-    imedit::Image final_image(wid, hei);
+    Image final_image(wid, hei);
 
     for (int i = 0; i < hei; ++i)
     {
@@ -510,38 +513,29 @@ void create_cloud_2_figure()
         }
     }
 
-    final_image.write("debiasing_figs_images/cloud_2/combined.exr");
-    final_image.write("debiasing_figs_images/cloud_2/combined.png");
+    imedit::write_image("debiasing_figs_images/cloud_2/combined.exr", final_image);
+    imedit::write_image("debiasing_figs_images/cloud_2/combined.png", final_image);
 
     std::cout << "width: " << wid << std::endl;
     std::cout << "height: " << hei << std::endl;
 
-    mod_exp_anal.write("debiasing_figs_images/cloud_2/exp_anal.png");
-    mod_c_1_b_0_25_anal.write("debiasing_figs_images/cloud_2/c_1_0_b_0_25_anal.png");
-    mod_c_2_b_0_5_anal.write("debiasing_figs_images/cloud_2/c_2_0_b_0_5_anal.png");
-    mod_c_1_5_b_0_75_anal.write("debiasing_figs_images/cloud_2/c_1_5_b_0_75_anal.png");
-    mod_exp_deb.write("debiasing_figs_images/cloud_2/exp_deb.png");
-    mod_c_1_b_0_25_deb.write("debiasing_figs_images/cloud_2/c_1_0_b_0_25_deb.png");
-    mod_c_2_b_0_5_deb.write("debiasing_figs_images/cloud_2/c_2_0_b_0_5_deb.png");
-    mod_c_1_5_b_0_75_deb.write("debiasing_figs_images/cloud_2/c_1_5_b_0_75_deb.png");
+    imedit::write_image("debiasing_figs_images/cloud_2/exp_anal.png", mod_exp_anal);
+    imedit::write_image("debiasing_figs_images/cloud_2/c_1_0_b_0_25_anal.png", mod_c_1_b_0_25_anal);
+    imedit::write_image("debiasing_figs_images/cloud_2/c_2_0_b_0_5_anal.png", mod_c_2_b_0_5_anal);
+    imedit::write_image("debiasing_figs_images/cloud_2/c_1_5_b_0_75_anal.png", mod_c_1_5_b_0_75_anal);
+    imedit::write_image("debiasing_figs_images/cloud_2/exp_deb.png", mod_exp_deb);
+    imedit::write_image("debiasing_figs_images/cloud_2/c_1_0_b_0_25_deb.png", mod_c_1_b_0_25_deb);
+    imedit::write_image("debiasing_figs_images/cloud_2/c_2_0_b_0_5_deb.png", mod_c_2_b_0_5_deb);
+    imedit::write_image("debiasing_figs_images/cloud_2/c_1_5_b_0_75_deb.png", mod_c_1_5_b_0_75_deb);
 
-    // crop_1_deb.write("debiasing_figs_images/cloud_2/deb_crop_1.exr");
-    // crop_2_deb.write("debiasing_figs_images/cloud_2/deb_crop_2.exr");
-    // crop_3_deb.write("debiasing_figs_images/cloud_2/deb_crop_3.exr");
-    // crop_4_deb.write("debiasing_figs_images/cloud_2/deb_crop_4.exr");
-    // crop_1_ray.write("debiasing_figs_images/cloud_2/ray_crop_1.exr");
-    // crop_2_ray.write("debiasing_figs_images/cloud_2/ray_crop_2.exr");
-    // crop_3_ray.write("debiasing_figs_images/cloud_2/ray_crop_3.exr");
-    // crop_4_ray.write("debiasing_figs_images/cloud_2/ray_crop_4.exr");
-
-    crop_1_deb.write("debiasing_figs_images/cloud_2/deb_crop_1.png");
-    crop_2_deb.write("debiasing_figs_images/cloud_2/deb_crop_2.png");
-    crop_3_deb.write("debiasing_figs_images/cloud_2/deb_crop_3.png");
-    crop_4_deb.write("debiasing_figs_images/cloud_2/deb_crop_4.png");
-    crop_1_ray.write("debiasing_figs_images/cloud_2/ray_crop_1.png");
-    crop_2_ray.write("debiasing_figs_images/cloud_2/ray_crop_2.png");
-    crop_3_ray.write("debiasing_figs_images/cloud_2/ray_crop_3.png");
-    crop_4_ray.write("debiasing_figs_images/cloud_2/ray_crop_4.png");
+    imedit::write_image("debiasing_figs_images/cloud_2/deb_crop_1.png", crop_1_deb);
+    imedit::write_image("debiasing_figs_images/cloud_2/deb_crop_2.png", crop_2_deb);
+    imedit::write_image("debiasing_figs_images/cloud_2/deb_crop_3.png", crop_3_deb);
+    imedit::write_image("debiasing_figs_images/cloud_2/deb_crop_4.png", crop_4_deb);
+    imedit::write_image("debiasing_figs_images/cloud_2/ray_crop_1.png", crop_1_ray);
+    imedit::write_image("debiasing_figs_images/cloud_2/ray_crop_2.png", crop_2_ray);
+    imedit::write_image("debiasing_figs_images/cloud_2/ray_crop_3.png", crop_3_ray);
+    imedit::write_image("debiasing_figs_images/cloud_2/ray_crop_4.png", crop_4_ray);
 }
 
 void create_consistent_figure()
@@ -550,26 +544,26 @@ void create_consistent_figure()
 
     system("mkdir debiasing_figs_images/consistent/");
 
-    imedit::Image scene = imedit::Image(path + "final.exr");
-    // imedit::Image fd_ref = imedit::Image(path + "final_fd.exr");
-    imedit::Image fd_ref = imedit::Image(path + "consist_8192.exr");
-    imedit::Image consist_3 = imedit::Image(path + "consist_8192.exr");
-    imedit::Image consist_2 = imedit::Image(path + "consist_256.exr");
-    imedit::Image consist_1 = imedit::Image(path + "consist_16.exr");
+    Image scene = Image(path + "final.exr");
+    // Image fd_ref = Image(path + "final_fd.exr");
+    Image fd_ref = Image(path + "consist_8192.exr");
+    Image consist_3 = Image(path + "consist_8192.exr");
+    Image consist_2 = Image(path + "consist_256.exr");
+    Image consist_1 = Image(path + "consist_16.exr");
 
-    imedit::Image mod_fd = imedit::Image(fd_ref.width(), fd_ref.height());
-    imedit::Image mod_consist_3 = imedit::Image(consist_3.width(), consist_3.height());
-    imedit::Image mod_consist_2 = imedit::Image(consist_2.width(), consist_2.height());
-    imedit::Image mod_consist_1 = imedit::Image(consist_1.width(), consist_1.height());
+    Image mod_fd = Image(fd_ref.width(), fd_ref.height());
+    Image mod_consist_3 = Image(consist_3.width(), consist_3.height());
+    Image mod_consist_2 = Image(consist_2.width(), consist_2.height());
+    Image mod_consist_1 = Image(consist_1.width(), consist_1.height());
 
     create_fd_image(fd_ref, mod_fd);
     create_fd_image(consist_3, mod_consist_3);
     create_fd_image(consist_2, mod_consist_2);
     create_fd_image(consist_1, mod_consist_1);
 
-    imedit::Image consist_1_inset = imedit::Image(fd_ref.width()/10, fd_ref.height()/10);
-    imedit::Image consist_2_inset = imedit::Image(fd_ref.width()/10, fd_ref.height()/10);
-    imedit::Image consist_3_inset = imedit::Image(fd_ref.width()/10, fd_ref.height()/10);
+    Image consist_1_inset = Image(fd_ref.width()/10, fd_ref.height()/10);
+    Image consist_2_inset = Image(fd_ref.width()/10, fd_ref.height()/10);
+    Image consist_3_inset = Image(fd_ref.width()/10, fd_ref.height()/10);
 
     std::cout << "hello" << std::endl;
 
@@ -593,18 +587,18 @@ void create_consistent_figure()
             consist_3_inset(j, i, 2) = mod_consist_3(j + inset_j_off, i + inset_i_off, 2);
         }
     }
+    
+    imedit::write_image("debiasing_figs_images/consistent/scene.exr", scene);
+    imedit::write_image("debiasing_figs_images/consistent/fd_ref.exr", mod_fd);
+    imedit::write_image("debiasing_figs_images/consistent/consist_3.exr", mod_consist_3);
+    imedit::write_image("debiasing_figs_images/consistent/consist_2.exr", mod_consist_2);
+    imedit::write_image("debiasing_figs_images/consistent/consist_1.exr", mod_consist_1);
 
-    scene.write("debiasing_figs_images/consistent/scene.exr");
-    mod_fd.write("debiasing_figs_images/consistent/fd_ref.exr");
-    mod_consist_3.write("debiasing_figs_images/consistent/consist_3.exr");
-    mod_consist_2.write("debiasing_figs_images/consistent/consist_2.exr");
-    mod_consist_1.write("debiasing_figs_images/consistent/consist_1.exr");
-
-    scene.write("debiasing_figs_images/consistent/scene.png");
-    mod_fd.write("debiasing_figs_images/consistent/fd_ref.png");
-    consist_3_inset.write("debiasing_figs_images/consistent/consist_3.png");
-    consist_2_inset.write("debiasing_figs_images/consistent/consist_2.png");
-    consist_1_inset.write("debiasing_figs_images/consistent/consist_1.png");
+    imedit::write_image("debiasing_figs_images/consistent/scene.png", scene);
+    imedit::write_image("debiasing_figs_images/consistent/fd_ref.png", mod_fd);
+    imedit::write_image("debiasing_figs_images/consistent/consist_3.png", mod_consist_3);
+    imedit::write_image("debiasing_figs_images/consistent/consist_2.png", mod_consist_2);
+    imedit::write_image("debiasing_figs_images/consistent/consist_1.png", mod_consist_1);
 }
 
 void create_shader_figure()
@@ -613,25 +607,25 @@ void create_shader_figure()
 
     system("mkdir debiasing_figs_images/shader/");
 
-    imedit::Image scene = imedit::Image(path + "real-final.exr");
-    imedit::Image biased = imedit::Image(path + "shader_biased.exr");
-    imedit::Image ref = imedit::Image(path + "shader_ref.exr");
-    imedit::Image unb = imedit::Image(path + "shader_unb.exr");
+    Image scene = Image(path + "real-final.exr");
+    Image biased = Image(path + "shader_biased.exr");
+    Image ref = Image(path + "shader_ref.exr");
+    Image unb = Image(path + "shader_unb.exr");
 
-    imedit::Image mod_scene = imedit::Image(scene.width(), scene.height());
-    imedit::Image mod_biased = imedit::Image(biased.width(), biased.height());
-    imedit::Image mod_ref = imedit::Image(ref.width(), ref.height());
-    imedit::Image mod_unb = imedit::Image(unb.width(), unb.height());
+    Image mod_scene = Image(scene.width(), scene.height());
+    Image mod_biased = Image(biased.width(), biased.height());
+    Image mod_ref = Image(ref.width(), ref.height());
+    Image mod_unb = Image(unb.width(), unb.height());
 
     create_fd_image(scene, mod_scene);
     create_fd_image(biased, mod_biased);
     create_fd_image(ref, mod_ref);
     create_fd_image(unb, mod_unb);
 
-    scene.write("debiasing_figs_images/shader/scene.exr");
-    mod_biased.write("debiasing_figs_images/shader/preexp_biased.exr");
-    mod_ref.write("debiasing_figs_images/shader/preexp_ref.exr");
-    mod_unb.write("debiasing_figs_images/shader/preexp_unb.exr");
+    imedit::write_image("debiasing_figs_images/shader/scene.exr", scene);
+    imedit::write_image("debiasing_figs_images/shader/preexp_biased.exr", mod_biased);
+    imedit::write_image("debiasing_figs_images/shader/preexp_ref.exr", mod_ref);
+    imedit::write_image("debiasing_figs_images/shader/preexp_unb.exr", mod_unb);
 
     int i1_offset = 200;
     int j1_offset = 175;
@@ -641,13 +635,13 @@ void create_shader_figure()
     int wid = 50;
     int hei = 35;
 
-    imedit::Image biased_inset_1 = imedit::Image(wid, hei);
-    imedit::Image ref_inset_1 = imedit::Image(wid, hei);
-    imedit::Image unb_inset_1 = imedit::Image(wid, hei);
+    Image biased_inset_1 = Image(wid, hei);
+    Image ref_inset_1 = Image(wid, hei);
+    Image unb_inset_1 = Image(wid, hei);
 
-    imedit::Image biased_inset_2 = imedit::Image(wid, hei);
-    imedit::Image ref_inset_2 = imedit::Image(wid, hei);
-    imedit::Image unb_inset_2 = imedit::Image(wid, hei);
+    Image biased_inset_2 = Image(wid, hei);
+    Image ref_inset_2 = Image(wid, hei);
+    Image unb_inset_2 = Image(wid, hei);
 
     for (int i = 0; i < hei; ++i)
     {
@@ -691,28 +685,28 @@ void create_shader_figure()
     ref_inset_2.exposure(1.0 / 1000.0);
     unb_inset_2.exposure(1.0 / 1000.0);
 
-    mod_biased.write("debiasing_figs_images/shader/biased.exr");
-    mod_ref.write("debiasing_figs_images/shader/ref.exr");
-    mod_unb.write("debiasing_figs_images/shader/unb.exr");
+    imedit::write_image("debiasing_figs_images/shader/biased.exr", mod_biased);
+    imedit::write_image("debiasing_figs_images/shader/ref.exr", mod_ref);
+    imedit::write_image("debiasing_figs_images/shader/unb.exr", mod_unb);
 
-    scene.write("debiasing_figs_images/shader/scene.png");
-    mod_biased.write("debiasing_figs_images/shader/biased.png");
-    mod_ref.write("debiasing_figs_images/shader/ref.png");
-    mod_unb.write("debiasing_figs_images/shader/unb.png");
+    imedit::write_image("debiasing_figs_images/shader/scene.png", scene);
+    imedit::write_image("debiasing_figs_images/shader/biased.png", mod_biased);
+    imedit::write_image("debiasing_figs_images/shader/ref.png", mod_ref);
+    imedit::write_image("debiasing_figs_images/shader/unb.png", mod_unb);
+    
+    imedit::write_image("debiasing_figs_images/shader/biased_inset_1.png", biased_inset_1);
+    imedit::write_image("debiasing_figs_images/shader/ref_inset_1.png", ref_inset_1);
+    imedit::write_image("debiasing_figs_images/shader/unb_inset_1.png", unb_inset_1);
+    imedit::write_image("debiasing_figs_images/shader/biased_inset_2.png", biased_inset_2);
+    imedit::write_image("debiasing_figs_images/shader/ref_inset_2.png", ref_inset_2);
+    imedit::write_image("debiasing_figs_images/shader/unb_inset_2.png", unb_inset_2);
 
-    biased_inset_1.write("debiasing_figs_images/shader/biased_inset_1.png");
-    ref_inset_1.write("debiasing_figs_images/shader/ref_inset_1.png");
-    unb_inset_1.write("debiasing_figs_images/shader/unb_inset_1.png");
-    biased_inset_2.write("debiasing_figs_images/shader/biased_inset_2.png");
-    ref_inset_2.write("debiasing_figs_images/shader/ref_inset_2.png");
-    unb_inset_2.write("debiasing_figs_images/shader/unb_inset_2.png");
-
-    biased_inset_1.write("debiasing_figs_images/shader/biased_inset_1.exr");
-    ref_inset_1.write("debiasing_figs_images/shader/ref_inset_1.exr");
-    unb_inset_1.write("debiasing_figs_images/shader/unb_inset_1.exr");
-    biased_inset_2.write("debiasing_figs_images/shader/biased_inset_2.exr");
-    ref_inset_2.write("debiasing_figs_images/shader/ref_inset_2.exr");
-    unb_inset_2.write("debiasing_figs_images/shader/unb_inset_2.exr");
+    imedit::write_image("debiasing_figs_images/shader/biased_inset_1.exr", biased_inset_1);
+    imedit::write_image("debiasing_figs_images/shader/ref_inset_1.exr", ref_inset_1);
+    imedit::write_image("debiasing_figs_images/shader/unb_inset_1.exr", unb_inset_1);
+    imedit::write_image("debiasing_figs_images/shader/biased_inset_2.exr", biased_inset_2);
+    imedit::write_image("debiasing_figs_images/shader/ref_inset_2.exr", ref_inset_2);
+    imedit::write_image("debiasing_figs_images/shader/unb_inset_2.exr", unb_inset_2);
 }
 
 void create_teaser_figure()
@@ -721,10 +715,10 @@ void create_teaser_figure()
 
     system("mkdir debiasing_figs_images/teaser/");
 
-    imedit::Image teaser = imedit::Image(path + "base_teaser.exr");
-    imedit::Image fd = imedit::Image(path + "fd_teaser.exr");
+    Image teaser = Image(path + "base_teaser.exr");
+    Image fd = Image(path + "fd_teaser.exr");
 
-    imedit::Image mod_fd = imedit::Image(fd.width(), fd.height());
+    Image mod_fd = Image(fd.width(), fd.height());
 
     create_fd_image(fd, mod_fd);
 
@@ -747,7 +741,7 @@ void create_teaser_figure()
 
     mod_fd.exposure(12.5);
 
-    imedit::Image combined = imedit::Image(fd.width(), fd.height());
+    Image combined = Image(fd.width(), fd.height());
 
     for (int i = 0; i < mod_fd.height(); ++i)
     {
@@ -776,9 +770,9 @@ void create_teaser_figure()
         }
     }
 
-    teaser.write("debiasing_figs_images/teaser/teaser_base.png");
-    mod_fd.write("debiasing_figs_images/teaser/teaser_fd.png");
-    combined.write("debiasing_figs_images/teaser/combined_teaser.png");
+    imedit::write_image("debiasing_figs_images/teaser/teaser_base.png", teaser);
+    imedit::write_image("debiasing_figs_images/teaser/teaser_fd.png", mod_fd);
+    imedit::write_image("debiasing_figs_images/teaser/combined_teaser.png", combined);
 }
 
 void create_da_figure()

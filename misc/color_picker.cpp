@@ -16,14 +16,16 @@
 #define Imagef imedit::RGBImage<float>
 #define Pixf imedit::Pixel<float>
 
+#define TestImageRes 1000
+
 void consistency_unit_test_float()
 {
     system("mkdir color_picker_res/consist/");
     system("mkdir color_picker_res/consist/float/");
     std::string path = "color_picker_res/consist/float/";
 
-    int wid = 512;
-    int hei = 512;
+    int wid = TestImageRes;
+    int hei = TestImageRes;
     Imagef test = Imagef(wid, hei);
 
     for (int i = 0; i < hei; ++i)
@@ -67,8 +69,8 @@ void consistency_unit_test_double()
     system("mkdir color_picker_res/consist/double/");
     std::string path = "color_picker_res/consist/double/";
 
-    int wid = 512;
-    int hei = 512;
+    int wid = TestImageRes;
+    int hei = TestImageRes;
     Imaged test = Imaged(wid, hei);
 
     for (int i = 0; i < hei; ++i)
@@ -110,29 +112,32 @@ void hue_box_visualization(float hue)
 {
     std::string path = "color_picker_res/";
 
-    float min_lum = 0.f;
-    float max_lum = 1.f;
+    float min_lum = 0.0f;
+    float max_lum = 1.0f;
     float min_sat = 0.f;
     float max_sat = 1.f;
 
-    int image_samples = 1;
-    int image_res = 512;
+    int image_samples = 128;
+    int image_res = TestImageRes;
 
     pcg32 rng = pcg32(0x1234, 0x567a);
 
-    Imagef image = Imagef(512, 512);
+    Imagef image = Imagef(image_res, image_res);
 
-    for (int i = 0; i < image.height(); ++i)
-    {
-        for (int j = 0; j < image.width(); ++j)
+    for (int k = 0; k < image_samples; ++k) {
+        for (int i = 0; i < image.height(); ++i)
         {
-            Pixf pix = Pixf();
-            pix.r = hue;
-            pix.g = float(j) / float(image.width()) + rng.nextFloat() / float(image.width());
-            pix.b = float(i) / float(image.height()) + rng.nextFloat() / float(image.height());
-            imedit::hsl_to_rgb_2(pix);
+            for (int j = 0; j < image.width(); ++j)
+            {
+                Pixf pix = Pixf();
+                pix.r = hue;
+                pix.g = (float(i) + rng.nextFloat()) / float(image.height()) * (max_sat - min_sat) + min_sat;
+                pix.b = (float(j) + rng.nextFloat()) / float(image.width()) * (max_lum - min_lum) + min_lum;
 
-            image(j, i) += pix / float(image_samples);
+                imedit::hsl_to_rgb(pix);
+
+                image(j, i) += pix / float(image_samples);
+            }
         }
     }
 
@@ -144,10 +149,43 @@ void lum_box_visualization(float lum)
 {
     float min_hue = 0.f;
     float max_hue = 1.f;
-    float min_sat = 0.f;
-    float max_sat = 1.f;
+    float min_sat = 0.0f;
+    float max_sat = 1.0f;
 
-    // TODO
+    std::string path = "color_picker_res/";
+
+    int image_samples = 128;
+    int image_res = TestImageRes;
+
+    pcg32 rng = pcg32(0x1234, 0x567a);
+
+    Imagef image = Imagef(image_res, image_res);
+
+    for (int k = 0; k < image_samples; ++k) {
+        for (int i = 0; i < image.height(); ++i)
+        {
+            for (int j = 0; j < image.width(); ++j)
+            {
+                Pixf pix = Pixf();
+                pix.b = lum;
+                pix.g = 1.0 - (float(i) + rng.nextFloat()) / float(image.height()) * (max_sat - min_sat) + min_sat;
+                pix.r = (float(j) + rng.nextFloat()) / float(image.width()) * (max_hue - min_hue) + min_hue;
+
+                if (j == 0) {
+                    std::cout << pix << " -> ";
+                }
+                imedit::hsl_to_rgb(pix);
+                if (j == 0) {
+                    std::cout << pix << std::endl;
+                }
+
+                image(j, i) += pix / float(image_samples);
+            }
+        }
+    }
+
+    imedit::write_image(path + "lum_box.exr", image);
+    imedit::write_image(path + "lum_box.png", image);
 }
 
 void sat_box_visualization(float sat)
@@ -157,37 +195,218 @@ void sat_box_visualization(float sat)
     float min_hue = 0.f;
     float max_hue = 1.f;
 
-    // TODO
+    std::string path = "color_picker_res/";
+
+    int image_samples = 32;
+    int image_res = TestImageRes;
+
+    pcg32 rng = pcg32(0x1234, 0x567a);
+
+    Imagef image = Imagef(image_res, image_res);
+
+    for (int k = 0; k < image_samples; ++k) {
+        for (int i = 0; i < image.height(); ++i)
+        {
+            for (int j = 0; j < image.width(); ++j)
+            {
+                Pixf pix = Pixf();
+                pix.b = (float(i) + rng.nextFloat()) / float(image.height()) * (max_lum - min_lum) + min_lum;
+                pix.g = sat;
+                pix.r = (float(j) + rng.nextFloat()) / float(image.width()) * (max_hue - min_hue) + min_hue;
+
+                if (j == 0) {
+                    std::cout << pix << " -> ";
+                }
+                imedit::hsl_to_rgb(pix);
+                if (j == 0) {
+                    std::cout << pix << std::endl;
+                }
+
+                image(j, i) += pix / float(image_samples);
+            }
+        }
+    }
+
+    imedit::write_image(path + "sat_box.exr", image);
+    imedit::write_image(path + "sat_box.png", image);
 }
 
 void hue_circle_visualization(float hue)
 {
+    // r param -     lum
+    // theta param - sat
     float min_lum = 0.f;
     float max_lum = 1.f;
-    float min_sat = 0.f;
+    float min_sat = 0.4f;
     float max_sat = 1.f;
 
-    // TODO
+    std::string path = "color_picker_res/";
+
+    int image_samples = 128;
+    int image_res = TestImageRes;
+
+    pcg32 rng = pcg32(0x1234, 0x567a);
+
+    Imagef image = Imagef(image_res, image_res);
+
+    for (int k = 0; k < image_samples; ++k) {
+        for (int i = 0; i < image.height(); ++i)
+        {
+            for (int j = 0; j < image.width(); ++j)
+            {
+                float r = 0.0;
+                float theta = 0.0;
+
+                float xx = (float(j) + rng.nextFloat() - float(image.width()) / 2.f);
+                float yy = (float(i) + rng.nextFloat() - float(image.height()) / 2.f);
+
+                // TODO: do these operations faster
+                xx /= float(image.width()) / 2.f;
+                yy /= float(image.height()) / 2.f;
+                r = std::sqrt(xx*xx + yy*yy);
+                theta = std::acos(xx / r) * yy / std::abs(yy);
+                theta += M_PI;
+                theta /= (2.f * M_PI);
+                
+
+                Pixf pix = Pixf();
+                if (r <= 1.0) {
+                    pix.g = r;
+                    pix.g = pix.g * (max_sat - min_sat) + min_sat;
+                    pix.r = hue;
+                    pix.b = theta;
+                    pix.b = pix.b * (max_lum - min_lum) + min_lum;
+                    imedit::hsl_to_rgb(pix);
+                } else {
+                    pix = Pixf(0.0);
+                }
+
+                image(j, i) += pix / float(image_samples);
+            }
+        }
+    }
+
+    imedit::write_image(path + "hue_circ.exr", image);
+    imedit::write_image(path + "hue_circ.png", image);
 }
 
 void lum_circle_visualization(float lum)
 {
+    // r param -     sat
+    // theta param - hue
     float min_hue = 0.f;
     float max_hue = 1.f;
-    float min_sat = 0.f;
-    float max_sat = 1.f;
+    float min_sat = 0.4f;
+    float max_sat = 1.0;
 
-    // TODO
+    std::string path = "color_picker_res/";
+
+    int image_samples = 128;
+    int image_res = TestImageRes;
+
+    pcg32 rng = pcg32(0x1234, 0x567a);
+
+    Imagef image = Imagef(image_res, image_res);
+
+    for (int k = 0; k < image_samples; ++k) {
+        for (int i = 0; i < image.height(); ++i)
+        {
+            for (int j = 0; j < image.width(); ++j)
+            {
+                float r = 0.0;
+                float theta = 0.0;
+
+                float xx = (float(j) + rng.nextFloat() - float(image.width()) / 2.f);
+                float yy = (float(i) + rng.nextFloat() - float(image.height()) / 2.f);
+
+                // TODO: do these operations faster
+                xx /= float(image.width()) / 2.f;
+                yy /= float(image.height()) / 2.f;
+                r = std::sqrt(xx*xx + yy*yy);
+                theta = std::acos(xx / r) * yy / std::abs(yy);
+                theta += M_PI;
+                theta /= (2.f * M_PI);
+                
+
+                Pixf pix = Pixf();
+                if (r <= 1.0) {
+                    pix.g = r;
+                    pix.g = pix.g * (max_sat - min_sat) + min_sat;
+                    pix.b = lum;
+                    pix.r = theta;
+                    pix.r = pix.r * (max_hue - min_hue) + min_hue;
+                    imedit::hsl_to_rgb(pix);
+                } else {
+                    pix = Pixf(0.0);
+                }
+
+                image(j, i) += pix / float(image_samples);
+            }
+        }
+    }
+
+    imedit::write_image(path + "lum_circ.exr", image);
+    imedit::write_image(path + "lum_circ.png", image);
 }
 
 void sat_circle_visualization(float sat)
 {
+    // r param -     lum
+    // theta param - hue
+
     float min_lum = 0.f;
-    float max_lum = 1.f;
+    float max_lum = 0.6f;
     float min_hue = 0.f;
     float max_hue = 1.f;
 
-    // TODO
+    std::string path = "color_picker_res/";
+
+    int image_samples = 128;
+    int image_res = TestImageRes;
+
+    pcg32 rng = pcg32(0x1234, 0x567a);
+
+    Imagef image = Imagef(image_res, image_res);
+
+    for (int k = 0; k < image_samples; ++k) {
+        for (int i = 0; i < image.height(); ++i)
+        {
+            for (int j = 0; j < image.width(); ++j)
+            {
+                float r = 0.0;
+                float theta = 0.0;
+
+                float xx = (float(j) + rng.nextFloat() - float(image.width()) / 2.f);
+                float yy = (float(i) + rng.nextFloat() - float(image.height()) / 2.f);
+
+                // TODO: do these operations faster
+                xx /= float(image.width()) / 2.f;
+                yy /= float(image.height()) / 2.f;
+                r = std::sqrt(xx*xx + yy*yy);
+                theta = std::acos(xx / r) * yy / std::abs(yy);
+                theta += M_PI;
+                theta /= (2.f * M_PI);
+                
+
+                Pixf pix = Pixf();
+                if (r <= 1.0) {
+                    pix.b = 1.0 - r;
+                    pix.b = pix.b * (max_lum - min_lum) + min_lum;
+                    pix.g = sat;
+                    pix.r = theta;
+                    pix.r = pix.r * (max_hue - min_hue) + min_hue;
+                    imedit::hsl_to_rgb(pix);
+                } else {
+                    pix = Pixf(0.0);
+                }
+
+                image(j, i) += pix / float(image_samples);
+            }
+        }
+    }
+
+    imedit::write_image(path + "sat_circ.exr", image);
+    imedit::write_image(path + "sat_circ.png", image);
 }
 
 int main(int argc, char *argv[])
@@ -196,37 +415,13 @@ int main(int argc, char *argv[])
     consistency_unit_test_float();
     consistency_unit_test_double();
 
-    // TODO: box
-    // TODO: make hue visualization
-    hue_box_visualization(0.0f);
-    // TODO: make lum visualization
-    lum_box_visualization(0.7f);
-    // TODO: make sat visualization
-    sat_box_visualization(0.7f);
+    hue_box_visualization(0.2f);
+    lum_box_visualization(0.525f);
+    sat_box_visualization(1.0f);
 
-    // TODO: circle
-    // TODO: make hue visualization
-    hue_circle_visualization(0.0f);
-    // TODO: make lum visualization
-    lum_circle_visualization(0.7f);
-    // TODO: make sat visualization
-    sat_circle_visualization(0.7f);
-
-    // int start_frame = 0;
-    // int end_frame = 4920;
-
-    // std::string prefix = "/Users/corneria/Documents/Projects/FeignRenderer/build/hall_of_tiles_final/hall_of_tiles_final_";
-
-    // for (int i = start_frame; i < end_frame; ++i)
-    // {
-    //     char str[5];
-    //     snprintf(str, 5, "%04d", i);
-    //     std::string frame = std::string(str);
-    //     Imagef image;
-    //     bool success = imedit::image_read(frame, image);
-    //     if (!success)
-    //         std::cout << frame << std::endl;
-    // }
+    hue_circle_visualization(0.4f);
+    lum_circle_visualization(0.525f);
+    sat_circle_visualization(1.0f);
 
     return 0;
 }

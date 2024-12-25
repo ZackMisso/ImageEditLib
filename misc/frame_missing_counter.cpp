@@ -26,6 +26,6 @@ int main(int argc, char* argv[])
         bool success = imedit::read_image(prefix + frame + ".exr", image);
         if (!success) std::cout << frame << std::endl;
     }
-    
+
     return 0;
 }

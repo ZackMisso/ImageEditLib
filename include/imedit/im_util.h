@@ -767,110 +767,130 @@ namespace imedit
         return err;
     }
 
-    // this is wrong
+    // in the process of fixing
     template <typename T>
     static void hsl_to_rgb(Pixel<T> &pixel)
     {
-        // hue is expected to be in the [0.0-1.0] range
-        T hue = pixel.r * 360.0;
-        T sat = pixel.g;
-        T lum = pixel.b;
+        if (pixel.g == 0.0) {
+            pixel.r = pixel.b;
+            pixel.g = pixel.b;
+        } else {
+            T r = 0.0;
+            T g = 0.0;
+            T b = 0.0;
 
-        T c = (1.0 - std::abs(2.0 * lum - 1.0)) * sat;
-        T x = c * (1.0 - std::abs(std::fmod((hue / 60.0), 2.0) - 1.0));
-        T m = lum - c / 2.0;
+            T temp_1 = 0.0;
+            T temp_2 = 0.0;
 
-        T rp = 0.0;
-        T gp = 0.0;
-        T bp = 0.0;
+            temp_1 = (pixel.b < 0.5) ?
+                (pixel.b * (1.0 + pixel.g)) :
+                (pixel.b + pixel.g - pixel.b * pixel.g);
+            
+            temp_2 = 2.0 * pixel.b - temp_1;
 
-        if (hue >= 0.0 && hue < 60.0)
-        {
-            rp = c;
-            gp = x;
-        }
-        else if (hue >= 60.0 && hue < 120.0)
-        {
-            rp = x;
-            gp = c;
-        }
-        else if (hue >= 120.0 && hue < 180.0)
-        {
-            gp = c;
-            bp = x;
-        }
-        else if (hue >= 180.0 && hue < 240.0)
-        {
-            gp = x;
-            bp = c;
-        }
-        else if (hue >= 240.0 && hue < 300.0)
-        {
-            bp = c;
-            rp = x;
-        }
-        else if (hue >= 300.0 && hue < 360.0)
-        {
-            bp = x;
-            rp = c;
-        }
+            r = pixel.r + (T)0.333;
+            b = pixel.r - (T)0.333;
+            g = pixel.r;
 
-        pixel.r = rp + m;
-        pixel.g = gp + m;
-        pixel.b = bp + m;
+            // TODO: maybe add a wrapping method to pixel to do this
+            while (r > (T)1.0) { r -= (T)1.0; }
+            while (r < (T)0.0) { r += (T)1.0; }
+            while (g > (T)1.0) { g -= (T)1.0; }
+            while (g < (T)0.0) { g += (T)1.0; }
+            while (b > (T)1.0) { b -= (T)1.0; }
+            while (b < (T)0.0) { b += (T)1.0; }
+
+            if (6.0 * r < 1.0) {
+                pixel.r = temp_2 + (temp_1 - temp_2) * (T)6.0 * r;
+            } else {
+                if (2.0 * r < 1.0) {
+                    pixel.r = temp_1;
+                } else {
+                    if (3.0 * r < 2.0) {
+                        pixel.r = temp_2 + (temp_1 - temp_2) * ((T)0.666 - r) * (T)6.0;
+                    } else {
+                        pixel.r = temp_2;
+                    }
+                }
+            }
+
+            if (6.0 * g < 1.0) {
+                pixel.g = temp_2 + (temp_1 - temp_2) * (T)6.0 * g;
+            } else {
+                if (2.0 * g < 1.0) {
+                    pixel.g = temp_1;
+                } else {
+                    if (3.0 * g < 2.0) {
+                        pixel.g = temp_2 + (temp_1 - temp_2) * ((T)0.666 - g) * (T)6.0;
+                    } else {
+                        pixel.g = temp_2;
+                    }
+                }
+            }
+
+            if (6.0 * b < 1.0) {
+                pixel.b = temp_2 + (temp_1 - temp_2) * (T)6.0 * b;
+            } else {
+                if (2.0 * b < 1.0) {
+                    pixel.b = temp_1;
+                } else {
+                    if (3.0 * b < 2.0) {
+                        pixel.b = temp_2 + (temp_1 - temp_2) * ((T)0.666 - b) * (T)6.0;
+                    } else {
+                        pixel.b = temp_2;
+                    }
+                }
+            }
+        }
     }
 
     // in the process of fixing
     template <typename T>
-    static void hsl_to_rgb_2(Pixel<T> &pixel)
+    static void rgb_to_hsl(Pixel<T> &pixel)
     {
-        // hue is expected to be in the [0.0-1.0] range
-        T hue = pixel.r * 360.0;
-        T sat = pixel.g;
-        T lum = pixel.b;
+        T hue = (T)0.0;
+        T sat = (T)0.0;
+        T lum = (T)0.0;
 
-        T c = (1.0 - std::abs(2.0 * lum - 1.0)) * sat;
-        T x = c * (1.0 - std::abs(std::fmod((hue / 60.0), 2.0) - 1.0));
-        T m = lum - c / 2.0;
+        int max_channel = -1;
+        T min = pixel.min();
+        T max = pixel.max(max_channel);
 
-        T rp = 0.0;
-        T gp = 0.0;
-        T bp = 0.0;
+        lum = (min + max) / (T)(2.0);
 
-        if (hue >= 0.0 && hue < 60.0)
-        {
-            rp = c;
-            gp = x;
-        }
-        else if (hue >= 60.0 && hue < 120.0)
-        {
-            rp = x;
-            gp = c;
-        }
-        else if (hue >= 120.0 && hue < 180.0)
-        {
-            gp = c;
-            bp = x;
-        }
-        else if (hue >= 180.0 && hue < 240.0)
-        {
-            gp = x;
-            bp = c;
-        }
-        else if (hue >= 240.0 && hue < 300.0)
-        {
-            bp = c;
-            rp = x;
-        }
-        else if (hue >= 300.0 && hue < 360.0)
-        {
-            bp = x;
-            rp = c;
+        if (min == max) {
+            sat = 0.0;
+            hue = 0.0;
+        } else {
+            sat = (lum <= 0.5) ?
+                (max - min) / (max + min) :
+                (max - min) / (2.0 - max - min);
+
+            switch (max_channel) {
+                case 0: {
+                    hue = (pixel.g - pixel.b)/ (max - min);
+                    break;
+                }
+                case 1: {
+                    hue = (T)2.0 + (pixel.b - pixel.r) / (max - min);
+                    break;
+                }
+                case 2: {
+                    hue = (T)4.0 + (pixel.r - pixel.g) / (max - min);
+                    break;
+                }
+                default:
+                {
+                    // this should never happen in the current version which
+                    // only supports 3 color channels
+                    std::cout << "THIS SHOULD NOT HAPPEN" << std::endl;
+                }
+            }
         }
 
-        pixel.r = rp + m;
-        pixel.g = gp + m;
-        pixel.b = bp + m;
+        pixel.r = (hue < 1.0) ? hue + 1.0 : hue;
+        pixel.g = sat;
+        pixel.b = lum;
     }
 
     // TODO: this is very slow

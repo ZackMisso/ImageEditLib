@@ -1,6 +1,7 @@
 #pragma once
 
 #include <tgmath.h>
+#include <iostream>
 
 namespace imedit
 {
@@ -172,14 +173,56 @@ namespace imedit
                    b != other.b;
         }
 
+        friend std::ostream& operator<<(std::ostream& out, const Pixel<T> &pix)
+        {
+            out << "(" << pix.r << ", " << pix.g << ", " << pix.b << ")";
+            return out;
+        }
+
         T min() const
         {
             return std::min(r, std::min(g, b));
         }
 
+        T min(int& channel) const
+        {
+            channel = 0;
+            T val = r;
+
+            if (g < val) {
+                channel = 1;
+                val = g;
+            }
+
+            if (b < val) {
+                channel = 2;
+                val = b;
+            }
+            
+            return val;
+        }
+
         T max() const
         {
             return std::max(r, std::max(g, b));
+        }
+
+        T max(int& channel) const
+        {
+            channel = 0;
+            T val = r;
+
+            if (g > val) {
+                channel = 1;
+                val = g;
+            }
+
+            if (b > val) {
+                channel = 2;
+                val = b;
+            }
+            
+            return val;
         }
 
         T &access(int index)

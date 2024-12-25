@@ -40,9 +40,8 @@ namespace imedit
         return 1.055f * std::pow(value, (T)(1.f / 2.4f)) - 0.055f;
     }
 
-    // taken from PBRTv3
     template <typename T>
-    static unsigned char valToByte(T val)
+    static unsigned char sRGB_to_linearRGB(T val)
     {
         T min = (T)0.0;
         T max = (T)255.0;
@@ -50,9 +49,11 @@ namespace imedit
     }
 
     template <typename T>
-    static void byteToVal(const unsigned char in, T &val)
+    static void linearRGB_to_sRGB(const unsigned char in, T &val)
     {
-        T byt = (((T)in) - (T)0.5) / ((T)255.0);
+        T byt = ((T)in) / ((T)255.0);
+        if (byt < 0.04045)
+            byt /= 12.92; 
         byt = (byt + 0.055) / (1.055);
         val = pow(byt, (T)2.4);
     }
