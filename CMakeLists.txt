@@ -550,6 +550,23 @@ set(color_picker_srcs
     misc/color_picker.cpp
 )
 
+set(unittests_srcs
+    ext/stb/stb_image_write.h
+    ext/stb/stb_image.h
+
+    ext/pcg/pcg32.h
+
+    ext/tinyexr/tinyexr.h
+
+    include/imedit/image.h
+    include/imedit/procedural.h
+    include/imedit/comparator.h
+    include/imedit/filter.h
+
+    src/image.cpp
+    src/unittest.cpp
+)
+
 # add_executable(imedit ${imedit_srcs})
 # add_executable(texture_gen ${texture_gen_srcs})
 # add_executable(move_demo ${move_demo_srcs})
@@ -581,6 +598,7 @@ add_executable(caustic_unb_2 ${caustic_unb_2_srcs})
 add_executable(debiasing_figs ${debiasing_figs_srcs})
 add_executable(consistent ${consistent_srcs})
 add_executable(color_picker ${color_picker_srcs})
+add_executable(unittests ${unittests_srcs})
 
 # target_link_libraries(imedit ${PYTHON_LIBRARIES})
 # target_link_libraries(texture_gen ${PYTHON_LIBRARIES})

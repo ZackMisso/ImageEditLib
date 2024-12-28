@@ -171,13 +171,7 @@ void lum_box_visualization(float lum)
                 pix.g = 1.0 - (float(i) + rng.nextFloat()) / float(image.height()) * (max_sat - min_sat) + min_sat;
                 pix.r = (float(j) + rng.nextFloat()) / float(image.width()) * (max_hue - min_hue) + min_hue;
 
-                if (j == 0) {
-                    std::cout << pix << " -> ";
-                }
                 imedit::hsl_to_rgb(pix);
-                if (j == 0) {
-                    std::cout << pix << std::endl;
-                }
 
                 image(j, i) += pix / float(image_samples);
             }
@@ -214,13 +208,7 @@ void sat_box_visualization(float sat)
                 pix.g = sat;
                 pix.r = (float(j) + rng.nextFloat()) / float(image.width()) * (max_hue - min_hue) + min_hue;
 
-                if (j == 0) {
-                    std::cout << pix << " -> ";
-                }
                 imedit::hsl_to_rgb(pix);
-                if (j == 0) {
-                    std::cout << pix << std::endl;
-                }
 
                 image(j, i) += pix / float(image_samples);
             }
@@ -264,7 +252,11 @@ void hue_circle_visualization(float hue)
                 xx /= float(image.width()) / 2.f;
                 yy /= float(image.height()) / 2.f;
                 r = std::sqrt(xx*xx + yy*yy);
-                theta = std::acos(xx / r) * yy / std::abs(yy);
+                if (yy != 0.0) {
+                    theta = std::acos(xx / r) * yy / std::abs(yy);
+                } else {
+                    theta = std::acos(xx / r);
+                }
                 theta += M_PI;
                 theta /= (2.f * M_PI);
                 
@@ -323,7 +315,11 @@ void lum_circle_visualization(float lum)
                 xx /= float(image.width()) / 2.f;
                 yy /= float(image.height()) / 2.f;
                 r = std::sqrt(xx*xx + yy*yy);
-                theta = std::acos(xx / r) * yy / std::abs(yy);
+                if (yy != 0.0) {
+                    theta = std::acos(xx / r) * yy / std::abs(yy);
+                } else {
+                    theta = std::acos(xx / r);
+                }
                 theta += M_PI;
                 theta /= (2.f * M_PI);
                 
@@ -383,7 +379,14 @@ void sat_circle_visualization(float sat)
                 xx /= float(image.width()) / 2.f;
                 yy /= float(image.height()) / 2.f;
                 r = std::sqrt(xx*xx + yy*yy);
-                theta = std::acos(xx / r) * yy / std::abs(yy);
+                if (xx > r) {
+                    std::cout << "WHAT THE FUFK" << std::endl;
+                }
+                if (yy != 0.0) {
+                    theta = std::acos(xx / r) * yy / std::abs(yy);
+                } else {
+                    theta = std::acos(xx / r);
+                }
                 theta += M_PI;
                 theta /= (2.f * M_PI);
                 
@@ -415,12 +418,18 @@ int main(int argc, char *argv[])
     consistency_unit_test_float();
     consistency_unit_test_double();
 
+    std::cout << "creating hue box visualization" << std::endl;
     hue_box_visualization(0.2f);
+    std::cout << "creating lum box visualization" << std::endl;
     lum_box_visualization(0.525f);
+    std::cout << "creating sat box visualization" << std::endl;
     sat_box_visualization(1.0f);
 
+    std::cout << "creating hue circle visualization" << std::endl;
     hue_circle_visualization(0.4f);
+    std::cout << "creating lum circle visualization" << std::endl;
     lum_circle_visualization(0.525f);
+    std::cout << "creating sat circle visualization" << std::endl;
     sat_circle_visualization(1.0f);
 
     return 0;
