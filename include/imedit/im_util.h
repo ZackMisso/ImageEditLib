@@ -657,6 +657,81 @@ namespace imedit
     //     }
     // }
 
+    template <typename T, typename F>
+    static F compute_error(const T& one, const T& two) {
+        F err = (F)0.0;
+        
+        for (int i = 0; i < one.size(); ++i)
+        {
+            err += (two[i] - one[i]);
+        }
+
+        return err;
+    }
+
+    template <typename T, typename F>
+    static F compute_abs_error(const T& one, const T& two) {
+        F abs_err = (F)0.0;
+        
+        for (int i = 0; i < one.size(); ++i)
+        {
+            abs_err += std::abs(two[i] - one[i]);
+        }
+
+        return abs_err;
+    }
+
+    template <typename T, typename F>
+    static F compute_sqr_error(const T& one, const T& two) {
+        F sqr_err = (F)0.0;
+        
+        for (int i = 0; i < one.size(); ++i)
+        {
+            sqr_err += (two[i] - one[i]) * (two[i] - one[i]);
+        }
+
+        return sqr_err;
+    }
+
+    template <typename T, typename F>
+    static F compute_mean_abs_error(const T& one, const T& two) {
+        F abs_err = (F)0.0;
+        F mean_term = (F)1.0 / (F)(one.size());
+        
+        for (int i = 0; i < one.size(); ++i)
+        {
+            abs_err = abs_err + mean_term * (std::abs(two[i] - one[i]) - abs_err);
+        }
+
+        return abs_err;
+    }
+
+    template <typename T, typename F>
+    static F compute_mean_sqr_error(const T& one, const T& two) {
+        F sqr_err = (F)0.0;
+        F mean_term = (F)1.0 / (F)(one.size());
+        
+        for (int i = 0; i < one.size(); ++i)
+        {
+            sqr_err = sqr_err + mean_term * ((two[i] - one[i]) * (two[i] - one[i]) - sqr_err);
+        }
+
+        return sqr_err;
+    }
+
+    template <typename T, typename F>
+    static F compute_mean_rel_error(const T& one, const T& two) {
+        F rel_err = (F)0.0;
+        F mean_term = (F)1.0 / (F)(one.size());
+        
+        for (int i = 0; i < one.size(); ++i)
+        {
+            rel_err = rel_err + mean_term * (std::abs(two[i] - one[i]) / (two[i]) - rel_err);
+        }
+
+        return rel_err;
+    }
+
     template <typename T>
     static RGBImage<T> *low_avg_comparison(const std::vector<RGBImage<T> *> &images)
     {

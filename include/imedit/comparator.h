@@ -14,10 +14,12 @@ namespace imedit
         ERR_NONE = 0x0,
         ERROR = 0x1,
         ABS_ERROR = 0x01,
-        REL_ERROR = 0x001,
+        // REL_ERROR = 0x001,
         SQR_ERROR = 0x0001,
-        VARIANCE = 0x00001, // MSE and Variance are the same
-        MEAN_ABS_ERROR = 0x000001
+        // VARIANCE = 0x00001, // MSE and Variance are the same
+        MEAN_ABS_ERROR = 0x000001,
+        MEAN_SQR_ERROR = 0x0000001,
+        MEAN_REL_ERROR = 0x00000001,
     };
 
     enum OutputType {
@@ -46,6 +48,12 @@ namespace imedit
             initialize_maps();
         }
 
+        ~ImageCompareData() {
+            // this datastructure does not own the images
+            image_one = nullptr;
+            image_two = nullptr;
+        }
+
         void initialize_maps() {
             #if FAST_MODE
             #else
@@ -53,18 +61,74 @@ namespace imedit
                 errors = std::unordered_map<ErrorType, F>();
 
                 // initialize the individual images
-                // TODO
+                if (errors & ErrorType::ERROR) {
+                    errors[ErrorType::ERROR] = (F)0.0;
+                }
+
+                if (errors_to_report & ErrorType::ABS_ERROR) {
+                    errors[ErrorType::ABS_ERROR] = (F)0.0;
+                }
+
+                // if (data.errors_to_report & ErrorType::REL_ERROR) {
+                //     // TODO: maybe
+                // }
+
+                if (errors_to_report & ErrorType::SQR_ERROR) {
+                    errors[ErrorType::SQR_ERROR] = (F)0.0;
+                }
+
+                // if (data.errors_to_report & ErrorType::VARIANCE) {
+                //     // TODO: maybe (same as MSE)
+                // }
+
+                if (errors_to_report & ErrorType::MEAN_ABS_ERROR) {
+                    errors[ErrorType::MEAN_ABS_ERROR] = (F)0.0;
+                }
+
+                if (errors_to_report & ErrorType::MEAN_SQR_ERROR) {
+                    errors[ErrorType::MEAN_SQR_ERROR] = (F)0.0;
+                }
+
+                if (errors_to_report & ErrorType::MEAN_REL_ERROR) {
+                    errors[ErrorType::MEAN_REL_ERROR] = (F)0.0;
+                }
+
+                if (outputs_to_report & OutputType::DIFF) {
+                    outputs[OutputType::DIFF] = T(image_one->width(), image_one->height());
+                }
+
+                if (outputs_to_report & OutputType::ABS_DIFF) {
+                    outputs[OutputType::ABS_DIFF] = T(image_one->width(), image_one->height());
+                }
+
+                if (outputs_to_report & OutputType::REL_DIFF) {
+                    outputs[OutputType::REL_DIFF] = T(image_one->width(), image_one->height());
+                }
+
+                if (outputs_to_report & OutputType::SQR_DIFF) {
+                    outputs[OutputType::SQR_DIFF] = T(image_one->width(), image_one->height());
+                }
             #endif
         }
 
-        ~ImageCompareData() {
-            // this datastructure does not own the images
-            image_one = nullptr;
-            image_two = nullptr;
+        F& operator()(ErrorType err_type) {
+            return errors[err_type];
         }
 
+        T& operator()(OutputType out_type) {
+            return outputs[out_type];
+        }
+        
+        F operator[](ErrorType err_type) const {
+            return errors[err_type];
+        }
+
+        // to avoid inefficient code, leaving this commented for now
+        // T operator[](OutputType out_type) const {
+        //     return outputs[out_type];
+        // }
 #if FAST_MODE
-        F variance;
+        F mse;
 #else
         std::unordered_map<OutputType, T> outputs;
         std::unordered_map<ErrorType, F> errors;
@@ -83,46 +147,58 @@ namespace imedit
         // this function always computes: image_two - image_one
         // where image_two is assumed to be the ground truth
 #if FAST_MODE
-        // TODO
+        mse = compute_mean_sqr_error(*data.one, *data.two);
 #else
         if (data.errors & ErrorType::ERROR) {
-            // TODO
+            data[ErrorType::ERROR] = compute_error(*data.one, *data.two);
         }
 
         if (data.errors_to_report & ErrorType::ABS_ERROR) {
-            // TODO
+            data[ErrorType::ABS_ERROR] = compute_abs_error(*data.one, *data.two);
         }
 
-        if (data.errors_to_report & ErrorType::REL_ERROR) {
-            // TODO
-        }
+        // if (data.errors_to_report & ErrorType::REL_ERROR) {
+        //     // TODO: maybe
+        // }
 
         if (data.errors_to_report & ErrorType::SQR_ERROR) {
-            // TODO
+            data[ErrorType::SQR_ERROR] = compute_sqr_error(*data.one, *data.two);
         }
 
-        if (data.errors_to_report & ErrorType::VARIANCE) {
-            // TODO
-        }
+        // if (data.errors_to_report & ErrorType::VARIANCE) {
+        //     // TODO: maybe (same as MSE)
+        // }
 
         if (data.errors_to_report & ErrorType::MEAN_ABS_ERROR) {
-            // TODO
+            data[ErrorType::MEAN_ABS_ERROR] = compute_mean_abs_error(*data.one, *data.two);
+        }
+
+        if (data.errors_to_report & ErrorType::MEAN_SQR_ERROR) {
+            data[ErrorType::MEAN_SQR_ERROR] = compute_mean_sqr_error(*data.one, *data.two);
+        }
+
+        if (data.errors_to_report & ErrorType::MEAN_REL_ERROR) {
+            data[ErrorType::MEAN_REL_ERROR] = compute_mean_rel_error(*data.one, *data.two);
         }
 
         if (data.outputs_to_report & OutputType::DIFF) {
-            // TODO
+            data[OutputType::DIFF] = *data.two - *data.one;
         }
 
         if (data.outputs_to_report & OutputType::ABS_DIFF) {
-            // TODO
+            data[OutputType::ABS_DIFF] = *data.two - *data.one;
+            data[OutputType::ABS_DIFF].abs();
         }
 
         if (data.outputs_to_report & OutputType::REL_DIFF) {
-            // TODO
+            data[OutputType::REL_DIFF] = (*data.two - *data.one);
+            data[OutputType::REL_DIFF].abs();
+            data[OutputType::REL_DIFF] /= *data.one;
         }
 
         if (data.outputs_to_report & OutputType::SQR_DIFF) {
-            // TODO
+            data[OutputType::SQR_DIFF] = (*data.two - *data.one);
+            data[OutputType::SQR_DIFF].square();
         }
 #endif
     }
