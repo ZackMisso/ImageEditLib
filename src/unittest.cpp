@@ -19,6 +19,8 @@ bool test_comparator() {
     init_grad_image(image);
 
     imedit::write_image("unit_tests/grad_image.exr", image);
+
+    return true;
 }
 
 int main(int argc, char* argv[]) {
@@ -27,8 +29,9 @@ int main(int argc, char* argv[]) {
     system("rm -rf unit_tests/");
     system("mkdir unit_tests/");
 
-    test_comparator();
-    // TODO
+    if (!test_comparator()) {
+        std::cout << "test failed" << std::endl;
+    }
 
     return 0;
 }
