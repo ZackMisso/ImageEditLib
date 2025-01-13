@@ -842,7 +842,6 @@ namespace imedit
         return err;
     }
 
-    // in the process of fixing
     template <typename T>
     static void hsl_to_rgb(Pixel<T> &pixel)
     {
@@ -943,7 +942,9 @@ namespace imedit
 
             switch (max_channel) {
                 case 0: {
-                    hue = (pixel.g - pixel.b)/ (max - min);
+                    double seg = pixel.g - pixel.b;
+                    hue = (seg) / (max - min);
+                    if (seg < 0.0) hue += 6.0;
                     break;
                 }
                 case 1: {
@@ -963,9 +964,16 @@ namespace imedit
             }
         }
 
-        pixel.r = (hue < 1.0) ? hue + 1.0 : hue;
+        pixel.r = (hue * 60.0) / 360.0;
         pixel.g = sat;
         pixel.b = lum;
+
+        // while (pixel.r > (T)1.0) { pixel.r -= (T)1.0; }
+        // while (pixel.r < (T)0.0) { pixel.r += (T)1.0; }
+        // while (pixel.g > (T)1.0) { pixel.g -= (T)1.0; }
+        // while (pixel.g < (T)0.0) { pixel.g += (T)1.0; }
+        // while (pixel.b > (T)1.0) { pixel.b -= (T)1.0; }
+        // while (pixel.b < (T)0.0) { pixel.b += (T)1.0; }
     }
 
     // TODO: this is very slow
@@ -1148,6 +1156,25 @@ namespace imedit
             for (int j = 0; j < output.width(); ++j)
             {
                 output(j, i) = input(j / 2, i / 2);
+            }
+        }
+
+        return output;
+    }
+
+    template <typename T>
+    static RGBImage<T> half_sized_image(const RGBImage<T> &input)
+    {
+        RGBImage<T> output = RGBImage<T>(input.width() / 2, input.height() / 2);
+
+        for (int i = 0; i < output.height(); ++i)
+        {
+            for (int j = 0; j < output.width(); ++j)
+            {
+                output(j, i) = (input(2*j,2*i) + 
+                                input(2*j+1,2*i) + 
+                                input(2*j+1,2*i+1) + 
+                                input(2*j,2*i+1)) / 4.0;
             }
         }
 

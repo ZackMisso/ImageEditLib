@@ -101,6 +101,10 @@ namespace imedit
 
         void operator~();
 
+        // conversion operations
+        void convert_to_hsl();
+        void convert_to_rgb();
+
         // TODO: speed test these operations, this seems slow
         RGBImage<T> operator+(const RGBImage<T> &other) const;
         RGBImage<T> operator-(const RGBImage<T> &other) const;
@@ -685,6 +689,28 @@ namespace imedit
     {
         // TODO
         return Pixel<T>();
+    }
+
+    template <typename T>
+    void RGBImage<T>::convert_to_hsl()
+    {
+        // TODO: when more color spaces are supported, this will be
+        //       more complicated
+        int size = w * h;
+        for (int i = 0; i < size; ++i) {
+            rgb_to_hsl(pixels[i]);
+        }
+    }
+
+    template <typename T>
+    void RGBImage<T>::convert_to_rgb()
+    {
+        // TODO: when more color spaces are supported, this will be
+        //       more complicated
+        int size = w * h;
+        for (int i = 0; i < size; ++i) {
+            hsl_to_rgb(pixels[i]);
+        }
     }
 
     template <typename T>

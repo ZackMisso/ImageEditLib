@@ -550,6 +550,42 @@ set(color_picker_srcs
     misc/color_picker.cpp
 )
 
+set(palette_grid_srcs
+    ext/stb/stb_image_write.h
+    ext/stb/stb_image.h
+
+    ext/pcg/pcg32.h
+
+    ext/tinyexr/tinyexr.h
+
+    include/imedit/image.h
+    include/imedit/procedural.h
+    include/imedit/comparator.h
+    include/imedit/filter.h
+
+    src/image.cpp
+    
+    misc/palette_grid.cpp
+)
+
+set(color_shift_srcs
+    ext/stb/stb_image_write.h
+    ext/stb/stb_image.h
+
+    ext/pcg/pcg32.h
+
+    ext/tinyexr/tinyexr.h
+
+    include/imedit/image.h
+    include/imedit/procedural.h
+    include/imedit/comparator.h
+    include/imedit/filter.h
+
+    src/image.cpp
+    
+    misc/color_shifter.cpp
+)
+
 set(unittests_srcs
     ext/stb/stb_image_write.h
     ext/stb/stb_image.h
@@ -598,6 +634,8 @@ add_executable(caustic_unb_2 ${caustic_unb_2_srcs})
 add_executable(debiasing_figs ${debiasing_figs_srcs})
 add_executable(consistent ${consistent_srcs})
 add_executable(color_picker ${color_picker_srcs})
+add_executable(palette_grid ${palette_grid_srcs})
+add_executable(color_shift ${color_shift_srcs})
 add_executable(unittests ${unittests_srcs})
 
 # target_link_libraries(imedit ${PYTHON_LIBRARIES})
