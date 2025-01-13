@@ -97,18 +97,18 @@ void palette_shift(Imaged& image, Palette* palette, double dist, double threshol
 
     std::vector<int> index = std::vector<int>(image.width()*image.height());
 
-    for (int i = 0; i < image.height(); ++i) {
-        for (int j = 0; j < image.width(); ++j) {
-            index[i * image.width() + j] = palette->closest_palette_index(image(j,i));
-        }
-    }
+    // for (int i = 0; i < image.height(); ++i) {
+    //     for (int j = 0; j < image.width(); ++j) {
+    //         index[i * image.width() + j] = palette->closest_palette_index(image(j,i));
+    //     }
+    // }
 
     // for (int k = 0; k < palette->colors.size(); ++k) {
     for (int i = 0; i < image.height(); ++i) {
         for (int j = 0; j < image.width(); ++j) {
-            if (compare_dist(image(j,i,0), palette->colors[index[i*image.width()+j]].r) <= threshold) {
+            // if (compare_dist(image(j,i,0), palette->colors[index[i*image.width()+j]].r) <= threshold) {
                 image(j,i,0) += dist;
-            }
+            // }
         }
     }
     // }
@@ -133,11 +133,14 @@ int main(int argc, char *argv[])
     // TODO: parse inputs (probably in a future version of this tool)
     // TODO: make directory
 
-    for (int i = 0; i <= grid_iterations; ++i) {
+    // this is for a demo
+    for (int i = 512; i <= 516; ++i) {
         std::cout << "creating palette version: " << i << std::endl;
         Imaged copy = og_image;
         // imedit::write_image(path + "pre_iter_" + std::to_string(i)+".exr", copy);
-        double dist = double(i) / double(grid_iterations+1);
+        double dist = double(i-11) / double(grid_iterations+1);
+        while (dist >= 1.0) dist -= 1.0;
+        dist = std::max(dist, 0.0);
         std::cout << "using distance: " << dist << std::endl;
         palette_shift(copy, palette, dist, 0.01);
         Imaged half = half_sized_image(copy);
