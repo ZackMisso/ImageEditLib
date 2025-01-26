@@ -90,6 +90,10 @@ namespace imedit
         void exposure(T factor);
         void alterGamma(T oldGamma, T newGamma);
 
+        // hsl modifiers
+        void hue_shift(T factor);
+        void hue_shift(T factor, T center, T range);
+
         void resize(int cols, int rows);
         void setZero();
 
@@ -308,6 +312,49 @@ namespace imedit
             pixels[i].r = pow(pixels[i].r, power);
             pixels[i].g = pow(pixels[i].g, power);
             pixels[i].b = pow(pixels[i].b, power);
+        }
+    }
+
+    template <typename T>
+    void RGBImage<T>::hue_shift(T factor)
+    {
+        int siz = h * w;
+
+        for (int i = 0; i < siz; ++i) {
+            Pixel<T> pix = pixels[i];
+            rgb_to_hsl(pix);
+            pix.r += factor;
+            
+            if (pix.r > 1.0) { 
+                pix.r -= 1.0;
+            }
+
+            hsl_to_rgb(pix);
+
+            pixels[i] = pix;
+        }
+    }
+
+    template <typename T>
+    void RGBImage<T>::hue_shift(T factor, T center, T range)
+    {
+        int siz = h * w;
+
+        for (int i = 0; i < siz; ++i) {
+            Pixel<T> pix = pixels[i];
+            rgb_to_hsl(pix);
+
+            if (pix.r > center - range && pix.r < center + range) {
+                pix.r += factor;
+                
+                if (pix.r > 1.0) { 
+                    pix.r -= 1.0;
+                }
+
+                hsl_to_rgb(pix);
+
+                pixels[i] = pix;
+            }
         }
     }
 

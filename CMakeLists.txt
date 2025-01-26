@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.1)
 
 project(imedit)
 
+set(BUILD_PRIVATE_PROJECTS ON)
+
 if(APPLE)
     set(CMAKE_MACOSX_RPATH ON)
 endif()
@@ -637,6 +639,28 @@ add_executable(color_picker ${color_picker_srcs})
 add_executable(palette_grid ${palette_grid_srcs})
 add_executable(color_shift ${color_shift_srcs})
 add_executable(unittests ${unittests_srcs})
+
+# private projects which should not be publically pushed
+if (BUILD_PRIVATE_PROJECTS) 
+    set(sk_gen_srcs
+        ext/stb/stb_image_write.h
+        ext/stb/stb_image.h
+
+        ext/pcg/pcg32.h
+
+        ext/tinyexr/tinyexr.h
+
+        include/imedit/image.h
+        include/imedit/procedural.h
+        include/imedit/comparator.h
+        include/imedit/filter.h
+
+        src/image.cpp
+        private/scripts/sk_gen.cpp
+    )
+
+    add_executable(sk_gen ${sk_gen_srcs})
+endif()
 
 # target_link_libraries(imedit ${PYTHON_LIBRARIES})
 # target_link_libraries(texture_gen ${PYTHON_LIBRARIES})

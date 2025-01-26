@@ -120,8 +120,12 @@ int main(int argc, char *argv[])
 {
     std::cout << "starting palette_grid v:0.0.1" << std::endl;
     
-    std::string path = "../private/";
+    // std::string path = "../private/";
     int grid_iterations = 100;
+
+    std::string path = "../private/palette_grid_test/";
+    std::string mk = "mkdir " + path;
+    system(mk.c_str());
 
     Imaged og_image;
     parse_image_to_use(og_image);
@@ -134,7 +138,7 @@ int main(int argc, char *argv[])
     // TODO: make directory
 
     // this is for a demo
-    for (int i = 512; i <= 516; ++i) {
+    for (int i = 0; i <= 516; ++i) {
         std::cout << "creating palette version: " << i << std::endl;
         Imaged copy = og_image;
         // imedit::write_image(path + "pre_iter_" + std::to_string(i)+".exr", copy);

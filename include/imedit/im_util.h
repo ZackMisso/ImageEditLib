@@ -311,6 +311,48 @@ namespace imedit
     }
 
     template <typename T>
+    static void hue_image(const RGBImage<T> &one, RGBImage<T> &two)
+    {
+        for (int i = 0; i < one.height(); ++i)
+        {
+            for (int j = 0; j < one.width(); ++j)
+            {
+                Pixel<T> pix = one(j, i);
+                rgb_to_hsl(pix);
+                two(j, i) = Pixel<T>(pix.r, pix.r, pix.r);
+            }
+        }
+    }
+
+    template <typename T>
+    static void sat_image(const RGBImage<T> &one, RGBImage<T> &two)
+    {
+        for (int i = 0; i < one.height(); ++i)
+        {
+            for (int j = 0; j < one.width(); ++j)
+            {
+                Pixel<T> pix = one(j, i);
+                rgb_to_hsl(pix);
+                two(j, i) = Pixel<T>(pix.g, pix.g, pix.g);
+            }
+        }
+    }
+
+    template <typename T>
+    static void lum_image(const RGBImage<T> &one, RGBImage<T> &two)
+    {
+        for (int i = 0; i < one.height(); ++i)
+        {
+            for (int j = 0; j < one.width(); ++j)
+            {
+                Pixel<T> pix = one(j, i);
+                rgb_to_hsl(pix);
+                two(j, i) = Pixel<T>(pix.b, pix.b, pix.b);
+            }
+        }
+    }
+
+    template <typename T>
     static void false_color_proxies(const RGBImage<T> &other,
                                     std::vector<T> &proxies,
                                     T min,
