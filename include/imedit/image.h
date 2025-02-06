@@ -340,11 +340,17 @@ namespace imedit
     {
         int siz = h * w;
 
+
         for (int i = 0; i < siz; ++i) {
             Pixel<T> pix = pixels[i];
             rgb_to_hsl(pix);
 
-            if (pix.r > center - range && pix.r < center + range) {
+            // this triple check is inefficient but is done to account for the
+            // fact that (h=1.0) == (h=0.0).
+            if ((pix.r > center - range && pix.r < center + range) || 
+                (pix.r + 1.0 > center - range && pix.r + 1.0 < center + range) ||
+                (pix.r - 1.0 > center - range && pix.r - 1.0 < center + range))
+            {
                 pix.r += factor;
                 
                 if (pix.r > 1.0) { 
@@ -357,11 +363,6 @@ namespace imedit
             }
         }
     }
-
-    // bool RGBImage::writeChannel(const std::string& filename, int ch)
-    // {
-    //     return getChannel(ch).write(filename);
-    // }
 
     template <typename T>
     T RGBImage<T>::safeAccess(int j, int i, int k)
@@ -399,21 +400,6 @@ namespace imedit
             pixels[i] = Pixel<T>();
         }
     }
-
-    // Image RGBImage::getChannel(int ch)
-    // {
-    //     Image image = Image(w, h);
-    //
-    //     for (int i = 0; i < h; ++i)
-    //     {
-    //         for (int j = 0; j < w; ++j)
-    //         {
-    //             image(j, h) = operator()(j, h);
-    //         }
-    //     }
-    //
-    //     return image;
-    // }
 
     template <typename T>
     void RGBImage<T>::setPixels(T r, T g, T b)

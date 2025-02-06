@@ -18,12 +18,126 @@ struct UnitTest {
     double err_threshold;
 };
 
-struct RGBToHSLAndBackTest : public UnitTest {
+struct HSLToRGBTest : public UnitTest {
     virtual bool generate_ground_truth() {
+        // TODO
         return false;
     }
 
     virtual bool run_test() const {
+        // TODO
+        return false;
+    }
+
+    virtual std::string name() const { return "HSLToRGB"; }
+};
+
+struct RGBToHTest : public UnitTest {
+    virtual bool generate_ground_truth() {
+        // TODO
+        return false;
+    }
+
+    virtual bool run_test() const {
+        // TODO
+        return false;
+    }
+
+    virtual std::string name() const { return "RGBToH"; }
+};
+
+struct RGBToSTest : public UnitTest {
+    virtual bool generate_ground_truth() {
+        // TODO
+        return false;
+    }
+
+    virtual bool run_test() const {
+        // TODO
+        return false;
+    }
+
+    virtual std::string name() const { return "RGBToS"; }
+};
+
+struct RGBToLTest : public UnitTest {
+    virtual bool generate_ground_truth() {
+        // TODO
+        return false;
+    }
+
+    virtual bool run_test() const {
+        // TODO
+        return false;
+    }
+
+    virtual std::string name() const { return "RGBToL"; }
+};
+
+struct RGBToHSLTest : public UnitTest {
+    virtual bool generate_ground_truth() {
+        // TODO
+        return false;
+    }
+
+    virtual bool run_test() const {
+        // TODO
+        return false;
+    }
+
+    virtual std::string name() const { return "RGBToHSL"; }
+};
+
+struct HueShiftTest : public UnitTest {
+    virtual bool generate_ground_truth() {
+        // TODO
+        return false;
+    }
+
+    virtual bool run_test() const {
+        // TODO
+        return false;
+    }
+
+    virtual std::string name() const { return "HueShift"; }
+};
+
+struct SatShiftTest : public UnitTest {
+    virtual bool generate_ground_truth() {
+        // TODO
+        return false;
+    }
+
+    virtual bool run_test() const {
+        // TODO
+        return false;
+    }
+
+    virtual std::string name() const { return "SatShift"; }
+};
+
+struct LumShiftTest : public UnitTest {
+    virtual bool generate_ground_truth() {
+        // TODO
+        return false;
+    }
+
+    virtual bool run_test() const {
+        // TODO
+        return false;
+    }
+
+    virtual std::string name() const { return "LumShift"; }
+};
+
+struct RGBToHSLAndBackTest : public UnitTest {
+    virtual bool generate_ground_truth() {
+        // TODO
+        return false;
+    }
+
+    virtual bool run_test() const {
+        // TODO
         return false;
     }
 
